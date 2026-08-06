@@ -1,1 +1,1 @@
-# Cloudflare deployment package for Lexora.
+# Cloudflare deployment package for Liberum.

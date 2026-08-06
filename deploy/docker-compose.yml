@@ -1,20 +1,20 @@
-# Lexora — production-style stack (PostgreSQL + FastAPI).
+# Liberum — production-style stack (PostgreSQL + FastAPI).
 # Run from repository root:
 #   docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build
 #
 # Optional Cloudflare Tunnel in front of the app container:
 #   docker compose -f deploy/docker-compose.yml --env-file deploy/.env --profile tunnel up -d --build
 
-name: lexora
+name: liberum
 
 services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-lexora}
+      POSTGRES_USER: ${POSTGRES_USER:-liberum}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in deploy/.env}
-      POSTGRES_DB: ${POSTGRES_DB:-lexora}
+      POSTGRES_DB: ${POSTGRES_DB:-liberum}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -32,18 +32,18 @@ services:
       db:
         condition: service_healthy
     environment:
-      APP_NAME: ${APP_NAME:-Lexora}
+      APP_NAME: ${APP_NAME:-Liberum}
       APP_TAGLINE: ${APP_TAGLINE:-English Learning Platform}
       SESSION_SECRET_KEY: ${SESSION_SECRET_KEY:?Set SESSION_SECRET_KEY in deploy/.env}
       DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD:?Set DEFAULT_ADMIN_PASSWORD in deploy/.env}
-      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-lexora_session}
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-liberum_session}
       OWNER_USERNAME: ${OWNER_USERNAME:-owner}
-      OWNER_EMAIL: ${OWNER_EMAIL:-owner@lexora.local}
-      OWNER_FULL_NAME: ${OWNER_FULL_NAME:-Lexora Owner}
-      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-lexora}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-lexora}
+      OWNER_EMAIL: ${OWNER_EMAIL:-owner@liberum.local}
+      OWNER_FULL_NAME: ${OWNER_FULL_NAME:-Liberum Owner}
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-liberum}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-liberum}
     volumes:
-      - lexora_uploads:/app/uploads
-      - lexora_backups:/app/backups
+      - liberum_uploads:/app/uploads
+      - liberum_backups:/app/backups
     ports:
       - "${EXPOSE_PORT:-8000}:8000"
     expose:
@@ -69,5 +69,5 @@ services:
 
 volumes:
   postgres_data:
-  lexora_uploads:
-  lexora_backups:
+  liberum_uploads:
+  liberum_backups:

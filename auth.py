@@ -107,7 +107,7 @@ def ensure_owner_account():
         import master_database
         master_database.init_master_db()
             
-        tenant = PlatformTenant(slug="lexora_admin", db_filename="tenant_1.db")
+        tenant = PlatformTenant(slug="liberum_admin", db_filename="tenant_1.db")
         db.add(tenant)
         db.flush()
         

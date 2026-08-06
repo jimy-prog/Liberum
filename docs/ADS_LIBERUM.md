@@ -1,11 +1,11 @@
-# ADS: Lexora Platform
+# ADS: Liberum Platform
 
 ## 1. Purpose
 
-This document defines the architectural direction for transforming the current local teacher platform into `Lexora`:
+This document defines the architectural direction for transforming the current local teacher platform into `Liberum`:
 
-- `Lexora Core`: the main online school platform for teacher operations and student access
-- `Lexora Mock`: a child platform focused on IELTS-style mock tests
+- `Liberum Core`: the main online school platform for teacher operations and student access
+- `Liberum Mock`: a child platform focused on IELTS-style mock tests
 
 The goal is to move from a single-user local admin tool to a secure, always-available web platform with clear role separation, scalable content management, and phased delivery.
 
@@ -66,18 +66,18 @@ Later:
 
 Primary brand:
 
-- `Lexora`
+- `Liberum`
 
 Recommended product split:
 
-- `Lexora Core` for school/admin/student platform
-- `Lexora Mock` for IELTS mock exams
+- `Liberum Core` for school/admin/student platform
+- `Liberum Mock` for IELTS mock exams
 
 This split keeps one brand family while allowing separate product focus.
 
 ## 4. Product Vision
 
-### Lexora Core
+### Liberum Core
 
 The central web platform for:
 
@@ -91,7 +91,7 @@ The central web platform for:
 - performance tracking
 - payments and reporting
 
-### Lexora Mock
+### Liberum Mock
 
 A dedicated examination environment for:
 
@@ -324,7 +324,7 @@ Current schema is centered around:
 - signed URLs or protected downloads for sensitive files
 - environment-based secrets management
 
-## 10. Rebrand Scope: Teacher Admin -> Lexora
+## 10. Rebrand Scope: Teacher Admin -> Liberum
 
 Rebrand must cover:
 
@@ -340,9 +340,9 @@ Rebrand must cover:
 
 Recommended rename strategy:
 
-- product/UI brand: rename immediately to `Lexora`
+- product/UI brand: rename immediately to `Liberum`
 - technical package paths: rename carefully in early implementation phase
-- database filename: migrate from `teacher_admin.db` to `lexora.db` with safe fallback or migration copy
+- database filename: migrate from `teacher_admin.db` to `liberum.db` with safe fallback or migration copy
 
 ## 11. Delivery Strategy
 
@@ -372,7 +372,7 @@ Tasks:
 
 - audit current routes, templates, models, settings
 - create docs and target architecture
-- define naming rules for `Lexora`
+- define naming rules for `Liberum`
 - identify migration-sensitive files
 - create config layer for environment variables
 
@@ -380,25 +380,25 @@ Deliverable:
 
 - approved ADS
 
-### Phase 1: Lexora rebrand and production hardening
+### Phase 1: Liberum rebrand and production hardening
 
 Objective:
 
-- convert current project from local branded tool into deployable `Lexora` admin platform
+- convert current project from local branded tool into deployable `Liberum` admin platform
 
 Tasks:
 
-- rename visible branding to `Lexora`
+- rename visible branding to `Liberum`
 - centralize app metadata/config
 - replace hardcoded secrets
-- prepare `lexora.db` naming strategy
+- prepare `liberum.db` naming strategy
 - improve startup scripts
 - add production config support
 - clean static and upload structure
 
 Deliverable:
 
-- `Lexora` branded admin platform ready for deployment preparation
+- `Liberum` branded admin platform ready for deployment preparation
 
 ### Phase 2: Real authentication and role model
 
@@ -453,9 +453,9 @@ Tasks:
 
 Deliverable:
 
-- first version of student-facing `Lexora Core`
+- first version of student-facing `Liberum Core`
 
-### Phase 5: Lexora Mock MVP
+### Phase 5: Liberum Mock MVP
 
 Objective:
 
@@ -472,7 +472,7 @@ Tasks:
 
 Deliverable:
 
-- working `Lexora Mock` MVP
+- working `Liberum Mock` MVP
 
 ### Phase 6: Printed-to-digital ingestion workflow
 
@@ -510,9 +510,9 @@ Tasks:
 
 Deliverable:
 
-- broader `Lexora` ecosystem
+- broader `Liberum` ecosystem
 
-## 13. Lexora Mock: Specific Functional Design
+## 13. Liberum Mock: Specific Functional Design
 
 ### 13.1 Product rules
 
@@ -549,7 +549,7 @@ Later:
 The safest first implementation slice is:
 
 1. create project documentation and target plan
-2. rebrand the current platform to `Lexora`
+2. rebrand the current platform to `Liberum`
 3. introduce config and environment safety
 4. start auth/user model refactor
 
@@ -565,7 +565,7 @@ Why this slice:
 ### Sprint A
 
 - add app config module
-- rename UI branding to `Lexora`
+- rename UI branding to `Liberum`
 - rename startup messages/scripts
 - prepare database naming migration path
 - remove hardcoded secret key and default auth weakness
@@ -586,7 +586,7 @@ Why this slice:
 
 ### Sprint D
 
-- design and implement `Lexora Mock` data model
+- design and implement `Liberum Mock` data model
 - create admin exam builder and publication workflow
 
 ## 16. Decisions Proposed For Approval
@@ -597,15 +597,15 @@ These are the recommended baseline decisions unless changed:
 - keep Jinja temporarily for admin speed
 - use PostgreSQL for production
 - keep one repository with modular domains
-- make `Lexora` the umbrella brand
-- make `Lexora Mock` the exam-focused child product
+- make `Liberum` the umbrella brand
+- make `Liberum Mock` the exam-focused child product
 - build developer-only ingestion workflow before opening test publishing to others
 
 ## 17. Success Criteria
 
 The transformation is successful when:
 
-- `Lexora` is reachable online 24/7
+- `Liberum` is reachable online 24/7
 - you have a secure developer/admin account
 - students can log in to their own area
 - the platform supports real production hosting
@@ -620,6 +620,6 @@ Implementation should proceed in this exact order:
 2. Rebrand + config hardening
 3. Authentication redesign
 4. Production deployment foundation
-5. Lexora Mock MVP
+5. Liberum Mock MVP
 6. Printed-to-digital ingestion
 7. Student portal expansion

@@ -1,4 +1,4 @@
-# Запуск Lexora
+# Запуск Liberum
 
 ## Задача «открыть откуда угодно»
 
@@ -44,4 +44,4 @@ docker compose -f deploy/docker-compose.yml --env-file deploy/.env down
 
 ---
 
-Технические детали: [DEPLOY.md](../DEPLOY.md), архитектура: [docs/ADS_LEXORA.md](../docs/ADS_LEXORA.md).
+Технические детали: [DEPLOY.md](../DEPLOY.md), архитектура: [docs/ADS_LIBERUM.md](../docs/ADS_LIBERUM.md).

@@ -209,7 +209,7 @@ class PlacementSession(Base):
 def get_db(request: Request = None):
     token = None
     if request:
-        token = request.cookies.get("lexora_session")
+        token = request.cookies.get("liberum_session")
         if not token and "Authorization" in request.headers:
             auth_header = request.headers["Authorization"]
             if auth_header.startswith("Bearer "):

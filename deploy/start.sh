@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Lexora — запуск одной командой (нужен установленный Docker).
+# Liberum — запуск одной командой (нужен установленный Docker).
 # Из папки проекта:  bash deploy/start.sh
 set -euo pipefail
 
@@ -10,7 +10,7 @@ ENV_FILE="$ROOT/deploy/.env"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Lexora — проверка Docker"
+echo "  Liberum — проверка Docker"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if ! command -v docker >/dev/null 2>&1; then
@@ -68,9 +68,9 @@ lines = [
     f"SESSION_SECRET_KEY={session_key}",
     f"DEFAULT_ADMIN_PASSWORD={admin_pw}",
     f"POSTGRES_PASSWORD={db_pw}",
-    "APP_NAME=Lexora",
-    "POSTGRES_USER=lexora",
-    "POSTGRES_DB=lexora",
+    "APP_NAME=Liberum",
+    "POSTGRES_USER=liberum",
+    "POSTGRES_DB=liberum",
     "EXPOSE_PORT=8000",
 ]
 print("\n─── Доступ из интернета (телефон вне Wi‑Fi, другая страна) ───")

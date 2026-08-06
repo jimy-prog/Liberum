@@ -1,4 +1,4 @@
-# Lexora: простой гайд для GitHub + Deploy + Cloudflare
+# Liberum: простой гайд для GitHub + Deploy + Cloudflare
 
 ## 1. Что мы строим
 
@@ -58,7 +58,7 @@
 
 Сделай новый репозиторий, например:
 
-- `lexora`
+- `liberum`
 
 Потом загрузи туда проект.
 
@@ -83,13 +83,13 @@
 2. Создай папку, например:
 
 ```bash
-mkdir -p ~/lexora-app
+mkdir -p ~/liberum-app
 ```
 
 Можно использовать helper script:
 
 ```bash
-bash cloudflare_deploy/server_setup.sh ~/lexora-app
+bash cloudflare_deploy/server_setup.sh ~/liberum-app
 ```
 
 ## 7. Шаг 3. Настрой SSH-доступ для GitHub Actions
@@ -101,7 +101,7 @@ bash cloudflare_deploy/server_setup.sh ~/lexora-app
 1. На своём компьютере создай SSH key, если его нет:
 
 ```bash
-ssh-keygen -t ed25519 -C "lexora-deploy"
+ssh-keygen -t ed25519 -C "liberum-deploy"
 ```
 
 2. У тебя появятся 2 файла:
@@ -180,7 +180,7 @@ ssh-keygen -t ed25519 -C "lexora-deploy"
 - `SERVER_HOST` = IP сервера
 - `SERVER_PORT` = `22`
 - `SERVER_USER` = например `ubuntu`
-- `SERVER_PATH` = `/home/ubuntu/lexora-app`
+- `SERVER_PATH` = `/home/ubuntu/liberum-app`
 - `SESSION_SECRET_KEY` = длинный случайный секрет
 - `DEFAULT_ADMIN_PASSWORD` = временный пароль админа
 - `CLOUDFLARE_TUNNEL_TOKEN` = токен из Cloudflare
@@ -192,8 +192,8 @@ ssh-keygen -t ed25519 -C "lexora-deploy"
 
 Например:
 
-- staging: `/home/ubuntu/lexora-staging`
-- production: `/home/ubuntu/lexora-production`
+- staging: `/home/ubuntu/liberum-staging`
+- production: `/home/ubuntu/liberum-production`
 
 ## 10. Шаг 6. Как будет работать staging
 
@@ -292,7 +292,7 @@ git push -u origin codex/test-deploy
 Если Cloudflare пока не настроен, можно руками проверить через IP сервера:
 
 ```bash
-cd /home/ubuntu/lexora-staging/cloudflare_deploy
+cd /home/ubuntu/liberum-staging/cloudflare_deploy
 docker compose -f docker-compose.direct.yml up -d --build
 ```
 
@@ -307,7 +307,7 @@ http://IP_СЕРВЕРА:8000
 Зайди по SSH на сервер и выполни:
 
 ```bash
-cd /home/ubuntu/lexora-staging/cloudflare_deploy
+cd /home/ubuntu/liberum-staging/cloudflare_deploy
 docker compose ps
 docker compose logs -f
 ```
@@ -315,7 +315,7 @@ docker compose logs -f
 Если нужно смотреть отдельно:
 
 ```bash
-docker compose logs -f lexora-app
+docker compose logs -f liberum-app
 docker compose logs -f cloudflared
 ```
 
@@ -368,4 +368,4 @@ git push origin main
 5. Ты тестируешь staging
 6. По твоей команде я готовлю production update
 
-Это уже будет нормальный профессиональный цикл разработки для `Lexora`.
+Это уже будет нормальный профессиональный цикл разработки для `Liberum`.

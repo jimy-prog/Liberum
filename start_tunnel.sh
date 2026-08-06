@@ -1,6 +1,6 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════
-#  Lexora — Start with Cloudflare Tunnel
+#  Liberum — Start with Cloudflare Tunnel
 #  Run this instead of "python3 main.py" when you want
 #  phone/outside access.
 # ═══════════════════════════════════════════════════════
@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
 echo ""
-echo "🚀 Starting Lexora..."
+echo "🚀 Starting Liberum..."
 echo ""
 
 # Check if cloudflared is installed

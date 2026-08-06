@@ -32,4 +32,4 @@ else:
 
 print("\n✓ Done. Now run:")
 print("  python3 migrate_online.py")
-print("  launchctl stop com.lexora.app && launchctl start com.lexora.app")
+print("  launchctl stop com.liberum.app && launchctl start com.liberum.app")

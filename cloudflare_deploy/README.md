@@ -1,6 +1,6 @@
-# Lexora Cloudflare Deployment
+# Liberum Cloudflare Deployment
 
-This directory contains a separate deployment setup for running the current Lexora FastAPI app behind Cloudflare Tunnel without changing the main project files.
+This directory contains a separate deployment setup for running the current Liberum FastAPI app behind Cloudflare Tunnel without changing the main project files.
 
 ## Why this approach
 
@@ -20,14 +20,14 @@ The app runs in Docker as the origin service, and `cloudflared` publishes it sec
 - separate Cloudflare entrypoint: `cloudflare_main.py`
 - separate Docker image definition
 - separate Docker Compose file
-- automatic first-run copy of the current `teacher_admin.db` into `/app/data/lexora.db`
-- automatic first-run copy of the old password hash into `lexora_auth_password.txt`
+- automatic first-run copy of the current `teacher_admin.db` into `/app/data/liberum.db`
+- automatic first-run copy of the old password hash into `liberum_auth_password.txt`
 
 ## Structure
 
 - `cloudflare_main.py`: Cloudflare-specific app entrypoint
 - `entrypoint.sh`: prepares persistent data on first container start
-- `Dockerfile`: builds the Lexora image
+- `Dockerfile`: builds the Liberum image
 - `docker-compose.yml`: runs the app plus Cloudflare Tunnel
 - `.env.example`: environment variables required for deployment
 
@@ -43,7 +43,7 @@ The app runs in Docker as the origin service, and `cloudflared` publishes it sec
 1. Open Zero Trust dashboard
 2. Create a Tunnel
 3. Create a public hostname like `app.yourdomain.com`
-4. Point that hostname to `http://lexora-app:8000`
+4. Point that hostname to `http://liberum-app:8000`
 5. Copy the tunnel token
 
 ## Deployment steps
@@ -65,8 +65,8 @@ docker compose up -d --build
 
 On first start:
 
-- if `/app/data/lexora.db` does not exist, the container copies `teacher_admin.db` into it
-- if `lexora_auth_password.txt` does not exist, the container copies `auth_password.txt` into it
+- if `/app/data/liberum.db` does not exist, the container copies `teacher_admin.db` into it
+- if `liberum_auth_password.txt` does not exist, the container copies `auth_password.txt` into it
 
 This preserves your current data and password state.
 
@@ -74,9 +74,9 @@ This preserves your current data and password state.
 
 Docker volumes are used for:
 
-- database: `lexora_data`
-- uploads: `lexora_uploads`
-- backups: `lexora_backups`
+- database: `liberum_data`
+- uploads: `liberum_uploads`
+- backups: `liberum_backups`
 
 ## Local checks on the server
 
@@ -84,7 +84,7 @@ After deploy:
 
 ```bash
 docker compose ps
-docker compose logs -f lexora-app
+docker compose logs -f liberum-app
 docker compose logs -f cloudflared
 ```
 

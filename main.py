@@ -404,7 +404,7 @@ async def register_verify(request: Request, email: str = Form(""), phone: str = 
                     "request": request, "step": "1", "channel": "phone", "error": "Account already exists."
                 })
                 
-            email = f"{phone.replace('+', '')}@phone.lexora"
+            email = f"{phone.replace('+', '')}@phone.liberum"
         else:
             email = email.strip().lower()
             # Verify OTP
@@ -442,11 +442,11 @@ async def register_verify(request: Request, email: str = Form(""), phone: str = 
             db.add(tenant)
             db.flush()
         else:
-            # Students belong to the main shared lexora_admin tenant
-            tenant = db.query(PlatformTenant).filter(PlatformTenant.slug == "lexora_admin").first()
+            # Students belong to the main shared liberum_admin tenant
+            tenant = db.query(PlatformTenant).filter(PlatformTenant.slug == "liberum_admin").first()
             if not tenant:
                 tenant = PlatformTenant(
-                    slug="lexora_admin",
+                    slug="liberum_admin",
                     db_filename="tenant_1.db"
                 )
                 db.add(tenant)
@@ -539,9 +539,9 @@ async def mock_google_oauth_callback(
                 master_db.add(tenant)
                 master_db.flush()
             else:
-                tenant = master_db.query(PlatformTenant).filter(PlatformTenant.slug == "lexora_admin").first()
+                tenant = master_db.query(PlatformTenant).filter(PlatformTenant.slug == "liberum_admin").first()
                 if not tenant:
-                    tenant = PlatformTenant(slug="lexora_admin", db_filename="tenant_1.db")
+                    tenant = PlatformTenant(slug="liberum_admin", db_filename="tenant_1.db")
                     master_db.add(tenant)
                     master_db.flush()
                 
@@ -622,7 +622,7 @@ def repair_teacher_tenant_mappings():
     from master_database import SessionMaster, User, PlatformTenant
     db = SessionMaster()
     try:
-        admin_tenant = db.query(PlatformTenant).filter_by(slug="lexora_admin").first()
+        admin_tenant = db.query(PlatformTenant).filter_by(slug="liberum_admin").first()
         if not admin_tenant:
             return
         

@@ -15,13 +15,13 @@ Author: Jamshid Mahkamov
 
 # 1.1 Product Vision
 
-Lexora is a modern educational ecosystem designed to help independent teachers, educational centers, and students manage every stage of the learning process from a single platform.
+Liberum is a modern educational ecosystem designed to help independent teachers, educational centers, and students manage every stage of the learning process from a single platform.
 
 The platform is not intended to become another Learning Management System (LMS). Instead, it aims to combine education management, classroom administration, AI-powered assessment, and realistic computer-based examinations into one unified ecosystem.
 
 The primary objective is to eliminate the need for teachers and students to use multiple disconnected services.
 
-Every educational activity—from attendance tracking to IELTS mock examinations—should be performed inside Lexora.
+Every educational activity—from attendance tracking to IELTS mock examinations—should be performed inside Liberum.
 
 The platform must feel professional, reliable, scalable, and intuitive.
 
@@ -31,7 +31,7 @@ Every feature added to the platform must contribute to this vision.
 
 # 1.2 Core Mission
 
-The mission of Lexora is to provide teachers with complete control over their educational business while giving students a seamless digital learning experience that closely resembles modern international educational platforms.
+The mission of Liberum is to provide teachers with complete control over their educational business while giving students a seamless digital learning experience that closely resembles modern international educational platforms.
 
 The platform should reduce administrative work, improve learning quality, automate repetitive processes using Artificial Intelligence, and increase trust between teachers and students.
 
@@ -39,7 +39,7 @@ The platform should reduce administrative work, improve learning quality, automa
 
 # 1.3 Long-Term Vision
 
-Lexora is designed as a long-term educational ecosystem.
+Liberum is designed as a long-term educational ecosystem.
 
 The initial release focuses on:
 
@@ -67,7 +67,7 @@ Every architectural decision made today must allow these future modules to be in
 
 # 1.4 Product Philosophy
 
-Lexora follows six fundamental principles.
+Liberum follows six fundamental principles.
 
 ---
 
@@ -131,7 +131,7 @@ No architectural decision should prevent future scaling.
 
 Consistency.
 
-Every module inside Lexora must follow the same interaction patterns.
+Every module inside Liberum must follow the same interaction patterns.
 
 Buttons.
 
@@ -219,7 +219,7 @@ Complexity should exist inside the system architecture—not inside the user exp
 
 # 1.8 AI-First Development Principles
 
-Every future AI implementation inside Lexora must follow these rules.
+Every future AI implementation inside Liberum must follow these rules.
 
 AI generates.
 
@@ -261,7 +261,7 @@ without exception.
 
 # 2.1 Architecture Philosophy
 
-Lexora shall be designed as a modular platform.
+Liberum shall be designed as a modular platform.
 
 Every major feature must exist as an independent module that communicates with the rest of the platform through clearly defined services.
 
@@ -303,7 +303,7 @@ Future modules shall be integrated without changing the existing architecture.
 
 # 2.3 System Hierarchy
 
-Lexora Platform
+Liberum Platform
 
 │
 
@@ -872,7 +872,7 @@ without changing existing modules.
 
 # 3.1 Purpose
 
-The User Role & Permission System defines every type of user that can access the Lexora platform.
+The User Role & Permission System defines every type of user that can access the Liberum platform.
 
 Its purpose is to ensure that every user only has access to the information and functionality required for their responsibilities.
 
@@ -1444,7 +1444,7 @@ New roles should be created through configuration whenever possible.
 
 # 4.1 Purpose
 
-The Owner Workspace is the primary control center of the entire Lexora platform.
+The Owner Workspace is the primary control center of the entire Liberum platform.
 
 Unlike a traditional dashboard that only displays statistics, the Owner Workspace functions as an operational command center.
 
@@ -1794,7 +1794,7 @@ The Owner should never manually search for unfinished work.
 
 # 4.11 Smart Recommendations
 
-Lexora should actively assist the Owner.
+Liberum should actively assist the Owner.
 
 Examples:
 
@@ -2016,7 +2016,7 @@ Every important action should be reachable within three clicks.
 
 No critical information should ever remain hidden.
 
-The Owner Workspace must become the operational brain of the Lexora ecosystem.
+The Owner Workspace must become the operational brain of the Liberum ecosystem.
 
 ---
 
@@ -2029,13 +2029,13 @@ The Owner Workspace must become the operational brain of the Lexora ecosystem.
 
 # 5.1 Purpose
 
-The Mock Examination System is the core feature of the Lexora platform.
+The Mock Examination System is the core feature of the Liberum platform.
 
 Its purpose is to allow the platform owner to convert printed IELTS examination materials into professional computer-delivered mock examinations that closely replicate the real IELTS testing experience.
 
 The system must support the complete lifecycle of every examination—from PDF upload to student performance analytics.
 
-Unlike traditional LMS systems that simply upload PDF files, Lexora transforms examination materials into structured, interactive digital assessments.
+Unlike traditional LMS systems that simply upload PDF files, Liberum transforms examination materials into structured, interactive digital assessments.
 
 ---
 
@@ -2661,7 +2661,7 @@ The Owner should be able to transform a printed IELTS examination into a profess
 
 Students should experience an examination environment that feels authentic, reliable, and indistinguishable from a professional computer-delivered language examination.
 
-The Mock Examination System shall become the defining feature of the Lexora platform.
+The Mock Examination System shall become the defining feature of the Liberum platform.
 
 ---
 
@@ -2674,7 +2674,7 @@ The Mock Examination System shall become the defining feature of the Lexora plat
 
 # 6.1 Purpose
 
-The Mock Builder is the content creation environment of the Lexora platform.
+The Mock Builder is the content creation environment of the Liberum platform.
 
 Its purpose is to transform traditional paper-based examinations into fully interactive digital examinations that replicate professional computer-delivered testing.
 
@@ -3232,7 +3232,7 @@ Deleted content remains recoverable until permanently removed.
 
 The Owner should be capable of creating a complete professional IELTS examination from a printed source with minimal manual effort.
 
-The Builder should become the single production environment for every future examination published on Lexora.
+The Builder should become the single production environment for every future examination published on Liberum.
 
 Every interaction should reduce workload while maintaining complete human control over educational quality.
 
@@ -3249,7 +3249,7 @@ Every interaction should reduce workload while maintaining complete human contro
 
 The PDF Processing Pipeline is responsible for transforming printed examination materials into structured digital examination objects.
 
-Unlike conventional OCR systems that only extract text, Lexora performs semantic document understanding.
+Unlike conventional OCR systems that only extract text, Liberum performs semantic document understanding.
 
 The system must recognize:
 
@@ -6133,7 +6133,7 @@ The Teacher Workspace should minimize administrative effort and maximize time sp
 
 # Goal
 
-The Student Workspace is the personal learning hub of every student using the Lexora platform.
+The Student Workspace is the personal learning hub of every student using the Liberum platform.
 
 It should provide a clean, motivating, and organized environment where students can study, complete assignments, take mock examinations, communicate with teachers, and monitor their progress.
 
@@ -6983,9 +6983,9 @@ Architecture should require minimal redesign while scaling.
 
 ## Product Vision
 
-Lexora is not just an LMS.
+Liberum is not just an LMS.
 
-Lexora is an AI-powered educational operating system.
+Liberum is an AI-powered educational operating system.
 
 The long-term vision includes:
 
@@ -7051,7 +7051,7 @@ No feature should require rewriting the platform architecture.
 
 ## Final Success Criteria
 
-Lexora should become the central ecosystem connecting teachers, students, AI, assessments, educational management, and future online learning into a single unified platform.
+Liberum should become the central ecosystem connecting teachers, students, AI, assessments, educational management, and future online learning into a single unified platform.
 
 Every new feature should integrate into the existing architecture without disrupting current functionality.
 

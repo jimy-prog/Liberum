@@ -9,7 +9,7 @@ router = APIRouter(prefix="/backup")
 @router.get("/download")
 def download_backup():
     src = str(DATABASE_FILE) if DATABASE_FILE is not None else DEFAULT_DB_FILENAME
-    prefix = "lexora_backup"
+    prefix = "liberum_backup"
     if os.path.basename(src) == LEGACY_DB_FILENAME:
         prefix = "teacher_admin_backup"
     name = f"{prefix}_{date.today()}.db"

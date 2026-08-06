@@ -1,4 +1,4 @@
-# Deploy Lexora
+# Deploy Liberum
 
 ## Просто запустить у себя на компьютере
 

@@ -47,4 +47,4 @@ conn.commit()
 conn.close()
 
 print("\n✓ All fixes done. Restart the app:")
-print("  launchctl stop com.lexora.app && launchctl start com.lexora.app")
+print("  launchctl stop com.liberum.app && launchctl start com.liberum.app")
