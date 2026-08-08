@@ -90,17 +90,17 @@ h1, h2, h3, h4, h5, h6, .font-display{font-family:var(--font-d)}
 /* ── Sidebar ── */
 .sidebar{
   position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border-right: 1px solid rgba(0,0,0,0.05);
-  box-shadow: 1px 0 10px rgba(0,0,0,0.02);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-right: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 1px 0 20px rgba(0,0,0,0.03);
   display:flex;flex-direction:column;z-index:200;overflow-y:auto;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 body.dark .sidebar {
-  background: rgba(19, 22, 29, 0.7);
-  border-right: 1px solid rgba(255,255,255,0.05);
+  background: rgba(19, 22, 29, 0.4);
+  border-right: 1px solid rgba(255,255,255,0.08);
 }
 .sidebar-brand{padding:20px 18px 14px;border-bottom:1px solid var(--border)}
 .brand-name{font-family:var(--font-d);font-size:1.2rem;font-weight:600;color:var(--text);line-height:1.1;letter-spacing:-0.02em}
@@ -120,14 +120,14 @@ body.dark .sidebar {
 .main{margin-left:var(--sidebar-w);min-height:100vh;display:flex;flex-direction:column}
 .topbar{
   height:var(--topbar-h);
-  background:rgba(255,255,255,.85);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.5);
+  backdrop-filter:blur(30px);
+  -webkit-backdrop-filter:blur(30px);
+  border-bottom:1px solid rgba(255,255,255,0.3);
   display:flex;align-items:center;justify-content:space-between;padding:0 26px;
-  position:sticky;top:0;z-index:100;box-shadow:var(--shadow-bar)
+  position:sticky;top:0;z-index:100;box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
 }
-body.dark .topbar{background:rgba(19,22,29,.9)}
+body.dark .topbar{background:rgba(19,22,29,.5); border-bottom:1px solid rgba(255,255,255,0.05);}
 .topbar-left{display:flex;align-items:center;gap:12px}
 .topbar-title{font-family:var(--font-d);font-size:1.15rem;font-weight:600;color:var(--text);letter-spacing:-0.02em}
 .topbar-right{display:flex;align-items:center;gap:8px}
@@ -137,10 +137,10 @@ body.dark .topbar{background:rgba(19,22,29,.9)}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   padding:10px 20px;border-radius:10px;font-family:var(--font-b);font-size:.85rem;font-weight:600;
-  cursor:pointer;border:1px solid transparent;text-decoration:none;transition:transform .2s, opacity .2s, background .2s, box-shadow .2s;white-space:nowrap
+  cursor:pointer;border:1px solid transparent;text-decoration:none;transition:transform .3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .3s cubic-bezier(0.16, 1, 0.3, 1), background .2s;white-space:nowrap
 }
-.btn:hover{ transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.btn:active{ transform: scale(0.97); box-shadow: none; }
+.btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+.btn:active{ transform: scale(0.96); box-shadow: none; }
 .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
 .btn-primary:hover{background:var(--accent2);border-color:var(--accent2)}
 .btn-ghost{background:transparent;color:var(--text2);border-color:var(--border)}
@@ -157,10 +157,17 @@ body.dark .btn-orange{border-color:rgba(251,146,60,.3)}
 
 /* ── Cards ── */
 .card{
-  background:var(--bg2);border:none;border-radius:16px;
-  overflow:hidden;box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+  background:rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border:1px solid rgba(255, 255, 255, 0.8);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.04);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-body.dark .card { box-shadow: 0 4px 24px rgba(0,0,0,0.15) }
+.card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.08); transform: translateY(-2px); }
+body.dark .card { background:rgba(25, 28, 36, 0.6); border:1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
 .card-header{
   display:flex;align-items:center;justify-content:space-between;padding:16px 20px;
   border-bottom:1px solid var(--border);background:transparent
