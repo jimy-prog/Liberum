@@ -62,3 +62,9 @@ STATIC_DIR = BASE_DIR / "static"
 UPLOADS_DIR = DATA_DIR / "uploads"
 
 LOG_FILENAME = os.getenv("APP_LOG_FILENAME", "liberum.log")
+
+# Email Authentication Configuration
+SMTP_HOST = os.getenv("SMTP_HOST", "mail.liberum.uz")
+SMTP_PORT = os.getenv("SMTP_PORT", "465")
+SMTP_USER = os.getenv("SMTP_USER", "main@liberum.uz")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")

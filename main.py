@@ -328,9 +328,15 @@ async def register_send_otp(request: Request, email: str = Form(...), account_ty
             })
             
         code = str(random.randint(100000, 999999))
-        print(f"=====================================")
-        print(f"MOCK EMAIL SENT TO {email}: OTP IS {code}")
-        print(f"=====================================")
+        
+        # Send real OTP email
+        from services.email_service import send_otp_email
+        success = send_otp_email(to_email=email.strip().lower(), otp_code=code)
+        
+        if not success:
+            return templates.TemplateResponse("register.html", {
+                "request": request, "step": "1", "channel": "email", "error": "Failed to send email. Please check your address."
+            })
         
         otp_entry = EmailOTP(
             email=email.strip().lower(),
