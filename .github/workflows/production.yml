@@ -44,6 +44,10 @@ jobs:
           SESSION_SECRET_KEY=${{ secrets.SESSION_SECRET_KEY }}
           DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}
           CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
+          SMTP_HOST="mail.liberum.uz"
+          SMTP_PORT="465"
+          SMTP_USER="main@liberum.uz"
+          SMTP_PASSWORD="8AX-qsz-UCV-NQd"
           EOT
           cd "${{ secrets.SERVER_PATH }}/cloudflare_deploy"
           docker compose up -d --build
