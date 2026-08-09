@@ -252,17 +252,3 @@ async def complete_onboarding_api(req: CompleteOnboardingRequest, response: Resp
             
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Onboarding failed: {str(e)}")
-            
-            return {
-                "success": True,
-                "user": {
-                    "id": user.id,
-                    "email": user.email,
-                    "role": user.role
-                }
-            }
-        finally:
-            master_db.close()
-            
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Invalid Firebase Token: {str(e)}")
