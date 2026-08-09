@@ -102,6 +102,7 @@ body{
   font-size:.82rem;
   margin-bottom:18px;
   text-align:center;
+  display: none;
 }
 .hint{
   text-align:center;
@@ -120,28 +121,26 @@ body{
   font-weight:500;
 }
 .back:hover{text-decoration:underline}
-::-webkit-scrollbar{width:8px}
-::-webkit-scrollbar-thumb{background:rgba(123,97,255,.35);border-radius:4px}
 </style>
 </head>
 <body>
 <div class="card">
-  <div class="logo">Lex<span>ora</span></div>
+  <div class="logo">Liber<span>um</span></div>
   <div class="sub">English Learning Platform</div>
-  {% if error %}
-  <div class="error">{{ error }}</div>
-  {% endif %}
-  <form method="post" action="/login">
-    <input type="hidden" name="next" value="{{ next }}">
+  
+  <div class="error" id="error-msg"></div>
+
+  <!-- Email Password Form -->
+  <form id="login-form">
     <div class="form-group">
-      <label class="form-label">Username, Email, or Phone</label>
-      <input class="form-control" type="text" name="identifier" autofocus autocomplete="username" placeholder="owner, email, or +99890...">
+      <label class="form-label">Email</label>
+      <input class="form-control" type="email" id="email" required placeholder="Enter your email">
     </div>
     <div class="form-group">
       <label class="form-label">Password</label>
-      <input class="form-control" type="password" name="password" autocomplete="current-password" placeholder="Enter your password">
+      <input class="form-control" type="password" id="password" required placeholder="Enter your password">
     </div>
-    <button class="btn" type="submit">Sign In</button>
+    <button class="btn" type="submit" id="submit-btn">Sign In</button>
   </form>
   
   <div class="hint" style="margin-top: 20px;">
@@ -154,14 +153,86 @@ body{
     <span style="flex: 1; border-bottom: 1px solid #e5e7eb; margin-left: 16px;"></span>
   </div>
   
-  <a href="/auth/google" style="text-decoration:none;">
-    <button class="btn" type="button" style="background:#fff; color:#334155; border:1px solid #e5e7eb; margin-top:0; display:flex; align-items:center; justify-content:center; gap:8px;">
-      <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:20px;height:20px;">
-      Sign in with Google
-    </button>
-  </a>
+  <button id="google-btn" class="btn" type="button" style="background:#fff; color:#334155; border:1px solid #e5e7eb; margin-top:0; display:flex; align-items:center; justify-content:center; gap:8px;">
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:20px;height:20px;">
+    Sign in with Google
+  </button>
 
   <a class="back" href="/static/landing/index.html">← Back to website</a>
 </div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyClVBI_xBtZDtoSDv6gWFEv9eCa4WPUDjw",
+    authDomain: "liberum-f13ff.firebaseapp.com",
+    projectId: "liberum-f13ff",
+    storageBucket: "liberum-f13ff.firebasestorage.app",
+    messagingSenderId: "730903093236",
+    appId: "1:730903093236:web:5f181959e3661c9d16e3a1",
+    measurementId: "G-KECV7R1DTE"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  const errorEl = document.getElementById("error-msg");
+  
+  function showError(msg) {
+    errorEl.innerText = msg;
+    errorEl.style.display = "block";
+  }
+
+  async function sendTokenToServer(idToken) {
+    const res = await fetch("/api/auth/firebase", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken: idToken, role: "student" }) // Defaults to student if new
+    });
+    const data = await res.json();
+    if (res.ok) {
+        // Redirect to dashboard (or mock tests depending on role)
+        window.location.href = data.user.role === 'student' ? '/mock' : '/dashboard';
+    } else {
+        showError(data.detail || "Authentication failed on server.");
+    }
+  }
+
+  // Handle Email/Password Login
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorEl.style.display = "none";
+    const btn = document.getElementById("submit-btn");
+    btn.innerText = "Signing in...";
+    
+    try {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      
+      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+      const token = await userCredential.user.getIdToken();
+      await sendTokenToServer(token);
+    } catch (err) {
+      showError(err.message);
+      btn.innerText = "Sign In";
+    }
+  });
+
+  // Handle Google Login
+  document.getElementById("google-btn").addEventListener("click", async () => {
+    errorEl.style.display = "none";
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const token = await result.user.getIdToken();
+      await sendTokenToServer(token);
+    } catch (err) {
+      showError(err.message);
+    }
+  });
+</script>
 </body>
 </html>

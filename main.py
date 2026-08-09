@@ -30,6 +30,7 @@ from routers import online as online_router
 from routers import archive as archive_router
 from routers import api_auth
 from routers import mock_platform
+
 from routers import owner
 from routers import classes
 from routers import reviews
@@ -656,10 +657,23 @@ def repair_teacher_tenant_mappings():
 @app.on_event("startup")
 def startup():
     from master_database import init_master_db
+    from config import FIREBASE_CREDENTIALS_PATH
+    import firebase_admin
+    from firebase_admin import credentials
+    
     init_master_db()
     ensure_owner_account()
     repair_teacher_tenant_mappings()
     run_backup()
+    
+    # Initialize Firebase Admin
+    if not firebase_admin._apps:
+        try:
+            cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
+            firebase_admin.initialize_app(cred)
+            print("Firebase Admin initialized successfully.")
+        except Exception as e:
+            print(f"Warning: Could not initialize Firebase Admin SDK: {e}")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

@@ -12,6 +12,9 @@ OWNER_FULL_NAME = os.getenv("OWNER_FULL_NAME", "Liberum Owner")
 DEFAULT_DB_FILENAME = "liberum.db"
 LEGACY_DB_FILENAME = "teacher_admin.db"
 
+# Firebase
+FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, "firebase-service-account.json")
+
 _db_env = os.getenv("DATABASE_URL", "").strip()
 if os.getenv("RENDER"):
     DATA_DIR = Path("/data")
