@@ -11,7 +11,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  font-family:'Inter',sans-serif;
+  font-family:"Inter",sans-serif;
   min-height:100vh;
   display:flex;
   align-items:center;
@@ -20,20 +20,21 @@ body{
   background-color:#f6f7fb;
   background-image:radial-gradient(circle, rgba(123, 97, 255, 0.07) 1px, transparent 1px);
   background-size:24px 24px;
+  -webkit-font-smoothing:antialiased;
 }
 .card{
   background:#fff;
   border:1px solid #e5e7eb;
-  border-radius:24px;
+  border-radius:20px;
   padding:44px 40px;
   width:100%;
-  max-width:500px;
-  box-shadow:0 25px 50px -12px rgba(17, 24, 39, 0.1);
+  max-width:400px;
+  box-shadow:0 18px 50px rgba(17, 24, 39, 0.1);
 }
 .logo{
-  font-family:'Space Grotesk',sans-serif;
+  font-family:"Space Grotesk",sans-serif;
   font-size:2rem;
-  font-weight:700;
+  font-weight:600;
   color:#101114;
   text-align:center;
   margin-bottom:6px;
@@ -42,298 +43,209 @@ body{
 .logo span{color:#7b61ff}
 .sub{
   text-align:center;
-  font-size:.75rem;
-  color:#64748b;
-  letter-spacing:.1em;
+  font-size:.72rem;
+  color:#6b6f7a;
+  letter-spacing:.12em;
   text-transform:uppercase;
   margin-bottom:28px;
-  font-weight:600;
-}
-.tabs {
-  display: flex;
-  background: #f1f5f9;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 24px;
-}
-.tab-btn {
-  flex: 1;
-  border: none;
-  background: transparent;
-  padding: 12px;
-  border-radius: 8px;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.tab-btn.active {
-  background: #fff;
-  color: #7b61ff;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  font-weight:500;
 }
 .form-label{
   display:block;
-  font-size:.7rem;
+  font-size:.68rem;
   font-weight:600;
-  letter-spacing:.05em;
+  letter-spacing:.06em;
   text-transform:uppercase;
-  color:#64748b;
+  color:#6b6f7a;
   margin-bottom:8px;
 }
-.form-control, select{
+.form-control{
   width:100%;
-  background:#f8fafc;
-  border:1px solid #e2e8f0;
-  border-radius:12px;
-  padding:14px 16px;
-  font-family:'Inter',sans-serif;
-  font-size:1rem;
-  color:#0f172a;
-  outline:none;
-  transition:all .2s;
-}
-.form-control:focus, select:focus{
-  border-color:#7b61ff;
   background:#fff;
-  box-shadow:0 0 0 4px rgba(123, 97, 255, 0.15);
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:13px 16px;
+  font-family:"Inter",sans-serif;
+  font-size:1rem;
+  color:#101114;
+  outline:none;
+  transition:border-color .15s, box-shadow .15s;
+  -webkit-appearance:none;
 }
-.form-group{margin-bottom:24px}
+.form-control:focus{
+  border-color:#7b61ff;
+  box-shadow:0 0 0 3px rgba(123, 97, 255, 0.2);
+}
+.form-group{margin-bottom:20px}
 .btn{
   width:100%;
   background:#7b61ff;
   color:#fff;
   border:none;
-  border-radius:12px;
-  padding:16px;
-  font-family:'Inter',sans-serif;
-  font-size:1.05rem;
+  border-radius:999px;
+  padding:14px;
+  font-family:"Inter",sans-serif;
+  font-size:.95rem;
   font-weight:600;
   cursor:pointer;
-  transition:all .2s;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
+  transition:background .15s, transform .1s;
+  margin-top:8px;
 }
-.btn:hover{background:#6b51ef; transform:translateY(-1px);}
+.btn:hover{background:#6b51ef}
 .btn:active{transform:scale(.99)}
-.btn-google {
-  background:#fff;
-  color:#334155;
-  border:1px solid #e2e8f0;
-  margin-top:16px;
-}
-.btn-google:hover {
-  background:#f8fafc;
-}
 .error{
-  background:#fef2f2;
-  border:1px solid #fecaca;
-  color:#ef4444;
-  padding:14px;
+  background:rgba(220, 38, 38, 0.08);
+  border:1px solid rgba(220, 38, 38, 0.25);
+  color:#b91c1c;
+  padding:12px 14px;
   border-radius:12px;
-  font-size:.85rem;
-  margin-bottom:24px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.step { display: none; }
-.step.active { display: block; }
-.register-form-pane { display: none; }
-.register-form-pane.active { display: block; }
-.divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  margin: 24px 0;
-}
-.divider::before, .divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid #e2e8f0;
-}
-.divider:not(:empty)::before { margin-right: 16px; }
-.divider:not(:empty)::after { margin-left: 16px; }
-.login-link {
+  font-size:.82rem;
+  margin-bottom:18px;
   text-align:center;
-  margin-top:24px;
-  font-size:.85rem;
-  color:#64748b;
+  display: none;
 }
-.login-link a {
+.hint{
+  text-align:center;
+  font-size:.75rem;
+  color:#6b6f7a;
+  margin-top:20px;
+  line-height:1.5;
+}
+.back{
+  display:block;
+  text-align:center;
+  margin-top:18px;
+  font-size:.8rem;
   color:#7b61ff;
   text-decoration:none;
-  font-weight:600;
+  font-weight:500;
 }
+.back:hover{text-decoration:underline}
 </style>
 </head>
 <body>
 <div class="card">
-  <div class="logo">Lex<span>ora</span></div>
-  <div class="sub">Create Your Account</div>
+  <div class="logo">Liber<span>um</span></div>
+  <div class="sub">Register Account</div>
   
-  {% if error %}
-  <div class="error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
-  {% endif %}
+  <div class="error" id="error-msg"></div>
 
-  <!-- Step 1: Request Email or Phone -->
-  <div id="step-1" class="step {% if not step or step == '1' %}active{% endif %}">
-    
-    <!-- Account type selection shown immediately in Step 1 -->
+  <!-- Email Password Form -->
+  <form id="register-form">
     <div class="form-group">
-      <label class="form-label">I want to register as a...</label>
-      <select id="main-role-select" onchange="syncRoleSelect(this.value)" required>
-        <option value="student">Student learning English</option>
-        <option value="teacher">Teacher / Tutor</option>
+      <label class="form-label">Full Name</label>
+      <input class="form-control" type="text" id="name" required placeholder="John Doe">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-control" type="email" id="email" required placeholder="Enter your email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-control" type="password" id="password" required placeholder="Create a password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">I am a...</label>
+      <select class="form-control" id="role" required>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
       </select>
     </div>
-
-    <div class="tabs">
-      <button class="tab-btn {% if not channel or channel == 'email' %}active{% endif %}" onclick="switchTab('email')">
-        <i class="fa-solid fa-envelope"></i> Email Address
-      </button>
-      <button class="tab-btn {% if channel == 'phone' %}active{% endif %}" onclick="switchTab('phone')">
-        <i class="fa-solid fa-phone"></i> Phone Number
-      </button>
-    </div>
-
-    <!-- Email Form -->
-    <div id="pane-email" class="register-form-pane {% if not channel or channel == 'email' %}active{% endif %}">
-      <form method="post" action="/register/send-otp">
-        <input type="hidden" name="account_type" id="email-role-hidden" value="student">
-        <div class="form-group">
-          <label class="form-label">Email Address</label>
-          <input class="form-control" type="email" name="email" required placeholder="you@example.com" value="{{ email | default('') }}">
-        </div>
-        <button class="btn" type="submit">Continue with Email</button>
-      </form>
-    </div>
-
-    <!-- Phone Form -->
-    <div id="pane-phone" class="register-form-pane {% if channel == 'phone' %}active{% endif %}">
-      <form method="post" action="/register/send-otp-phone">
-        <input type="hidden" name="account_type" id="phone-role-hidden" value="student">
-        <div class="form-group">
-          <label class="form-label">Phone Number</label>
-          <input class="form-control" type="tel" name="phone" required placeholder="+998 90 123 45 67" value="{{ phone | default('') }}">
-        </div>
-        <button class="btn" type="submit">Continue with Phone</button>
-      </form>
-    </div>
-    
-    <div class="divider">Or</div>
-    
-    <a href="/auth/google" style="text-decoration:none;">
-      <button class="btn btn-google" type="button">
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:20px;height:20px;">
-        Sign up with Google
-      </button>
-    </a>
-  </div>
-
-  <!-- Step 2: Questionnaire & OTP -->
-  <div id="step-2" class="step {% if step == '2' %}active{% endif %}">
-    <form method="post" action="/register/verify">
-      <input type="hidden" name="channel" value="{{ channel | default('email') }}">
-      
-      {% if channel == 'phone' %}
-        <input type="hidden" name="phone" value="{{ phone | default('') }}">
-        <div style="background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; padding:12px; border-radius:12px; font-size:0.85rem; margin-bottom:24px; display:flex; gap:8px; align-items:center;">
-          <i class="fa-solid fa-mobile-screen-button"></i>
-          We've sent an SMS code to <strong>{{ phone }}</strong>
-        </div>
-      {% else %}
-        <input type="hidden" name="email" value="{{ email | default('') }}">
-        <div style="background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; padding:12px; border-radius:12px; font-size:0.85rem; margin-bottom:24px; display:flex; gap:8px; align-items:center;">
-          <i class="fa-solid fa-envelope-circle-check"></i>
-          We've sent an Email code to <strong>{{ email }}</strong>
-        </div>
-      {% endif %}
-
-      <div class="form-group">
-        <label class="form-label">Verification Code</label>
-        <input class="form-control" type="text" name="otp" required placeholder="123456" style="letter-spacing:4px; font-size:1.2rem; text-align:center;">
-      </div>
-      
-      <div class="divider">Profile Details</div>
-
-      <div class="form-group">
-        <label class="form-label">Full Name</label>
-        <input class="form-control" type="text" name="full_name" required placeholder="John Doe">
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input class="form-control" type="password" name="password" required placeholder="Create a strong password">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">I am a...</label>
-        <select name="account_type" id="step2-role-select" required>
-          <option value="student" {% if account_type == 'student' %}selected{% endif %}>Student learning English</option>
-          <option value="teacher" {% if account_type == 'teacher' %}selected{% endif %}>Teacher/Tutor</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">What is your primary study focus?</label>
-        <select name="study_focus" required>
-          <option value="ielts_academic">IELTS Academic</option>
-          <option value="ielts_general">IELTS General Training</option>
-          <option value="general_english">General English</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <button class="btn" type="submit">Complete Registration</button>
-    </form>
+    <button class="btn" type="submit" id="submit-btn">Create Account</button>
+  </form>
+  
+  <div class="hint" style="margin-top: 20px;">
+    Already have an account? <a href="/login" style="color:#7b61ff; text-decoration:none; font-weight:600;">Sign in</a>
   </div>
   
-  <div class="login-link">
-    Already have an account? <a href="/login">Sign in</a>
+  <div style="display: flex; align-items: center; text-align: center; color: #94a3b8; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin: 20px 0;">
+    <span style="flex: 1; border-bottom: 1px solid #e5e7eb; margin-right: 16px;"></span>
+    Or
+    <span style="flex: 1; border-bottom: 1px solid #e5e7eb; margin-left: 16px;"></span>
   </div>
+  
+  <button id="google-btn" class="btn" type="button" style="background:#fff; color:#334155; border:1px solid #e5e7eb; margin-top:0; display:flex; align-items:center; justify-content:center; gap:8px;">
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:20px;height:20px;">
+    Sign up with Google
+  </button>
+
+  <a class="back" href="/static/landing/index.html">← Back to website</a>
 </div>
 
-<script>
-function switchTab(channel) {
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.register-form-pane').forEach(pane => pane.classList.remove('active'));
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyClVBI_xBtZDtoSDv6gWFEv9eCa4WPUDjw",
+    authDomain: "liberum-f13ff.firebaseapp.com",
+    projectId: "liberum-f13ff",
+    storageBucket: "liberum-f13ff.firebasestorage.app",
+    messagingSenderId: "730903093236",
+    appId: "1:730903093236:web:5f181959e3661c9d16e3a1",
+    measurementId: "G-KECV7R1DTE"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  const errorEl = document.getElementById("error-msg");
   
-  if (channel === 'phone') {
-    document.querySelector('.tabs button:nth-child(2)').classList.add('active');
-    document.getElementById('pane-phone').classList.add('active');
-  } else {
-    document.querySelector('.tabs button:first-child').classList.add('active');
-    document.getElementById('pane-email').classList.add('active');
+  function showError(msg) {
+    errorEl.innerText = msg;
+    errorEl.style.display = "block";
   }
-}
 
-function syncRoleSelect(val) {
-  document.getElementById('email-role-hidden').value = val;
-  document.getElementById('phone-role-hidden').value = val;
-  const step2Select = document.getElementById('step2-role-select');
-  if (step2Select) {
-    step2Select.value = val;
+  async function sendTokenToServer(idToken, role) {
+    const res = await fetch("/api/auth/firebase", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken: idToken, role: role })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        window.location.href = data.user.role === "student" ? "/mock" : "/dashboard";
+    } else {
+        showError(data.detail || "Authentication failed on server.");
+    }
   }
-}
 
-// Preset initially
-window.addEventListener('DOMContentLoaded', () => {
-  const currentVal = document.getElementById('main-role-select').value;
-  syncRoleSelect(currentVal);
-});
+  document.getElementById("register-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorEl.style.display = "none";
+    const btn = document.getElementById("submit-btn");
+    btn.innerText = "Creating account...";
+    
+    try {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      const name = document.getElementById("name").value;
+      const role = document.getElementById("role").value;
+      
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(userCredential.user, { displayName: name });
+      
+      const token = await userCredential.user.getIdToken();
+      await sendTokenToServer(token, role);
+    } catch (err) {
+      showError(err.message);
+      btn.innerText = "Create Account";
+    }
+  });
+
+  document.getElementById("google-btn").addEventListener("click", async () => {
+    errorEl.style.display = "none";
+    try {
+      const role = document.getElementById("role").value || "student";
+      const result = await signInWithPopup(auth, googleProvider);
+      const token = await result.user.getIdToken();
+      await sendTokenToServer(token, role);
+    } catch (err) {
+      showError(err.message);
+    }
+  });
 </script>
 </body>
 </html>
