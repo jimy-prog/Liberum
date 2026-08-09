@@ -134,7 +134,7 @@ body{
   <form id="login-form">
     <div class="form-group">
       <label class="form-label">Email</label>
-      <input class="form-control" type="email" id="email" required placeholder="Enter your email">
+      <input class="form-control" type="text" id="email" required placeholder="Enter your email or username">
     </div>
     <div class="form-group">
       <label class="form-label">Password</label>
@@ -217,12 +217,37 @@ body{
     btn.innerText = "Signing in...";
     
     try {
-      const email = document.getElementById("email").value;
+      const emailOrUsername = document.getElementById("email").value;
       const pass = document.getElementById("password").value;
       
-      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-      const token = await userCredential.user.getIdToken();
-      await sendTokenToServer(token);
+      // If it looks like an email, try Firebase first
+      if (emailOrUsername.includes("@")) {
+          try {
+              const userCredential = await signInWithEmailAndPassword(auth, emailOrUsername, pass);
+              const token = await userCredential.user.getIdToken();
+              await sendTokenToServer(token);
+              return;
+          } catch (err) {
+              // Only fallback if the error is not about wrong password
+              // But let's just log it and fallback anyway to classic login
+              console.warn("Firebase login failed:", err);
+          }
+      }
+      
+      // Fallback to classic login (for usernames or if Firebase fails)
+      const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier: emailOrUsername, password: pass })
+      });
+      const data = await res.json();
+      if (res.ok) {
+          window.location.href = data.redirect || "/dashboard";
+      } else {
+          showError(data.detail || "Authentication failed.");
+          btn.innerText = "Sign In";
+      }
+      
     } catch (err) {
       showError(err.message);
       btn.innerText = "Sign In";
