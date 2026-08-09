@@ -197,6 +197,7 @@ PUBLIC_PREFIXES = (
     "/favicon.ico",
     "/waitlist/from-google-form",
     "/register",
+    "/onboarding",
     "/images",
     "/healthz",
     "/placement/take",
@@ -310,6 +311,10 @@ async def logout_route(request: Request):
 @app.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request):
     return templates.TemplateResponse("register.html", {"request": request, "step": "1", "channel": "email"})
+
+@app.get("/onboarding", response_class=HTMLResponse)
+async def onboarding_page(request: Request):
+    return templates.TemplateResponse("onboarding.html", {"request": request})
 
 import random
 import secrets

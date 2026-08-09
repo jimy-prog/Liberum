@@ -191,12 +191,19 @@ body{
     const res = await fetch("/api/auth/firebase", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken: idToken, role: "student" }) // Defaults to student if new
+      body: JSON.stringify({ idToken: idToken, role: "student" }) // Role is ignored if new user, sent just in case
     });
     const data = await res.json();
     if (res.ok) {
-        // Redirect to dashboard (or mock tests depending on role)
-        window.location.href = data.user.role === 'student' ? '/mock' : '/dashboard';
+        if (data.requires_onboarding) {
+            sessionStorage.setItem("pending_firebase_token", idToken);
+            sessionStorage.setItem("pending_email", data.email);
+            sessionStorage.setItem("pending_name", data.name);
+            window.location.href = "/onboarding";
+        } else {
+            // Redirect to dashboard (or mock tests depending on role)
+            window.location.href = data.user.role === 'student' ? '/mock' : '/dashboard';
+        }
     } else {
         showError(data.detail || "Authentication failed on server.");
     }

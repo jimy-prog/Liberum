@@ -206,7 +206,14 @@ body{
     });
     const data = await res.json();
     if (res.ok) {
-        window.location.href = data.user.role === "student" ? "/mock" : "/dashboard";
+        if (data.requires_onboarding) {
+            sessionStorage.setItem("pending_firebase_token", idToken);
+            sessionStorage.setItem("pending_email", data.email);
+            sessionStorage.setItem("pending_name", data.name);
+            window.location.href = "/onboarding";
+        } else {
+            window.location.href = data.user.role === "student" ? "/mock" : "/dashboard";
+        }
     } else {
         showError(data.detail || "Authentication failed on server.");
     }

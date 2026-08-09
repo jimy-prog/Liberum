@@ -12,17 +12,14 @@ echo ""
 echo "🚀 Starting Liberum..."
 echo ""
 
-# Check if cloudflared is installed
-if ! command -v cloudflared &> /dev/null; then
-    echo "📦 Installing Cloudflare Tunnel (one time only)..."
-    if command -v brew &> /dev/null; then
-        brew install cloudflare/cloudflare/cloudflared
-    else
-        echo "❌ Homebrew not found. Install it first:"
-        echo "   /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-        echo "   Then run: brew install cloudflare/cloudflare/cloudflared"
-        exit 1
-    fi
+# Check if cloudflared is installed locally or globally
+if [ -f "$SCRIPT_DIR/bin/cloudflared" ]; then
+    CLOUDFLARED="$SCRIPT_DIR/bin/cloudflared"
+elif command -v cloudflared &> /dev/null; then
+    CLOUDFLARED="cloudflared"
+else
+    echo "❌ cloudflared not found. Please install it first!"
+    exit 1
 fi
 
 # Start the app in background
@@ -36,7 +33,7 @@ echo ""
 echo "🌐 Starting Cloudflare Tunnel..."
 echo "   Your public URL will appear below — open it on your iPhone!"
 echo ""
-cloudflared tunnel --url http://localhost:8000 &
+$CLOUDFLARED tunnel --url http://localhost:8000 &
 TUNNEL_PID=$!
 
 echo ""

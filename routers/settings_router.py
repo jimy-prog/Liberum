@@ -102,6 +102,23 @@ async def change_password(request: Request,
     set_password(new_pw, user=user)
     return RedirectResponse("/profile/?tab=security&success=password_changed", status_code=302)
 
+@router.post("/profile/update")
+async def update_profile(request: Request, full_name: str = Form(...)):
+    user = _current_user(request)
+    if not user:
+        return RedirectResponse("/login", status_code=302)
+    
+    mdb = SessionMaster()
+    try:
+        u = mdb.query(User).get(user.id)
+        if u:
+            u.full_name = full_name
+            mdb.commit()
+    finally:
+        mdb.close()
+        
+    return RedirectResponse("/profile/?tab=security&success=profile_updated", status_code=302)
+
 @router.post("/users/create")
 async def create_user(request: Request,
                       username: str = Form(...),

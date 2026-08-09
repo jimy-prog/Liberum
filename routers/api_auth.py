@@ -128,62 +128,130 @@ async def firebase_login_api(req: FirebaseLoginRequest, response: Response):
         try:
             user = master_db.query(User).filter(User.email == email).first()
             if not user:
-                role = req.role.strip().lower()
-                if role not in {"teacher", "student", "owner"}:
-                    role = "student"
+                # User does not exist, trigger onboarding flow on frontend
+                return {
+                    "requires_onboarding": True,
+                    "email": email,
+                    "name": name,
+                    "phone": phone
+                }
                 
-                # Fetch or create tenant
-                if role == "teacher":
-                    slug_base = email.split("@")[0].replace(".", "_")
-                    tenant_slug = f"{slug_base}_{random.randint(1000, 9999)}"
-                    tenant = PlatformTenant(slug=tenant_slug, db_filename=f"tenant_{tenant_slug}.db")
-                    master_db.add(tenant)
-                    master_db.flush()
-                else:
-                    tenant = master_db.query(PlatformTenant).filter(PlatformTenant.slug == "liberum_admin").first()
-                    if not tenant:
-                        tenant = PlatformTenant(slug="liberum_admin", db_filename="tenant_1.db")
-                        master_db.add(tenant)
-                        master_db.flush()
-                
-                prefix = email.split("@")[0].replace(".", "_")
-                username = f"{prefix}_{random.randint(1000, 9999)}"
-                
-                user = User(
-                    tenant_id=tenant.id,
-                    username=username,
-                    email=email,
-                    phone=phone,
-                    full_name=name,
-                    password_hash=hash_pw(secrets.token_hex(16)),
-                    role=role,
-                    is_active=True
-                )
-                master_db.add(user)
-                master_db.flush()
-                
-                if role == "teacher":
-                    master_db.add(TeacherProfile(user_id=user.id))
-                elif role == "student":
-                    master_db.add(StudentProfile(user_id=user.id))
-                    # Add to waitlist
-                    from database import get_tenant_engine, sessionmaker as tenant_sessionmaker
-                    from routers.waitlist import WaitlistEntry
-                    try:
-                        engine = get_tenant_engine("tenant_1.db")
-                        SessionTenant = tenant_sessionmaker(bind=engine)
-                        tenant_db = SessionTenant()
-                        tenant_db.add(WaitlistEntry(name=name, phone=phone, status="new"))
-                        tenant_db.commit()
-                        tenant_db.close()
-                    except Exception as e:
-                        print("Error writing Firebase student to waitlist:", e)
-                
-                master_db.commit()
-                master_db.refresh(user)
-                
+            # If user exists, just log them in
             token = create_session(user.id)
             response.set_cookie(SESSION_KEY, token, httponly=True, max_age=60*60*24*30, samesite="lax", path="/")
+            
+            return {
+                "success": True,
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "role": user.role,
+                    "full_name": user.full_name
+                }
+            }
+        finally:
+            master_db.close()
+            
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Invalid Firebase Token: {str(e)}")
+
+
+class CompleteOnboardingRequest(BaseModel):
+    idToken: str
+    role: str
+    full_name: str
+    phone: str
+
+@router.post("/onboarding")
+async def complete_onboarding_api(req: CompleteOnboardingRequest, response: Response):
+    import firebase_admin.auth as firebase_auth
+    from master_database import TeacherProfile, StudentProfile
+    import secrets
+    
+    try:
+        decoded_token = firebase_auth.verify_id_token(req.idToken)
+        email = decoded_token.get("email", "").strip().lower()
+        
+        if not email:
+            raise HTTPException(status_code=400, detail="Firebase token missing email")
+            
+        master_db = SessionMaster()
+        try:
+            user = master_db.query(User).filter(User.email == email).first()
+            if user:
+                raise HTTPException(status_code=400, detail="User already exists")
+                
+            role = req.role.strip().lower()
+            if role not in {"teacher", "student"}:
+                role = "student"
+                
+            # Fetch or create tenant
+            if role == "teacher":
+                slug_base = email.split("@")[0].replace(".", "_")
+                tenant_slug = f"{slug_base}_{random.randint(1000, 9999)}"
+                tenant = PlatformTenant(slug=tenant_slug, db_filename=f"tenant_{tenant_slug}.db")
+                master_db.add(tenant)
+                master_db.flush()
+            else:
+                tenant = master_db.query(PlatformTenant).filter(PlatformTenant.slug == "liberum_admin").first()
+                if not tenant:
+                    tenant = PlatformTenant(slug="liberum_admin", db_filename="tenant_1.db")
+                    master_db.add(tenant)
+                    master_db.flush()
+            
+            prefix = email.split("@")[0].replace(".", "_")
+            username = f"{prefix}_{random.randint(1000, 9999)}"
+            
+            user = User(
+                tenant_id=tenant.id,
+                username=username,
+                email=email,
+                phone=req.phone,
+                full_name=req.full_name,
+                password_hash=hash_pw(secrets.token_hex(16)),
+                role=role,
+                is_active=True
+            )
+            master_db.add(user)
+            master_db.flush()
+            
+            if role == "teacher":
+                master_db.add(TeacherProfile(user_id=user.id))
+            elif role == "student":
+                master_db.add(StudentProfile(user_id=user.id))
+                # Add to waitlist just in case
+                from database import get_tenant_engine, sessionmaker as tenant_sessionmaker
+                from routers.waitlist import WaitlistEntry
+                try:
+                    engine = get_tenant_engine(tenant.db_filename)
+                    SessionTenant = tenant_sessionmaker(bind=engine)
+                    tenant_db = SessionTenant()
+                    tenant_db.add(WaitlistEntry(name=req.full_name, phone=req.phone, status="new"))
+                    tenant_db.commit()
+                    tenant_db.close()
+                except Exception as e:
+                    print("Error writing Firebase student to waitlist:", e)
+            
+            master_db.commit()
+            master_db.refresh(user)
+            
+            token = create_session(user.id)
+            response.set_cookie(SESSION_KEY, token, httponly=True, max_age=60*60*24*30, samesite="lax", path="/")
+            
+            return {
+                "success": True,
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "role": user.role,
+                    "full_name": user.full_name
+                }
+            }
+        finally:
+            master_db.close()
+            
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Onboarding failed: {str(e)}")
             
             return {
                 "success": True,
