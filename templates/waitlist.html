@@ -7,28 +7,6 @@
 </div>
 {% endblock %}
 
-{% block extra_content_top %}
-<div class="alert alert-info mb-6" style="display:flex; justify-content:space-between; align-items:center; background: var(--blue-bg); border: 1px solid rgba(47, 128, 237, 0.2); color: var(--blue); padding: 16px;">
-  <div>
-    <strong><i class="fa-solid fa-link"></i> Public Waitlist Link</strong><br>
-    <span style="font-size: 0.9em; opacity: 0.9;">Share this link with prospective students to let them register directly.</span>
-  </div>
-  <div style="display:flex; gap:8px; align-items:center;">
-    <input type="text" readonly id="public-link" value="{{ request.url.scheme }}://{{ request.url.netloc }}/join/{{ request.state.current_user.username }}" style="padding: 8px 12px; border: 1px solid rgba(47, 128, 237, 0.3); border-radius: 4px; background: white; color: var(--text); font-size: 0.9em; width: 250px; outline: none;">
-    <button class="btn btn-primary btn-sm" onclick="copyPublicLink()">Copy</button>
-  </div>
-</div>
-<script>
-function copyPublicLink() {
-    var copyText = document.getElementById("public-link");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999);
-    document.execCommand("copy");
-    alert("Copied to clipboard!");
-}
-</script>
-{% endblock %}
-
 {% block extra_styles %}
 <style>
 .status-select-pill {
@@ -55,6 +33,25 @@ function copyPublicLink() {
 {% endblock %}
 
 {% block content %}
+<div class="alert alert-info mb-6" style="display:flex; justify-content:space-between; align-items:center; background: var(--blue-bg); border: 1px solid rgba(47, 128, 237, 0.2); color: var(--blue); padding: 16px;">
+  <div>
+    <strong><i class="fa-solid fa-link"></i> Public Waitlist Link</strong><br>
+    <span style="font-size: 0.9em; opacity: 0.9;">Share this link with prospective students to let them register directly.</span>
+  </div>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <input type="text" readonly id="public-link" value="{{ request.url.scheme }}://{{ request.url.netloc }}/join/{{ request.state.current_user.username }}" style="padding: 8px 12px; border: 1px solid rgba(47, 128, 237, 0.3); border-radius: 4px; background: white; color: var(--text); font-size: 0.9em; width: 250px; outline: none;">
+    <button class="btn btn-primary btn-sm" onclick="copyPublicLink()">Copy</button>
+  </div>
+</div>
+<script>
+function copyPublicLink() {
+    var copyText = document.getElementById("public-link");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    alert("Copied to clipboard!");
+}
+</script>
 
 {% if request.query_params.get('err') == 'banned_phone' %}
 <div class="alert mb-4" style="background:var(--red-bg);border:1px solid rgba(248,113,113,.25);color:var(--red)">
