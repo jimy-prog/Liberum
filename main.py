@@ -35,6 +35,7 @@ from routers import owner
 from routers import classes
 from routers import reviews
 from routers import placement
+from routers import join
 
 app = FastAPI(title=APP_NAME)
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
@@ -219,6 +220,7 @@ PUBLIC_PREFIXES = (
     "/healthz",
     "/placement/take",
     "/auth",
+    "/join",
 )
 
 
@@ -554,7 +556,7 @@ for r in [dashboard.router, students.router, groups.router, lessons.router,
           profile_router.router, monthly_report.router,
           timetable_export.router, holidays_router.router,
           online_router.router, archive_router.router,
-          mock_platform.router, owner.router, classes.router, reviews.router, placement.router]:
+          mock_platform.router, owner.router, classes.router, reviews.router, placement.router, join.router]:
     app.include_router(r)
 app.include_router(api_auth.router, prefix="/api")
 

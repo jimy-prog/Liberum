@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Successful</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FAFAFA;
+            --text-color: #1A1A1A;
+            --muted-text: #666666;
+            --border-color: #E5E5E5;
+            --primary-color: #2F80ED;
+            --success-color: #059669;
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px 32px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+
+        .icon-wrapper {
+            width: 64px;
+            height: 64px;
+            background-color: rgba(5, 150, 105, 0.1);
+            color: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px auto;
+        }
+        
+        .icon-wrapper svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .card h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .card p {
+            color: var(--muted-text);
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .footer-brand {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--muted-text);
+        }
+        
+        .footer-brand a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="icon-wrapper">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h1>You're on the list!</h1>
+            <p>Thank you for registering. We have securely saved your information. <b>{{ teacher_name }}</b> will review your request and get in touch with you shortly.</p>
+        </div>
+        
+        <div class="footer-brand">
+            Powered by <a href="https://liberum.uz" target="_blank">Liberum</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -3,12 +3,30 @@
 {% block page_title %}Waitlist{% endblock %}
 {% block topbar_actions %}
 <div style="display:flex;gap:8px;align-items:center">
-  <form method="post" action="/waitlist/import-google-sheet" style="display:inline">
-    <button class="btn btn-ghost btn-sm" type="submit">⇅ Import Sheet</button>
-  </form>
-  <a href="/profile/?tab=system#waitlist-import" class="btn btn-ghost btn-sm">Import Settings</a>
   <button class="btn btn-primary btn-sm" onclick="openModal('addEntry')">+ New Enquiry</button>
 </div>
+{% endblock %}
+
+{% block extra_content_top %}
+<div class="alert alert-info mb-6" style="display:flex; justify-content:space-between; align-items:center; background: var(--blue-bg); border: 1px solid rgba(47, 128, 237, 0.2); color: var(--blue); padding: 16px;">
+  <div>
+    <strong><i class="fa-solid fa-link"></i> Public Waitlist Link</strong><br>
+    <span style="font-size: 0.9em; opacity: 0.9;">Share this link with prospective students to let them register directly.</span>
+  </div>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <input type="text" readonly id="public-link" value="{{ request.url.scheme }}://{{ request.url.netloc }}/join/{{ request.state.current_user.username }}" style="padding: 8px 12px; border: 1px solid rgba(47, 128, 237, 0.3); border-radius: 4px; background: white; color: var(--text); font-size: 0.9em; width: 250px; outline: none;">
+    <button class="btn btn-primary btn-sm" onclick="copyPublicLink()">Copy</button>
+  </div>
+</div>
+<script>
+function copyPublicLink() {
+    var copyText = document.getElementById("public-link");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    alert("Copied to clipboard!");
+}
+</script>
 {% endblock %}
 
 {% block extra_styles %}
@@ -37,14 +55,7 @@
 {% endblock %}
 
 {% block content %}
-{% if request.query_params.get('import_ok') == '1' %}
-<div class="alert alert-success mb-4">Imported {{ request.query_params.get('imported') or '0' }} new enquiries from Google Sheet.</div>
-{% elif request.query_params.get('import_err') == 'sheet_id_required' %}
-<div class="alert mb-4" style="background:var(--red-bg);border:1px solid rgba(248,113,113,.25);color:var(--red)">Google Sheet ID is required.</div>
-{% elif request.query_params.get('import_err') == 'sheet_unavailable' %}
-<div class="alert mb-4" style="background:var(--red-bg);border:1px solid rgba(248,113,113,.25);color:var(--red)">Could not read the sheet. Check Sheet ID, tab name, and sharing access.</div>
-{% if last_import_error %}<div class="alert mb-4" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:.78rem">Technical detail: {{ last_import_error }}</div>{% endif %}
-{% endif %}
+
 {% if request.query_params.get('err') == 'banned_phone' %}
 <div class="alert mb-4" style="background:var(--red-bg);border:1px solid rgba(248,113,113,.25);color:var(--red)">
   This phone number belongs to a banned student, so enrollment is blocked.
