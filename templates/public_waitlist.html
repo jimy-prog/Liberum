@@ -2,183 +2,252 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join {{ teacher_name }}'s Waitlist</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Join {{ teacher_name }}'s Waitlist | Liberum</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #FAFAFA;
-            --text-color: #1A1A1A;
-            --muted-text: #666666;
-            --border-color: #E5E5E5;
-            --primary-color: #2F80ED;
-            --primary-hover: #1F6AD5;
-            --card-bg: #FFFFFF;
-            --error-color: #E02424;
-            --input-bg: #F9FAFB;
+            --bg:        #f6f7fb;
+            --bg2:       #ffffff;
+            --border:    #e5e7eb;
+            --text:      #101114;
+            --text2:     #6b6f7a;
+            --text3:     #9ca3af;
+            --accent:    #7b61ff;
+            --accent2:   #6b51ef;
+            --accent-glow: rgba(123, 97, 255, 0.14);
+            --red:       #dc2626;
+            --radius:    18px;
+            --radius-sm: 10px;
+            --font-d:    'Space Grotesk', sans-serif;
+            --font-b:    'Inter', sans-serif;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: var(--font-b);
+            background-color: var(--bg);
+            background-image: radial-gradient(circle, rgba(123, 97, 255, 0.06) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text);
             margin: 0;
-            padding: 0;
+            padding: 24px 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
             width: 100%;
-            max-width: 500px;
-            padding: 24px;
-            box-sizing: border-box;
+            max-width: 480px;
+            position: relative;
+        }
+        
+        .glow-circle {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            opacity: 0.15;
+            filter: blur(80px);
+            border-radius: 50%;
+            top: -50px;
+            left: -50px;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: var(--radius);
+            padding: 40px 32px;
+            box-shadow: 0 18px 50px rgba(17, 24, 39, 0.04), 0 4px 12px rgba(123, 97, 255, 0.04);
+            position: relative;
+            z-index: 1;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 36px;
+        }
+
+        .icon-box {
+            width: 56px;
+            height: 56px;
+            background: rgba(123, 97, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+            color: var(--accent);
+            box-shadow: 0 4px 12px var(--accent-glow);
         }
 
         .header h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 28px;
+            font-family: var(--font-d);
+            font-size: 26px;
             font-weight: 700;
-            margin: 0 0 8px 0;
+            margin: 0 0 10px 0;
             letter-spacing: -0.02em;
+            color: var(--text);
         }
 
         .header p {
-            color: var(--muted-text);
+            color: var(--text2);
             margin: 0;
-            font-size: 15px;
+            font-size: 14px;
             line-height: 1.5;
+        }
+        
+        .teacher-name {
+            font-weight: 600;
+            color: var(--accent);
         }
 
         .form-group {
             margin-bottom: 20px;
         }
 
-        label {
+        .form-label {
             display: block;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 6px;
-            color: var(--text-color);
-        }
-
-        input[type="text"], input[type="tel"], select, textarea {
-            width: 100%;
-            padding: 12px 16px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--input-bg);
-            box-sizing: border-box;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.1);
-            background-color: #FFFFFF;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text3);
+            margin-bottom: 8px;
         }
 
         .required::after {
             content: " *";
-            color: var(--error-color);
+            color: var(--red);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            font-family: var(--font-b);
+            font-size: 15px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg2);
+            color: var(--text);
+            box-sizing: border-box;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .form-control::placeholder {
+            color: #d1d5db;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+            background-color: #ffffff;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
         }
 
         .btn-submit {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
-            padding: 14px;
-            background-color: var(--text-color);
+            padding: 16px;
+            background-color: var(--accent);
             color: #FFFFFF;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-b);
             cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            margin-top: 12px;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s;
+            margin-top: 16px;
         }
 
         .btn-submit:hover {
-            background-color: #333333;
+            background-color: var(--accent2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(123, 97, 255, 0.25);
         }
         
         .btn-submit:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
+            box-shadow: none;
         }
 
         .footer-brand {
             text-align: center;
-            margin-top: 24px;
+            margin-top: 28px;
             font-size: 13px;
-            color: var(--muted-text);
+            color: var(--text3);
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
         }
         
         .footer-brand a {
-            color: var(--primary-color);
+            color: var(--text2);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        
+        .footer-brand a:hover {
+            color: var(--accent);
         }
         
         @media (max-width: 480px) {
             .card {
-                padding: 24px 20px;
+                padding: 32px 24px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="glow-circle"></div>
         <div class="card">
             <div class="header">
+                <div class="icon-box">🌟</div>
                 <h1>Join the Waitlist</h1>
-                <p>Register your interest for classes with <b>{{ teacher_name }}</b>.</p>
+                <p>Register your interest for classes with <span class="teacher-name">{{ teacher_name }}</span>.</p>
             </div>
             
             <form action="/join/{{ username }}/submit" method="POST">
                 <div class="form-group">
-                    <label class="required" for="name">Student's Full Name</label>
-                    <input type="text" id="name" name="name" required placeholder="John Doe">
+                    <label class="form-label required" for="name">Student's Full Name</label>
+                    <input type="text" id="name" name="name" class="form-control" required placeholder="John Doe">
                 </div>
                 
                 <div class="form-group">
-                    <label class="required" for="phone">Student's Phone Number</label>
-                    <input type="tel" id="phone" name="phone" required placeholder="+998 90 123 45 67">
+                    <label class="form-label required" for="phone">Student's Phone</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" required placeholder="+998 90 123 45 67">
                 </div>
                 
                 <div class="form-group">
-                    <label for="parent_phone">Parent's Phone Number (Optional)</label>
-                    <input type="tel" id="parent_phone" name="parent_phone" placeholder="+998 90 987 65 43">
+                    <label class="form-label" for="parent_phone">Parent's Phone (Optional)</label>
+                    <input type="tel" id="parent_phone" name="parent_phone" class="form-control" placeholder="+998 90 987 65 43">
                 </div>
                 
                 <div class="form-group">
-                    <label for="level">Current English Level</label>
-                    <select id="level" name="level">
+                    <label class="form-label" for="level">Current English Level</label>
+                    <select id="level" name="level" class="form-control">
                         <option value="">I'm not sure</option>
                         <option value="Beginner">Beginner</option>
                         <option value="Elementary">Elementary</option>
@@ -190,19 +259,19 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="mode">Preferred Format</label>
-                    <select id="mode" name="mode">
+                    <label class="form-label" for="mode">Preferred Format</label>
+                    <select id="mode" name="mode" class="form-control">
                         <option value="in-person">In-Person Classes</option>
                         <option value="online">Online Classes</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label for="learning_goal">What are your learning goals?</label>
-                    <textarea id="learning_goal" name="learning_goal" placeholder="E.g., IELTS preparation, speaking practice, grammar..."></textarea>
+                    <label class="form-label" for="learning_goal">Learning Goals</label>
+                    <textarea id="learning_goal" name="learning_goal" class="form-control" placeholder="E.g., IELTS preparation, speaking practice, grammar..."></textarea>
                 </div>
                 
-                <button type="submit" class="btn-submit">Submit Registration</button>
+                <button type="submit" class="btn-submit">Submit Registration <span>→</span></button>
             </form>
         </div>
         
