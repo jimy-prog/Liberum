@@ -55,6 +55,14 @@ def waitlist_view(request: Request, db: Session = Depends(get_db)):
         WaitlistEntry.status != "enrolled"
     ).order_by(WaitlistEntry.enquiry_date.desc()).all()
     groups = db.query(Group).filter(Group.status == "active").all()
+    
+    active_sessions = db.query(PlacementSession).filter(
+        PlacementSession.status.in_(["pending", "active"])
+    ).order_by(PlacementSession.id.desc()).all()
+    completed_sessions = db.query(PlacementSession).filter(
+        PlacementSession.status == "completed"
+    ).order_by(PlacementSession.completed_at.desc()).all()
+
     return templates.TemplateResponse("waitlist.html", {
         "request": request, "entries": entries,
         "groups": groups, "status_labels": STATUS_LABELS,
