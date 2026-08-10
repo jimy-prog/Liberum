@@ -44,6 +44,7 @@ services:
     volumes:
       - liberum_uploads:/app/uploads
       - liberum_backups:/app/backups
+      - liberum_tenants:/app/database_tenants
     ports:
       - "${EXPOSE_PORT:-8000}:8000"
     expose:
@@ -71,3 +72,4 @@ volumes:
   postgres_data:
   liberum_uploads:
   liberum_backups:
+  liberum_tenants:
