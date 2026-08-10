@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Request, Depends, Form, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 from datetime import date
 
-from database import get_db, SessionLocal
+from database import get_db, get_tenant_engine
 from master_database import SessionMaster, User
 from routers.waitlist import WaitlistEntry
 
@@ -47,7 +47,9 @@ async def submit_public_waitlist(
         if not user or user.role not in ["teacher", "owner"]:
             raise HTTPException(status_code=404, detail="Waitlist not found")
         
-        tenant_db = SessionLocal(user.id)
+        engine = get_tenant_engine(user.tenant.db_filename)
+        SessionTenant = sessionmaker(bind=engine)
+        tenant_db = SessionTenant()
         try:
             # Check for duplicates
             duplicate = tenant_db.query(WaitlistEntry).filter(
