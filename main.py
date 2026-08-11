@@ -624,28 +624,27 @@ def on_startup():
     # FORCE SYNC LOCAL DATA TO LIVE SERVER (One-Time Migration)
     # ---------------------------------------------------------
     import shutil
-    flag_file = DATA_DIR / "migrated_mock_data_v3.flag"
+    flag_file = DATA_DIR / "migrated_mock_data_v4.flag"
     if not flag_file.exists():
-        print("PERFORMING ONE-TIME DATA MIGRATION TO LIVE STORAGE...")
+        print("PERFORMING V4 SEED MIGRATION TO OVERRIDE GIT STASH...")
         
-        # 1. Sync master.db
-        if os.path.exists("master.db"):
+        # 1. Sync master.db from master_seed.db
+        if os.path.exists("master_seed.db"):
             try:
-                shutil.copy("master.db", DATA_DIR / "master.db")
-                print("Copied master.db to persistent storage.")
-            except shutil.SameFileError:
-                pass
+                shutil.copy("master_seed.db", DATA_DIR / "master.db")
+                print("Copied master_seed.db to master.db successfully.")
+            except Exception as e:
+                print(f"Failed to copy master_seed.db: {e}")
             
-        # 2. Sync tenant_1.db
-        tenant_1 = "database_tenants/tenant_1.db"
-        if os.path.exists(tenant_1):
+        # 2. Sync tenant_1.db from tenant_1_seed.db
+        if os.path.exists("tenant_1_seed.db"):
             target_dir = DATA_DIR / "database_tenants"
             target_dir.mkdir(parents=True, exist_ok=True)
             try:
-                shutil.copy(tenant_1, target_dir / "tenant_1.db")
-                print("Copied tenant_1.db to persistent storage.")
-            except shutil.SameFileError:
-                pass
+                shutil.copy("tenant_1_seed.db", target_dir / "tenant_1.db")
+                print("Copied tenant_1_seed.db to tenant_1.db successfully.")
+            except Exception as e:
+                print(f"Failed to copy tenant_1_seed.db: {e}")
             
         # 3. Sync all uploads (audios, etc)
         if os.path.exists("uploads"):
@@ -661,7 +660,7 @@ def on_startup():
             print("Copied all uploads/ media to persistent storage.")
             
         flag_file.touch()
-        print("MIGRATION COMPLETE.")
+        print("V4 MIGRATION COMPLETE.")
     # ---------------------------------------------------------
     from master_database import init_master_db
     from config import FIREBASE_CREDENTIALS_PATH
