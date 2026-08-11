@@ -630,16 +630,22 @@ def on_startup():
         
         # 1. Sync master.db
         if os.path.exists("master.db"):
-            shutil.copy("master.db", DATA_DIR / "master.db")
-            print("Copied master.db to persistent storage.")
+            try:
+                shutil.copy("master.db", DATA_DIR / "master.db")
+                print("Copied master.db to persistent storage.")
+            except shutil.SameFileError:
+                pass
             
         # 2. Sync tenant_1.db
         tenant_1 = "database_tenants/tenant_1.db"
         if os.path.exists(tenant_1):
             target_dir = DATA_DIR / "database_tenants"
             target_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy(tenant_1, target_dir / "tenant_1.db")
-            print("Copied tenant_1.db to persistent storage.")
+            try:
+                shutil.copy(tenant_1, target_dir / "tenant_1.db")
+                print("Copied tenant_1.db to persistent storage.")
+            except shutil.SameFileError:
+                pass
             
         # 3. Sync all uploads (audios, etc)
         if os.path.exists("uploads"):
@@ -648,7 +654,10 @@ def on_startup():
             for file in os.listdir("uploads"):
                 src_path = os.path.join("uploads", file)
                 if os.path.isfile(src_path):
-                    shutil.copy(src_path, target_uploads / file)
+                    try:
+                        shutil.copy(src_path, target_uploads / file)
+                    except shutil.SameFileError:
+                        pass
             print("Copied all uploads/ media to persistent storage.")
             
         flag_file.touch()
