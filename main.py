@@ -617,7 +617,43 @@ def repair_teacher_tenant_mappings():
         db.close()
 
 @app.on_event("startup")
-def startup():
+def on_startup():
+    print("Application starting up...")
+    
+    # ---------------------------------------------------------
+    # FORCE SYNC LOCAL DATA TO LIVE SERVER (One-Time Migration)
+    # ---------------------------------------------------------
+    import shutil
+    flag_file = DATA_DIR / "migrated_mock_data_v2.flag"
+    if not flag_file.exists():
+        print("PERFORMING ONE-TIME DATA MIGRATION TO LIVE STORAGE...")
+        
+        # 1. Sync master.db
+        if os.path.exists("master.db"):
+            shutil.copy("master.db", DATA_DIR / "master.db")
+            print("Copied master.db to persistent storage.")
+            
+        # 2. Sync tenant_1.db
+        tenant_1 = "database_tenants/tenant_1.db"
+        if os.path.exists(tenant_1):
+            target_dir = DATA_DIR / "database_tenants"
+            target_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy(tenant_1, target_dir / "tenant_1.db")
+            print("Copied tenant_1.db to persistent storage.")
+            
+        # 3. Sync all uploads (audios, etc)
+        if os.path.exists("uploads"):
+            target_uploads = DATA_DIR / "uploads"
+            target_uploads.mkdir(parents=True, exist_ok=True)
+            for file in os.listdir("uploads"):
+                src_path = os.path.join("uploads", file)
+                if os.path.isfile(src_path):
+                    shutil.copy(src_path, target_uploads / file)
+            print("Copied all uploads/ media to persistent storage.")
+            
+        flag_file.touch()
+        print("MIGRATION COMPLETE.")
+    # ---------------------------------------------------------
     from master_database import init_master_db
     from config import FIREBASE_CREDENTIALS_PATH
     import firebase_admin

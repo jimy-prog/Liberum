@@ -15,7 +15,6 @@ backups/
 # Allow uploads folder for mock test media, but ignore runtime recordings
 !uploads/
 uploads/tmp/
-uploads/*.webm
 uploads/*.wav
 uploads/*.mp3
 !uploads/audio/
