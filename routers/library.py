@@ -148,7 +148,7 @@ async def submit_grammar_test(request: Request, topic_id: int):
 @router.get("/teacher")
 def library_teacher_dashboard(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
-    if not user or user.role != "teacher": 
+    if not user or user.role not in ["teacher", "owner"]: 
         return RedirectResponse("/login", status_code=303)
         
     master_db = SessionMaster()
