@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-4 sm:px-6 py-6 w-full max-w-5xl mx-auto space-y-8 animate-fade-in text-[0.95rem]">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-4">
+        <a href="/library" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </a>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight font-display">Grammar Engine</h1>
+    </div>
+
+    <!-- Levels Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {% set levels = [
+            ("A1", "Beginner", "Foundational rules and basic tenses.", "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"),
+            ("A2", "Elementary", "Past tenses, comparatives, and basic modals.", "bg-teal-50 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400 border-teal-200 dark:border-teal-800"),
+            ("B1", "Intermediate", "Perfect tenses, conditionals, and passive voice.", "bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800"),
+            ("B2", "Upper Intermediate", "Advanced modals, reported speech, relative clauses.", "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800"),
+            ("C1", "Advanced", "Inversion, advanced conditionals, and nuance.", "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800"),
+            ("C2", "Proficiency", "Mastery of complex stylistic structures.", "bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 border-purple-200 dark:border-purple-800")
+        ] %}
+        
+        {% for lvl, name, desc, color_classes in levels %}
+        <div onclick="selectLevel('{{ lvl }}')" class="cursor-pointer border rounded-xl p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-md {{ color_classes }} {% if request.query_params.get('level') == lvl %}ring-2 ring-offset-2 ring-current ring-offset-white dark:ring-offset-gray-900{% endif %}">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xl font-bold font-display">{{ lvl }}</span>
+            </div>
+            <h3 class="font-bold mb-1 opacity-90">{{ name }}</h3>
+            <p class="text-xs opacity-75">{{ desc }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Topics List -->
+    {% if request.query_params.get('level') %}
+    <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mt-8 animate-fade-in">
+        <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+            <h2 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <span class="text-blue-600">Level {{ request.query_params.get('level') }}</span> Topics
+            </h2>
+        </div>
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+            {% for topic in topics %}
+            <li class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <a href="/library/grammar/{{ topic.id }}" class="flex items-center justify-between px-5 py-4">
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white mb-1">{{ topic.title }}</div>
+                        
+                        {% set score = progress.get(topic.id, 0) %}
+                        <div class="flex items-center gap-2 mt-2">
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 w-24">
+                                <div class="bg-{{ 'green' if score == 100 else ('yellow' if score >= 50 else 'gray') }}-500 h-1.5 rounded-full" style="width: {{ score if score > 0 else 5 }}%"></div>
+                            </div>
+                            <span class="text-[10px] font-medium text-gray-500">{{ score|int }}% Mastery</span>
+                        </div>
+                    </div>
+                    <div class="text-gray-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </a>
+            </li>
+            {% else %}
+            <li class="px-5 py-8 text-center text-gray-500 text-sm">
+                No topics currently available for this level. More coming soon!
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <div class="text-center py-12 text-gray-500 text-sm">
+        Select a level above to view topics.
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    function selectLevel(level) {
+        window.location.href = "/library/grammar?level=" + level;
+    }
+</script>
+{% endblock %}

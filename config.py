@@ -18,6 +18,8 @@ FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, "firebase-service-account.jso
 _db_env = os.getenv("DATABASE_URL", "").strip()
 if os.getenv("RENDER"):
     DATA_DIR = Path("/data")
+elif os.getenv("IS_DOCKER") == "true":
+    DATA_DIR = Path("/app/data")
 else:
     DATA_DIR = BASE_DIR
 

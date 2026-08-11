@@ -322,6 +322,8 @@ def init_tenant_db(engine):
 
 def _seed_settings(db):
     defaults = [
+        Settings(key="school_name",           value="Liberum Learning Centre", label="School Name", category="general"),
+        Settings(key="school_tagline",        value="English Learning Platform", label="School Tagline", category="general"),
         Settings(key="teacher_pct",           value="40",    label="Teacher % (default)",          category="finance"),
         Settings(key="finance_mode_default",  value="standard", label="Finance Mode (default: standard/custom)", category="finance"),
         Settings(key="lessons_per_week",       value="3",     label="Default Lessons Per Week",     category="schedule"),

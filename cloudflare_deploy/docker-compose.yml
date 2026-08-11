@@ -12,6 +12,7 @@ services:
       DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
       SESSION_COOKIE_NAME: liberum_session
       DATABASE_URL: sqlite:////app/data/liberum.db
+      IS_DOCKER: "true"
     volumes:
       - liberum_data:/app/data
       - liberum_uploads:/app/uploads

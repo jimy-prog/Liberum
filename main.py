@@ -36,6 +36,7 @@ from routers import classes
 from routers import reviews
 from routers import placement
 from routers import join
+from routers import library
 
 app = FastAPI(title=APP_NAME)
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
@@ -242,6 +243,31 @@ async def auth_middleware(request: Request, call_next):
         return await call_next(request)
     current_user = get_current_user(request)
     request.state.current_user = current_user
+    
+    # Inject school branding dynamically for white-labeling
+    request.state.school_name = "Liberum Learning Centre"
+    request.state.school_tagline = "Educational Platform"
+    
+    if current_user and getattr(current_user, "tenant_id", None):
+        try:
+            from master_database import SessionMaster, PlatformTenant
+            from database import get_tenant_engine, Settings
+            from sqlalchemy.orm import sessionmaker
+            
+            master_db = SessionMaster()
+            tenant = master_db.query(PlatformTenant).filter_by(id=current_user.tenant_id).first()
+            if tenant:
+                engine = get_tenant_engine(tenant.db_filename)
+                tenant_db = sessionmaker(bind=engine)()
+                s_name = tenant_db.query(Settings).filter_by(key="school_name").first()
+                s_tag = tenant_db.query(Settings).filter_by(key="school_tagline").first()
+                if s_name: request.state.school_name = s_name.value
+                if s_tag: request.state.school_tagline = s_tag.value
+                tenant_db.close()
+            master_db.close()
+        except Exception as e:
+            print("Error loading tenant settings in middleware:", e)
+            
     if not current_user:
         return RedirectResponse(f"/login?next={path}", status_code=302)
     return await call_next(request)
@@ -556,7 +582,7 @@ for r in [dashboard.router, students.router, groups.router, lessons.router,
           profile_router.router, monthly_report.router,
           timetable_export.router, holidays_router.router,
           online_router.router, archive_router.router,
-          mock_platform.router, owner.router, classes.router, reviews.router, placement.router, join.router]:
+          mock_platform.router, owner.router, classes.router, reviews.router, placement.router, join.router, library.router]:
     app.include_router(r)
 app.include_router(api_auth.router, prefix="/api")
 

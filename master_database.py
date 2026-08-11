@@ -8,7 +8,17 @@ from config import DATA_DIR
 MASTER_DB_URL = f"sqlite:///{DATA_DIR / 'master.db'}"
 engine_master = create_engine(MASTER_DB_URL, connect_args={"check_same_thread": False})
 SessionMaster = sessionmaker(autocommit=False, autoflush=False, bind=engine_master)
-MasterBase = declarative_base()
+class MasterBase(declarative_base()):
+    __abstract__ = True
+
+class PlatformUpdate(MasterBase):
+    __tablename__ = "platform_updates"
+    id = Column(Integer, primary_key=True)
+    version = Column(String, default="1.0.0")
+    title = Column(String, nullable=False)
+    description = Column(String, default="")
+    status = Column(String, default="Live")
+    release_date = Column(DateTime, default=datetime.utcnow)
 
 class PlatformTenant(MasterBase):
     __tablename__ = "tenants"
@@ -322,3 +332,59 @@ def init_master_db():
         import auth 
     finally:
         db.close()
+
+# --- LIBRARY & GRAMMAR ENGINE ---
+
+class LibraryBook(MasterBase):
+    __tablename__ = "library_books"
+    id = Column(Integer, primary_key=True)
+    tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=True) # If null, it's a global platform book
+    title = Column(String, nullable=False)
+    author = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    cover_url = Column(String, nullable=True)
+    file_url = Column(String, nullable=True)
+    book_type = Column(String, default="ebook") # ebook, audiobook
+    level = Column(String, default="All")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    tenant = relationship("PlatformTenant")
+
+
+class GrammarTopic(MasterBase):
+    __tablename__ = "grammar_topics"
+    id = Column(Integer, primary_key=True)
+    title = Column(String, nullable=False)
+    level = Column(String, default="A1") # A1, A2, B1, B2, C1, C2
+    explanation = Column(String, nullable=False) # Markdown/HTML content
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class GrammarQuestion(MasterBase):
+    __tablename__ = "grammar_questions"
+    id = Column(Integer, primary_key=True)
+    topic_id = Column(Integer, ForeignKey("grammar_topics.id"), nullable=False)
+    question_text = Column(String, nullable=False)
+    option_a = Column(String, nullable=False)
+    option_b = Column(String, nullable=False)
+    option_c = Column(String, nullable=False)
+    option_d = Column(String, nullable=False)
+    correct_option = Column(String, nullable=False) # 'A', 'B', 'C', or 'D'
+    explanation = Column(String, nullable=True)
+    
+    topic = relationship("GrammarTopic", backref="questions")
+
+
+class GrammarQuizAttempt(MasterBase):
+    __tablename__ = "grammar_quiz_attempts"
+    id = Column(Integer, primary_key=True)
+    tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=False)
+    student_id = Column(Integer, nullable=False)
+    topic_id = Column(Integer, ForeignKey("grammar_topics.id"), nullable=False)
+    score = Column(Integer, nullable=False) # Number of correct answers
+    total_questions = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    tenant = relationship("PlatformTenant")
+    topic = relationship("GrammarTopic")
+

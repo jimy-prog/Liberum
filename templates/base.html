@@ -321,8 +321,8 @@ body.dark .alert-success{border-color:rgba(74,222,128,.2);color:var(--green)}
 <body>
 <div class="sidebar" id="sidebar">
   <div class="sidebar-brand">
-    <div class="brand-name">Liberum</div>
-    <div class="brand-sub">English Learning Platform</div>
+    <div class="brand-name">{{ request.state.school_name | default('Liberum') }}</div>
+    <div class="brand-sub">{{ request.state.school_tagline | default('Educational Platform') }}</div>
   </div>
 
   <nav style="flex:1;padding:10px 0">
@@ -335,6 +335,23 @@ body.dark .alert-success{border-color:rgba(74,222,128,.2);color:var(--green)}
     {% set _is_owner = _u and _u.role == 'owner' %}
     {% set _is_teacher = _u and _u.role == 'teacher' %}
     {% set _is_staff = _is_owner or _is_teacher %}
+    
+    {% if _is_owner %}
+    <div class="nav-section" style="color:var(--accent);">Administration</div>
+    <a class="nav-link {% if active_page=='owner_dashboard' %}active{% endif %}" href="/owner/">
+      <span class="nav-icon">👑</span> Owner Admin
+    </a>
+    <a class="nav-link {% if active_page=='owner_updates' %}active{% endif %}" href="/owner/updates">
+      <span class="nav-icon">🔄</span> Platform Updates
+    </a>
+    <a class="nav-link {% if active_page=='owner_users' %}active{% endif %}" href="/owner/users">
+      <span class="nav-icon">👥</span> All Users
+    </a>
+    <a class="nav-link {% if active_page=='manage_mocks' %}active{% endif %}" href="/mock/manage">
+      <span class="nav-icon">⚙️</span> Manage Mocks
+    </a>
+
+    {% endif %}
 
     {% if _is_staff %}
     <div class="nav-section">Teaching</div>
@@ -367,17 +384,9 @@ body.dark .alert-success{border-color:rgba(74,222,128,.2);color:var(--green)}
     {% endif %}
 
     <div class="nav-section">Content</div>
-    {% if _is_owner %}
-    <a class="nav-link {% if active_page=='owner_dashboard' %}active{% endif %}" href="/owner/">
-      <span class="nav-icon">👑</span> Owner Home
+    <a class="nav-link {% if active_page=='library' %}active{% endif %}" href="{% if _is_staff %}/library/teacher{% else %}/library{% endif %}">
+      <span class="nav-icon">📖</span> Digital Library
     </a>
-    <a class="nav-link {% if active_page=='owner_users' %}active{% endif %}" href="/owner/users">
-      <span class="nav-icon">👥</span> All Users
-    </a>
-    <a class="nav-link {% if active_page=='manage_mocks' %}active{% endif %}" href="/mock/manage">
-      <span class="nav-icon">⚙️</span> Manage Mocks
-    </a>
-    {% endif %}
     <a class="nav-link {% if active_page=='courses' %}active{% endif %}" href="/courses/">
       <span class="nav-icon">📚</span> Courses
     </a>

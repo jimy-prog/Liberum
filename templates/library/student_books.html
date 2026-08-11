@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-4 sm:px-6 py-6 w-full max-w-6xl mx-auto animate-fade-in text-[0.95rem]">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8">
+        <a href="/library" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </a>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight font-display">The Bookshelf</h1>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+        <a href="?level=all" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap {{ 'bg-blue-600 text-white' if not request.query_params.get('level') or request.query_params.get('level') == 'all' else 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50' }}">All Levels</a>
+        <a href="?level=A1" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap {{ 'bg-blue-600 text-white' if request.query_params.get('level') == 'A1' else 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50' }}">A1 Beginner</a>
+        <a href="?level=A2" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap {{ 'bg-blue-600 text-white' if request.query_params.get('level') == 'A2' else 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50' }}">A2 Elementary</a>
+        <a href="?level=B1" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap {{ 'bg-blue-600 text-white' if request.query_params.get('level') == 'B1' else 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50' }}">B1 Intermediate</a>
+        <a href="?level=B2" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap {{ 'bg-blue-600 text-white' if request.query_params.get('level') == 'B2' else 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50' }}">B2 Upper Intermediate</a>
+        <a href="?level=C1" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap {{ 'bg-blue-600 text-white' if request.query_params.get('level') == 'C1' else 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50' }}">C1 Advanced</a>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+        {% for book in books %}
+        <div class="group relative flex flex-col cursor-pointer" onclick="openBookModal('{{ book.id }}', '{{ book.title|escape }}', '{{ book.author|escape }}', '{{ book.cover_url }}', '{{ book.level }}', '{{ book.book_type }}')">
+            <div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                {% if book.cover_url %}
+                <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <span class="text-4xl opacity-50">📚</span>
+                </div>
+                {% endif %}
+                
+                <!-- Hover Overlay -->
+                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                    <span class="bg-white/10 text-white border border-white/20 px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md">View Details</span>
+                </div>
+                
+                <!-- Level Badge -->
+                <div class="absolute top-2 right-2">
+                    <span class="bg-black/70 text-white px-2 py-0.5 rounded text-[10px] font-bold tracking-wider backdrop-blur-md">{{ book.level }}</span>
+                </div>
+            </div>
+            <div class="mt-3">
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white leading-tight line-clamp-1 font-display">{{ book.title }}</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ book.author }}</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-full py-12 text-center text-gray-500">
+            <p>No books available for this level yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Book Details Modal -->
+<div id="bookModal" class="modal-overlay">
+    <div class="modal" style="max-width: 700px;">
+        <div class="modal-header border-none pb-0">
+            <div class="w-full flex justify-end">
+                <button class="modal-close" onclick="closeBookModal()">&times;</button>
+            </div>
+        </div>
+        <div class="modal-body pt-0">
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Poster -->
+                <div class="w-full md:w-1/3 flex-shrink-0">
+                    <img id="modalCover" src="" class="w-full aspect-[2/3] object-cover rounded-lg shadow-lg border border-gray-200 dark:border-gray-700" alt="Cover">
+                </div>
+                <!-- Details -->
+                <div class="w-full md:w-2/3 flex flex-col justify-center">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span id="modalLevel" class="bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider"></span>
+                        <span id="modalType" class="bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase"></span>
+                    </div>
+                    <h2 id="modalTitle" class="text-2xl font-bold text-gray-900 dark:text-white font-display mb-1"></h2>
+                    <p id="modalAuthor" class="text-sm text-gray-500 dark:text-gray-400 mb-6"></p>
+                    
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+                        Immerse yourself in this curated reading experience. Reading graded materials at your specific level is one of the fastest ways to naturally acquire vocabulary and internalize complex grammar structures.
+                    </p>
+                    
+                    <div class="mt-auto flex gap-3">
+                        <button class="btn btn-primary flex-1">Read Online</button>
+                        <button class="btn btn-ghost flex-1">Download PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openBookModal(id, title, author, cover, level, type) {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalAuthor').textContent = author;
+        document.getElementById('modalCover').src = cover;
+        document.getElementById('modalLevel').textContent = level;
+        document.getElementById('modalType').textContent = type;
+        document.getElementById('bookModal').classList.add('open');
+    }
+    
+    function closeBookModal() {
+        document.getElementById('bookModal').classList.remove('open');
+    }
+</script>
+{% endblock %}

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Depends, HTTPException, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
-from master_database import SessionMaster, User, MockExam, MockAttempt, TeacherProfile, StudentProfile
+from master_database import SessionMaster, User, MockExam, MockAttempt, TeacherProfile, StudentProfile, PlatformUpdate
 from auth import get_current_user
 
 router = APIRouter(prefix="/owner", tags=["owner"])
@@ -114,3 +114,29 @@ async def restore_database(request: Request, db_file: UploadFile = File(...)):
         shutil.copyfileobj(db_file.file, buffer)
         
     return RedirectResponse("/owner/?restored=success", status_code=303)
+
+@router.get("/updates", response_class=HTMLResponse)
+async def owner_updates(request: Request, db: SessionMaster = Depends(get_mdb)):
+    user = get_current_user(request)
+    if not user or user.role != "owner":
+        return RedirectResponse("/login", status_code=302)
+        
+    updates = db.query(PlatformUpdate).order_by(PlatformUpdate.release_date.desc()).all()
+    
+    # Check if we should seed an initial update for demonstration
+    if not updates:
+        initial_update = PlatformUpdate(
+            version="1.1.0",
+            title="White-labeling Phase 1 & Owner Portal",
+            description="Added dynamic school branding, an owner administration dashboard, and this platform updates changelog.",
+            status="Live"
+        )
+        db.add(initial_update)
+        db.commit()
+        updates = [initial_update]
+        
+    return templates.TemplateResponse("owner_updates.html", {
+        "request": request,
+        "user": user,
+        "updates": updates
+    })

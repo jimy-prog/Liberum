@@ -2,6 +2,8 @@ name: Production Deploy
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ feature/white-labeling-updates, main, master ]
 
 jobs:
   deploy-production:

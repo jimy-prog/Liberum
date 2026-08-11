@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-6 py-8 w-full max-w-3xl mx-auto animate-fade-in">
+    <div class="mb-8">
+        <a href="/library/grammar/{{ topic.id }}" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex items-center mb-4">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Explanation
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Quiz: {{ topic.title }}</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">Test your knowledge with these {{ questions|length }} questions.</p>
+    </div>
+
+    <form action="/library/grammar/{{ topic.id }}/submit" method="post" class="space-y-8">
+        {% for q in questions %}
+        <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4"><span class="text-blue-600 font-bold mr-2">{{ loop.index }}.</span> {{ q.question_text }}</h3>
+            
+            <div class="space-y-3">
+                <label class="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                    <input type="radio" name="q_{{ q.id }}" value="A" required class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                    <span class="ml-3 text-gray-700 dark:text-gray-300">{{ q.option_a }}</span>
+                </label>
+                <label class="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                    <input type="radio" name="q_{{ q.id }}" value="B" required class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                    <span class="ml-3 text-gray-700 dark:text-gray-300">{{ q.option_b }}</span>
+                </label>
+                <label class="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                    <input type="radio" name="q_{{ q.id }}" value="C" required class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                    <span class="ml-3 text-gray-700 dark:text-gray-300">{{ q.option_c }}</span>
+                </label>
+                <label class="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                    <input type="radio" name="q_{{ q.id }}" value="D" required class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                    <span class="ml-3 text-gray-700 dark:text-gray-300">{{ q.option_d }}</span>
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 w-full sm:w-auto">
+                Submit Answers
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
