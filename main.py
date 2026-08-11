@@ -624,7 +624,7 @@ def on_startup():
     # FORCE SYNC LOCAL DATA TO LIVE SERVER (One-Time Migration)
     # ---------------------------------------------------------
     import shutil
-    flag_file = DATA_DIR / "migrated_mock_data_v2.flag"
+    flag_file = DATA_DIR / "migrated_mock_data_v3.flag"
     if not flag_file.exists():
         print("PERFORMING ONE-TIME DATA MIGRATION TO LIVE STORAGE...")
         
