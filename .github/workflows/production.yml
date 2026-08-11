@@ -23,7 +23,7 @@ jobs:
       - name: Sync project to production server
         run: |
           rsync -az --delete \
-            -e "ssh -p ${{ secrets.SERVER_PORT }} -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            -e "ssh -p 22 -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             --exclude ".git" \
             --exclude "__pycache__" \
             --exclude "*.pyc" \
@@ -32,14 +32,14 @@ jobs:
             --exclude "liberum.db" \
             --exclude "backups" \
             --exclude "uploads" \
-            ./ "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}/"
+            ./ "ubuntu@130.61.234.227:/home/ubuntu/Liberum/"
 
       - name: Write production env and deploy
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p "${{ secrets.SERVER_PORT }}" "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" << EOF
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << EOF
           set -eu
-          mkdir -p "${{ secrets.SERVER_PATH }}/cloudflare_deploy"
-          cat > "${{ secrets.SERVER_PATH }}/cloudflare_deploy/.env" << EOT
+          mkdir -p "/home/ubuntu/Liberum/cloudflare_deploy"
+          cat > "/home/ubuntu/Liberum/cloudflare_deploy/.env" << EOT
           SESSION_SECRET_KEY=${{ secrets.SESSION_SECRET_KEY }}
           DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}
           CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
