@@ -19,12 +19,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "${{ secrets.SERVER_PORT }}" -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Sync project to production server
         run: |
           rsync -az --delete \
-            -e "ssh -p ${{ secrets.SERVER_PORT }} -i ~/.ssh/deploy_key" \
+            -e "ssh -p ${{ secrets.SERVER_PORT }} -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             --exclude ".git" \
             --exclude "__pycache__" \
             --exclude "*.pyc" \
@@ -37,7 +36,7 @@ jobs:
 
       - name: Write production env and deploy
         run: |
-          ssh -i ~/.ssh/deploy_key -p "${{ secrets.SERVER_PORT }}" "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" << EOF
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p "${{ secrets.SERVER_PORT }}" "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" << EOF
           set -eu
           mkdir -p "${{ secrets.SERVER_PATH }}/cloudflare_deploy"
           cat > "${{ secrets.SERVER_PATH }}/cloudflare_deploy/.env" << EOT
