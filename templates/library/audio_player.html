@@ -358,6 +358,7 @@
         
         let isPlaying = false;
         let subtitlesEnabled = true;
+        let isScrubbing = false;
 
         // Formatting time in M:SS
         function formatTime(seconds) {
@@ -396,8 +397,10 @@
 
         // Time Update / Progress Bar
         audio.addEventListener('timeupdate', () => {
-            progressBar.value = audio.currentTime;
-            currentTimeEl.textContent = formatTime(audio.currentTime);
+            if (!isScrubbing) {
+                progressBar.value = audio.currentTime;
+                currentTimeEl.textContent = formatTime(audio.currentTime);
+            }
             
             // Subtitles logic
             if (subtitlesEnabled && audio.textTracks && audio.textTracks.length > 0) {
@@ -421,7 +424,13 @@
 
         // Scrubbing
         progressBar.addEventListener('input', () => {
+            isScrubbing = true;
+            currentTimeEl.textContent = formatTime(progressBar.value);
+        });
+        
+        progressBar.addEventListener('change', () => {
             audio.currentTime = progressBar.value;
+            isScrubbing = false;
         });
 
         // Volume
