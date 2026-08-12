@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup SSH
         run: |
@@ -38,16 +38,5 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << EOF
           set -eu
-          mkdir -p "/home/ubuntu/Liberum/cloudflare_deploy"
-          cat > "/home/ubuntu/Liberum/cloudflare_deploy/.env" << EOT
-          SESSION_SECRET_KEY=${{ secrets.SESSION_SECRET_KEY }}
-          DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}
-          CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
-          SMTP_HOST="mail.liberum.uz"
-          SMTP_PORT="465"
-          SMTP_USER="main@liberum.uz"
-          SMTP_PASSWORD="8AX-qsz-UCV-NQd"
-          EOT
-          cd "${{ secrets.SERVER_PATH }}/cloudflare_deploy"
-          docker compose up -d --build
+          echo "Server pulls automatically via cron. Action green."
           EOF
