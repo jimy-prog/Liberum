@@ -389,7 +389,7 @@ def delete_book(request: Request, book_id: int):
         
     master_db = SessionMaster()
     try:
-        book = master_db.query(LibraryBook).filter_by(id=book_id, tenant_id=user.tenant_id).first()
+        book = master_db.query(LibraryBook).filter_by(id=book_id).first()
         if book:
             if book.cover_url:
                 try: os.remove(book.cover_url.lstrip('/'))
@@ -412,10 +412,7 @@ def read_book(request: Request, book_id: int):
         
     master_db = SessionMaster()
     try:
-        book = master_db.query(LibraryBook).filter(
-            (LibraryBook.id == book_id) & 
-            ((LibraryBook.tenant_id == user.tenant_id) | (LibraryBook.tenant_id == None))
-        ).first()
+        book = master_db.query(LibraryBook).filter_by(id=book_id).first()
         if not book:
             raise HTTPException(status_code=404, detail="Book not found")
     finally:
