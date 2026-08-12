@@ -5,7 +5,7 @@ from pydantic import BaseModel
 import google.generativeai as genai
 
 from master_database import SessionMaster, User, GrammarQuizAttempt, GrammarTopic
-from database import get_tenant_engine, Student, Group, Lesson, Attendance, TestResult
+from database import get_tenant_engine, Student, Group, Lesson, Attendance, TestResult, AIChatSession, AIChatMessage
 from auth import get_current_user
 from config import GEMINI_API_KEY
 from sqlalchemy.orm import sessionmaker
@@ -24,14 +24,32 @@ class ChatRequest(BaseModel):
     include_tests: bool = False
     include_grammar: bool = False
     chat_history: list = [] # list of {"role": "user"|"model", "parts": "..."}
+    session_id: int | None = None
 
 @router.get("/")
 def ai_chat_page(request: Request):
     user = get_current_user(request)
     if not user:
         return RedirectResponse("/login", status_code=303)
+        
+    master_db = SessionMaster()
+    try:
+        user_record = master_db.query(User).filter_by(id=user.id).first()
+        tenant_db_filename = user_record.tenant.db_filename
+        student_id = user_record.student_id
+    finally:
+        master_db.close()
+        
+    engine = get_tenant_engine(tenant_db_filename)
+    SessionLocal = sessionmaker(bind=engine)
+    tenant_db = SessionLocal()
+    try:
+        sessions = tenant_db.query(AIChatSession).filter_by(student_id=student_id).order_by(AIChatSession.updated_at.desc()).all()
+    finally:
+        tenant_db.close()
+        
     return templates.TemplateResponse("library/student_ai_chat.html", {
-        "request": request, "user": user, "active_page": "library"
+        "request": request, "user": user, "active_page": "library", "sessions": sessions
     })
 
 @router.post("/chat")
@@ -133,8 +151,69 @@ Use this context to personalize your responses. If they ask about their recent l
         full_message = f"SYSTEM INSTRUCTION (DO NOT SHOW THIS TO THE USER):\n{system_prompt}\n\nUSER MESSAGE:\n{payload.message}"
         
         response = chat.send_message(full_message)
+        reply_text = response.text
         
-        return JSONResponse({"reply": response.text})
+        # Save to DB
+        engine = get_tenant_engine(tenant_db_filename)
+        SessionLocal = sessionmaker(bind=engine)
+        tenant_db2 = SessionLocal()
+        try:
+            if not payload.session_id:
+                # Create new session
+                title_preview = payload.message[:30] + ("..." if len(payload.message) > 30 else "")
+                new_session = AIChatSession(student_id=student_id, title=title_preview)
+                tenant_db2.add(new_session)
+                tenant_db2.commit()
+                tenant_db2.refresh(new_session)
+                session_id = new_session.id
+            else:
+                session_id = payload.session_id
+                # Update timestamp
+                existing_session = tenant_db2.query(AIChatSession).filter_by(id=session_id).first()
+                if existing_session:
+                    # updated_at will trigger auto update if configured, or we can just touch it
+                    pass 
+                
+            # Add user message
+            user_msg = AIChatMessage(session_id=session_id, role="user", content=payload.message)
+            tenant_db2.add(user_msg)
+            # Add lexi message
+            lexi_msg = AIChatMessage(session_id=session_id, role="lexi", content=reply_text)
+            tenant_db2.add(lexi_msg)
+            tenant_db2.commit()
+            
+        finally:
+            tenant_db2.close()
+            
+        return JSONResponse({"reply": reply_text, "session_id": session_id})
     except Exception as e:
         print("Gemini API Error:", str(e))
         return JSONResponse({"reply": "I'm sorry, my AI servers are currently experiencing issues. Please try again later.", "error": str(e)}, status_code=500)
+
+@router.get("/session/{session_id}")
+def load_session(request: Request, session_id: int):
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+        
+    master_db = SessionMaster()
+    try:
+        user_record = master_db.query(User).filter_by(id=user.id).first()
+        tenant_db_filename = user_record.tenant.db_filename
+        student_id = user_record.student_id
+    finally:
+        master_db.close()
+        
+    engine = get_tenant_engine(tenant_db_filename)
+    SessionLocal = sessionmaker(bind=engine)
+    tenant_db = SessionLocal()
+    try:
+        session = tenant_db.query(AIChatSession).filter_by(id=session_id, student_id=student_id).first()
+        if not session:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        messages = tenant_db.query(AIChatMessage).filter_by(session_id=session_id).order_by(AIChatMessage.id.asc()).all()
+        msg_list = [{"role": m.role, "content": m.content} for m in messages]
+        return JSONResponse({"messages": msg_list})
+    finally:
+        tenant_db.close()

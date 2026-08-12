@@ -5,11 +5,43 @@
 {% block extra_styles %}
 <style>
 /* Full screen dark/premium minimal layout */
-.ai-wrapper {
+.ai-layout-container {
+    display: flex;
+    height: calc(100vh - 100px);
+    max-height: 900px;
+    background: transparent;
+    margin: -26px; /* Edge to edge in page-content */
+}
+
+.ai-sidebar {
+    width: 260px;
+    background: rgba(255, 255, 255, 0.02);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 100px); /* Adjust based on your header */
-    max-height: 900px;
+    padding: 16px;
+    flex-shrink: 0;
+}
+.ai-sidebar-header { margin-bottom: 16px; }
+.new-chat-btn {
+    width: 100%; padding: 12px; background: transparent; color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
+    cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s;
+}
+.new-chat-btn:hover { background: rgba(255, 255, 255, 0.05); }
+.session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.session-list::-webkit-scrollbar { width: 4px; }
+.session-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.session-item {
+    padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--text2); font-size: 0.85rem;
+    transition: background 0.2s, color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.session-item:hover, .session-item.active { background: rgba(255, 255, 255, 0.05); color: var(--text); }
+
+.ai-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     position: relative;
     overflow: hidden;
     font-family: var(--font-s);
@@ -311,17 +343,32 @@
 {% endblock %}
 
 {% block content %}
-<div class="ai-wrapper">
-    
-    <!-- Chat History (Hidden initially) -->
-    <div class="chat-history" id="chatHistory">
-        <!-- Messages will be appended here -->
+<div class="ai-layout-container">
+    <!-- Secondary Sidebar for Chat History -->
+    <div class="ai-sidebar">
+        <div class="ai-sidebar-header">
+            <button class="new-chat-btn" onclick="startNewChat()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                New Chat
+            </button>
+        </div>
+        <div class="session-list" id="sessionList">
+            {% for session in sessions %}
+                <div class="session-item" onclick="loadSession({{ session.id }}, this)" title="{{ session.title }}">{{ session.title }}</div>
+            {% endfor %}
+        </div>
     </div>
 
-    <!-- Centered Landing Hero -->
-    <div class="landing-hero" id="landingHero">
-        <div class="lexi-logo">LEXI</div>
-    </div>
+    <div class="ai-wrapper">
+        <!-- Chat History (Hidden initially) -->
+        <div class="chat-history" id="chatHistory">
+            <!-- Messages will be appended here -->
+        </div>
+
+        <!-- Centered Landing Hero -->
+        <div class="landing-hero" id="landingHero">
+            <div class="lexi-logo">LEXI</div>
+        </div>
 
     <!-- Input Area -->
     <div class="input-container" id="inputContainer">
@@ -377,6 +424,7 @@
             </div>
         </div>
     </div>
+    </div>
 </div>
 
 <script>
@@ -392,6 +440,7 @@
     
     let isFirstMessage = true;
     let internalHistory = [];
+    let currentSessionId = null;
 
     // Auto-resize textarea
     chatInput.addEventListener('input', function() {
@@ -421,6 +470,51 @@
             setTimeout(() => {
                 landingHero.style.display = 'none';
             }, 400);
+        }
+    }
+
+    function startNewChat() {
+        currentSessionId = null;
+        isFirstMessage = true;
+        internalHistory = [];
+        chatHistoryEl.innerHTML = '';
+        
+        chatHistoryEl.classList.remove('visible');
+        inputContainer.classList.remove('active-chat');
+        landingHero.classList.remove('hidden');
+        landingHero.style.display = 'flex';
+        suggestions.style.display = 'flex';
+        
+        document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'));
+    }
+
+    async function loadSession(id, el) {
+        document.querySelectorAll('.session-item').forEach(e => e.classList.remove('active'));
+        if(el) el.classList.add('active');
+        
+        currentSessionId = id;
+        isFirstMessage = false;
+        internalHistory = [];
+        chatHistoryEl.innerHTML = '';
+        
+        landingHero.classList.add('hidden');
+        suggestions.style.display = 'none';
+        inputContainer.classList.add('active-chat');
+        chatHistoryEl.classList.add('visible');
+        landingHero.style.display = 'none';
+        
+        try {
+            const res = await fetch(`/library/ai/session/${id}`);
+            if (!res.ok) throw new Error('API Error');
+            const data = await res.json();
+            
+            data.messages.forEach(msg => {
+                appendMessage(msg.role, msg.content);
+                internalHistory.push({ role: msg.role === 'lexi' ? 'model' : 'user', parts: msg.content });
+            });
+        } catch(err) {
+            console.error(err);
+            appendMessage('lexi', 'Error loading chat history.');
         }
     }
 
@@ -467,7 +561,8 @@
             include_lessons: document.getElementById('ctx-lessons').checked,
             include_tests: document.getElementById('ctx-tests').checked,
             include_grammar: document.getElementById('ctx-grammar').checked,
-            chat_history: internalHistory
+            chat_history: internalHistory,
+            session_id: currentSessionId
         };
         
         const thinkingId = 'thinking-' + Date.now();
@@ -484,15 +579,18 @@
             
             const data = await res.json();
             
-            // Remove thinking
             document.getElementById(thinkingId).remove();
-            
-            // Append Lexi response
             appendMessage('lexi', data.reply);
             
-            // Push to history
             internalHistory.push({ role: 'user', parts: message });
             internalHistory.push({ role: 'model', parts: data.reply });
+            
+            if (!currentSessionId) {
+                // Was a new chat, refresh page to show new session in sidebar (simple approach)
+                window.location.reload();
+            } else {
+                currentSessionId = data.session_id;
+            }
             
         } catch (err) {
             document.getElementById(thinkingId).remove();

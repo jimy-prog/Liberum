@@ -429,7 +429,19 @@
         });
         
         progressBar.addEventListener('change', () => {
-            audio.currentTime = progressBar.value;
+            const newTime = parseFloat(progressBar.value);
+            if (!isNaN(newTime)) {
+                audio.currentTime = newTime;
+            }
+            isScrubbing = false;
+        });
+
+        // Also handle touchend / mouseup for better mobile scrubbing
+        progressBar.addEventListener('pointerup', () => {
+            const newTime = parseFloat(progressBar.value);
+            if (!isNaN(newTime)) {
+                audio.currentTime = newTime;
+            }
             isScrubbing = false;
         });
 

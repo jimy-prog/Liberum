@@ -206,6 +206,26 @@ class PlacementSession(Base):
     email = Column(String, default="")
     notes = Column(Text, default="")
 
+class AIChatSession(Base):
+    __tablename__ = "ai_chat_sessions"
+    id = Column(Integer, primary_key=True)
+    student_id = Column(Integer, ForeignKey("students.id"), nullable=False)
+    title = Column(String, default="New Conversation")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    messages = relationship("AIChatMessage", back_populates="session", cascade="all, delete-orphan")
+
+class AIChatMessage(Base):
+    __tablename__ = "ai_chat_messages"
+    id = Column(Integer, primary_key=True)
+    session_id = Column(Integer, ForeignKey("ai_chat_sessions.id"), nullable=False)
+    role = Column(String, nullable=False) # 'user' or 'lexi'
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    session = relationship("AIChatSession", back_populates="messages")
+
 def get_db(request: Request = None):
     token = None
     if request:
