@@ -21,6 +21,7 @@ uploads/*.mp3
 !uploads/images/
 !uploads/pdf/
 !uploads/course_files/
+!uploads/books/
 
 .pytest_cache/
 .mypy_cache/
