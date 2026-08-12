@@ -26,7 +26,7 @@ class ChatRequest(BaseModel):
     chat_history: list = [] # list of {"role": "user"|"model", "parts": "..."}
     session_id: int | None = None
 
-@router.get("/ai")
+@router.get("/")
 def ai_chat_page(request: Request):
     user = get_current_user(request)
     if not user:
