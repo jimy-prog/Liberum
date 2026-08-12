@@ -209,7 +209,7 @@ class PlacementSession(Base):
 class AIChatSession(Base):
     __tablename__ = "ai_chat_sessions"
     id = Column(Integer, primary_key=True)
-    student_id = Column(Integer, ForeignKey("students.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("students.id"), nullable=True)
     title = Column(String, default="New Conversation")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

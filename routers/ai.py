@@ -51,8 +51,8 @@ def ai_chat_page(request: Request):
         student = tenant_db.query(Student).filter(
             (Student.email == user_email) | (Student.phone == user_phone) | (Student.name == user_full_name)
         ).first()
-        student_id = student.id if student else 0
-        sessions = tenant_db.query(AIChatSession).filter_by(student_id=student_id).order_by(AIChatSession.updated_at.desc()).all() if student_id else []
+        student_id = student.id if student else None
+        sessions = tenant_db.query(AIChatSession).filter_by(student_id=student_id).order_by(AIChatSession.updated_at.desc()).all()
     finally:
         tenant_db.close()
         
@@ -92,13 +92,11 @@ def ai_chat_endpoint(request: Request, payload: ChatRequest):
         student = tenant_db.query(Student).filter(
             (Student.email == user_email) | (Student.phone == user_phone) | (Student.name == user_full_name)
         ).first()
-        if not student:
-            raise HTTPException(status_code=404, detail="Student record not found")
-        student_id = student.id
+        student_id = student.id if student else None
         
         # Now get grammar attempts from master_db since we have student_id
         grammar_data = []
-        if payload.include_grammar:
+        if payload.include_grammar and student_id:
             master_db = SessionMaster()
             try:
                 attempts = master_db.query(GrammarQuizAttempt).filter_by(student_id=student_id).all()
@@ -109,7 +107,7 @@ def ai_chat_endpoint(request: Request, payload: ChatRequest):
             finally:
                 master_db.close()
             
-        if payload.include_profile:
+        if student and payload.include_profile:
             student_info = f"Student Name: {student.name}\n"
             student_info += f"English Level: {student.level}\n"
             student_info += f"Strengths: {student.strengths}\n"
@@ -230,7 +228,7 @@ def load_session(request: Request, session_id: int):
         student = tenant_db.query(Student).filter(
             (Student.email == user_email) | (Student.phone == user_phone) | (Student.name == user_full_name)
         ).first()
-        student_id = student.id if student else 0
+        student_id = student.id if student else None
         
         session = tenant_db.query(AIChatSession).filter_by(id=session_id, student_id=student_id).first()
         if not session:

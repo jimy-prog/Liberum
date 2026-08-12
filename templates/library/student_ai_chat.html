@@ -351,21 +351,7 @@
 
 {% block content %}
 <div class="ai-layout-container">
-    <!-- Secondary Sidebar for Chat History -->
-    <div class="ai-sidebar">
-        <div class="ai-sidebar-header">
-            <button class="new-chat-btn" onclick="startNewChat()">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                New Chat
-            </button>
-        </div>
-        <div class="session-list" id="sessionList">
-            {% for session in sessions %}
-                <div class="session-item" onclick="loadSession({{ session.id }}, this)" title="{{ session.title }}">{{ session.title }}</div>
-            {% endfor %}
-        </div>
-    </div>
-
+    
     <div class="ai-wrapper">
         <!-- Chat History (Hidden initially) -->
         <div class="chat-history" id="chatHistory">
