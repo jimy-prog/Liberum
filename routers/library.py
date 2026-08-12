@@ -31,9 +31,7 @@ def list_books(request: Request, level: str = None):
     
     master_db = SessionMaster()
     try:
-        query = master_db.query(LibraryBook).filter(
-            (LibraryBook.tenant_id == user.tenant_id) | (LibraryBook.tenant_id == None)
-        )
+        query = master_db.query(LibraryBook)
         if level and level != "all":
             query = query.filter(LibraryBook.level == level)
             
@@ -325,7 +323,7 @@ def manage_books(request: Request):
         
     master_db = SessionMaster()
     try:
-        books = master_db.query(LibraryBook).filter_by(tenant_id=user.tenant_id).order_by(LibraryBook.created_at.desc()).all()
+        books = master_db.query(LibraryBook).order_by(LibraryBook.created_at.desc()).all()
     finally:
         master_db.close()
         
