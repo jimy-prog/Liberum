@@ -89,6 +89,13 @@ body.dark{
 
 h1, h2, h3, h4, h5, h6, .font-display{font-family:var(--font-d)}
 
+/* Custom Subtle Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: transparent; border-radius: 4px; }
+:hover::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.3); }
+::-webkit-scrollbar-thumb:hover { background: rgba(150, 150, 150, 0.5); }
+
 /* ── Sidebar ── */
 .sidebar{
   position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);

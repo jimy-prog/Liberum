@@ -7,36 +7,39 @@
 /* Full screen dark/premium minimal layout */
 .ai-layout-container {
     display: flex;
-    height: calc(100vh - 100px);
-    max-height: 900px;
+    height: calc(100vh - 56px); /* 56px is the topbar height */
     background: transparent;
     margin: -26px; /* Edge to edge in page-content */
 }
 
 .ai-sidebar {
-    width: 260px;
-    background: rgba(255, 255, 255, 0.02);
+    width: 280px;
+    background: transparent;
     border-right: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
-    padding: 16px;
+    padding: 24px 20px;
     flex-shrink: 0;
+    transition: background 0.3s;
 }
-.ai-sidebar-header { margin-bottom: 16px; }
+.ai-sidebar:hover {
+    background: rgba(255, 255, 255, 0.01);
+}
+.ai-sidebar-header { margin-bottom: 24px; }
 .new-chat-btn {
-    width: 100%; padding: 12px; background: transparent; color: var(--text);
-    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
-    cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s;
+    width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.03); color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; font-weight: 500;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;
 }
-.new-chat-btn:hover { background: rgba(255, 255, 255, 0.05); }
-.session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-.session-list::-webkit-scrollbar { width: 4px; }
-.session-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.new-chat-btn:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-1px); }
+.session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px; }
 .session-item {
-    padding: 10px 12px; border-radius: 8px; cursor: pointer; color: var(--text2); font-size: 0.85rem;
-    transition: background 0.2s, color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    padding: 12px 14px; border-radius: 10px; cursor: pointer; color: var(--text2); font-size: 0.9rem;
+    transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border: 1px solid transparent;
 }
-.session-item:hover, .session-item.active { background: rgba(255, 255, 255, 0.05); color: var(--text); }
+.session-item:hover { background: rgba(255, 255, 255, 0.04); color: var(--text); border-color: rgba(255, 255, 255, 0.05); }
+.session-item.active { background: rgba(255, 255, 255, 0.08); color: var(--text); font-weight: 500; }
 
 .ai-wrapper {
     flex: 1;
@@ -58,6 +61,7 @@
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
+    padding-bottom: 10vh; /* Nudge up slightly from dead center for better visual balance */
 }
 
 .landing-hero.hidden {
@@ -69,12 +73,15 @@
 
 .lexi-logo {
     font-family: var(--font-d);
-    font-size: 3.5rem;
+    font-size: 4rem;
     font-weight: 800;
-    letter-spacing: 4px;
-    color: var(--text);
+    letter-spacing: 6px;
+    background: linear-gradient(to right, #fff, #9ca3af);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin-bottom: 40px;
     text-transform: uppercase;
+    text-shadow: 0 10px 30px rgba(255,255,255,0.05);
 }
 
 /* Input Area - transitions from centered to bottom */
