@@ -11,6 +11,8 @@ OWNER_FULL_NAME = os.getenv("OWNER_FULL_NAME", "Liberum Owner")
 
 DEFAULT_DB_FILENAME = "liberum.db"
 LEGACY_DB_FILENAME = "teacher_admin.db"
+# AI API
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 # Firebase
 FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, "firebase-service-account.json")

@@ -11,3 +11,4 @@ firebase-admin
 PyMuPDF==1.23.8
 Pillow==10.2.0
 google-generativeai==0.5.2
+google-generativeai
