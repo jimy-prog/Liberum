@@ -3,6 +3,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
+from dotenv import load_dotenv
+load_dotenv()
+
 APP_NAME = os.getenv("APP_NAME", "Liberum")
 APP_TAGLINE = os.getenv("APP_TAGLINE", "English Learning Platform")
 OWNER_USERNAME = os.getenv("OWNER_USERNAME", "owner")
@@ -12,7 +15,8 @@ OWNER_FULL_NAME = os.getenv("OWNER_FULL_NAME", "Liberum Owner")
 DEFAULT_DB_FILENAME = "liberum.db"
 LEGACY_DB_FILENAME = "teacher_admin.db"
 # AI API
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+_raw_key = os.getenv("GEMINI_API_KEY", "")
+GEMINI_API_KEY = _raw_key.split(",")[0].strip() if _raw_key else ""
 
 # Firebase
 FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, "firebase-service-account.json")
