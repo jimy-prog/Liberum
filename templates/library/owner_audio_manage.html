@@ -21,7 +21,9 @@
                 <h2>Upload New Audio</h2>
             </div>
             <div class="card-body">
-                <form action="/library/audio/add" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 16px;">
+                <form id="uploadForm" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 16px;">
+                    <div id="errorAlert" style="display: none; background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 12px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.9rem;"></div>
+                    
                     <div>
                         <label>Title</label>
                         <input type="text" name="title" class="input" required>
@@ -66,8 +68,70 @@
                         <small style="color: var(--text3); font-size: 0.75rem;">Upload a WebVTT (.vtt) file for native web player subtitle support.</small>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Upload Audio</button>
+                    <div id="progressContainer" style="display: none; margin-top: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; color: var(--text2);">
+                            <span>Uploading...</span>
+                            <span id="progressText">0%</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: var(--bg3); border-radius: 999px; overflow: hidden;">
+                            <div id="progressBar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.2s;"></div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="uploadBtn" class="btn btn-primary" style="margin-top: 8px;">Upload Audio</button>
                 </form>
+                
+                <script>
+                    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        const form = this;
+                        const formData = new FormData(form);
+                        const uploadBtn = document.getElementById('uploadBtn');
+                        const progressContainer = document.getElementById('progressContainer');
+                        const progressBar = document.getElementById('progressBar');
+                        const progressText = document.getElementById('progressText');
+                        const errorAlert = document.getElementById('errorAlert');
+                        
+                        uploadBtn.disabled = true;
+                        uploadBtn.textContent = 'Uploading...';
+                        progressContainer.style.display = 'block';
+                        errorAlert.style.display = 'none';
+                        
+                        const xhr = new XMLHttpRequest();
+                        
+                        xhr.upload.addEventListener('progress', function(e) {
+                            if (e.lengthComputable) {
+                                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                                progressBar.style.width = percentComplete + '%';
+                                progressText.textContent = percentComplete + '%';
+                            }
+                        });
+                        
+                        xhr.addEventListener('load', function() {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                window.location.reload();
+                            } else {
+                                uploadBtn.disabled = false;
+                                uploadBtn.textContent = 'Upload Audio';
+                                progressContainer.style.display = 'none';
+                                errorAlert.textContent = 'Upload failed. Error code: ' + xhr.status;
+                                errorAlert.style.display = 'block';
+                            }
+                        });
+                        
+                        xhr.addEventListener('error', function() {
+                            uploadBtn.disabled = false;
+                            uploadBtn.textContent = 'Upload Audio';
+                            progressContainer.style.display = 'none';
+                            errorAlert.textContent = 'Upload failed due to a network error. Ensure the file size is not too large (Cloudflare limit is 100MB).';
+                            errorAlert.style.display = 'block';
+                        });
+                        
+                        xhr.open('POST', '/library/audio/add');
+                        xhr.send(formData);
+                    });
+                </script>
             </div>
         </div>
         
