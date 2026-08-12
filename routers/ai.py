@@ -26,7 +26,7 @@ class ChatRequest(BaseModel):
     chat_history: list = [] # list of {"role": "user"|"model", "parts": "..."}
     session_id: int | None = None
 
-@router.get("/")
+@router.get("/ai")
 def ai_chat_page(request: Request):
     user = get_current_user(request)
     if not user:
@@ -35,8 +35,12 @@ def ai_chat_page(request: Request):
     master_db = SessionMaster()
     try:
         user_record = master_db.query(User).filter_by(id=user.id).first()
+        if not user_record:
+            return RedirectResponse("/login", status_code=303)
         tenant_db_filename = user_record.tenant.db_filename
-        student_id = user_record.student_id
+        user_email = user_record.email
+        user_phone = user_record.phone
+        user_full_name = user_record.full_name
     finally:
         master_db.close()
         
@@ -44,7 +48,11 @@ def ai_chat_page(request: Request):
     SessionLocal = sessionmaker(bind=engine)
     tenant_db = SessionLocal()
     try:
-        sessions = tenant_db.query(AIChatSession).filter_by(student_id=student_id).order_by(AIChatSession.updated_at.desc()).all()
+        student = tenant_db.query(Student).filter(
+            (Student.email == user_email) | (Student.phone == user_phone) | (Student.name == user_full_name)
+        ).first()
+        student_id = student.id if student else 0
+        sessions = tenant_db.query(AIChatSession).filter_by(student_id=student_id).order_by(AIChatSession.updated_at.desc()).all() if student_id else []
     finally:
         tenant_db.close()
         
@@ -65,20 +73,13 @@ def ai_chat_endpoint(request: Request, payload: ChatRequest):
             raise HTTPException(status_code=404, detail="User not found")
         
         tenant_db_filename = user_record.tenant.db_filename
-        student_id = user_record.student_id
-        
-        # Get grammar attempts
-        grammar_data = []
-        if payload.include_grammar:
-            attempts = master_db.query(GrammarQuizAttempt).filter_by(student_id=student_id).all()
-            for a in attempts:
-                topic = master_db.query(GrammarTopic).filter_by(id=a.topic_id).first()
-                if topic:
-                    grammar_data.append(f"- {topic.title}: {a.score}/{a.total_questions}")
+        user_email = user_record.email
+        user_phone = user_record.phone
+        user_full_name = user_record.full_name
     finally:
         master_db.close()
-        
-    # Query Tenant DB
+
+    # Query Tenant DB first to get student_id
     engine = get_tenant_engine(tenant_db_filename)
     SessionLocal = sessionmaker(bind=engine)
     tenant_db = SessionLocal()
@@ -88,9 +89,25 @@ def ai_chat_endpoint(request: Request, payload: ChatRequest):
     test_info = ""
     
     try:
-        student = tenant_db.query(Student).filter_by(id=student_id).first()
+        student = tenant_db.query(Student).filter(
+            (Student.email == user_email) | (Student.phone == user_phone) | (Student.name == user_full_name)
+        ).first()
         if not student:
             raise HTTPException(status_code=404, detail="Student record not found")
+        student_id = student.id
+        
+        # Now get grammar attempts from master_db since we have student_id
+        grammar_data = []
+        if payload.include_grammar:
+            master_db = SessionMaster()
+            try:
+                attempts = master_db.query(GrammarQuizAttempt).filter_by(student_id=student_id).all()
+                for a in attempts:
+                    topic = master_db.query(GrammarTopic).filter_by(id=a.topic_id).first()
+                    if topic:
+                        grammar_data.append(f"- {topic.title}: {a.score}/{a.total_questions}")
+            finally:
+                master_db.close()
             
         if payload.include_profile:
             student_info = f"Student Name: {student.name}\n"
@@ -200,7 +217,9 @@ def load_session(request: Request, session_id: int):
     try:
         user_record = master_db.query(User).filter_by(id=user.id).first()
         tenant_db_filename = user_record.tenant.db_filename
-        student_id = user_record.student_id
+        user_email = user_record.email
+        user_phone = user_record.phone
+        user_full_name = user_record.full_name
     finally:
         master_db.close()
         
@@ -208,6 +227,11 @@ def load_session(request: Request, session_id: int):
     SessionLocal = sessionmaker(bind=engine)
     tenant_db = SessionLocal()
     try:
+        student = tenant_db.query(Student).filter(
+            (Student.email == user_email) | (Student.phone == user_phone) | (Student.name == user_full_name)
+        ).first()
+        student_id = student.id if student else 0
+        
         session = tenant_db.query(AIChatSession).filter_by(id=session_id, student_id=student_id).first()
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
