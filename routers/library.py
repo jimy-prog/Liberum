@@ -32,7 +32,7 @@ def list_books(request: Request, level: str = None):
     
     master_db = SessionMaster()
     try:
-        query = master_db.query(LibraryBook)
+        query = master_db.query(LibraryBook).filter(LibraryBook.book_type == "ebook")
         if level and level != "all":
             query = query.filter(LibraryBook.level == level)
             
