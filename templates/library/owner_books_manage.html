@@ -22,7 +22,9 @@
                 <h2 class="card-title" style="color: var(--text);">Upload New Book</h2>
             </div>
             <div class="card-body">
-                <form action="/library/books/add" method="post" enctype="multipart/form-data">
+                <form id="uploadBookForm" enctype="multipart/form-data">
+                    <div id="errorBookAlert" style="display: none; background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 12px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.9rem; margin-bottom: 16px;"></div>
+                    
                     <div class="form-group">
                         <label class="form-label">Book Title *</label>
                         <input type="text" name="title" class="form-control" required placeholder="e.g. Harry Potter">
@@ -55,16 +57,75 @@
                         <input type="file" name="cover_file" class="form-control" accept="image/*" style="padding: 8px;">
                     </div>
                     
-                    <div class="form-group mb-6">
+                    <div class="form-group mb-4">
                         <label class="form-label">Book File (EPUB or PDF) *</label>
                         <input type="file" name="book_file" class="form-control" accept=".pdf,.epub" required style="padding: 8px;">
                     </div>
                     
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
-                        <svg style="width:16px;height:16px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                        Upload Book
-                    </button>
+                    <div id="progressBookContainer" style="display: none; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; color: var(--text2);">
+                            <span>Uploading...</span>
+                            <span id="progressBookText">0%</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: var(--bg3); border-radius: 999px; overflow: hidden;">
+                            <div id="progressBookBar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.2s;"></div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="uploadBookBtn" class="btn btn-primary" style="width: 100%;">Upload Book</button>
                 </form>
+                
+                <script>
+                    document.getElementById('uploadBookForm').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        const form = this;
+                        const formData = new FormData(form);
+                        const uploadBtn = document.getElementById('uploadBookBtn');
+                        const progressContainer = document.getElementById('progressBookContainer');
+                        const progressBar = document.getElementById('progressBookBar');
+                        const progressText = document.getElementById('progressBookText');
+                        const errorAlert = document.getElementById('errorBookAlert');
+                        
+                        uploadBtn.disabled = true;
+                        uploadBtn.textContent = 'Uploading...';
+                        progressContainer.style.display = 'block';
+                        errorAlert.style.display = 'none';
+                        
+                        const xhr = new XMLHttpRequest();
+                        
+                        xhr.upload.addEventListener('progress', function(e) {
+                            if (e.lengthComputable) {
+                                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                                progressBar.style.width = percentComplete + '%';
+                                progressText.textContent = percentComplete + '%';
+                            }
+                        });
+                        
+                        xhr.addEventListener('load', function() {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                window.location.reload();
+                            } else {
+                                uploadBtn.disabled = false;
+                                uploadBtn.textContent = 'Upload Book';
+                                progressContainer.style.display = 'none';
+                                errorAlert.textContent = 'Upload failed. Error code: ' + xhr.status;
+                                errorAlert.style.display = 'block';
+                            }
+                        });
+                        
+                        xhr.addEventListener('error', function() {
+                            uploadBtn.disabled = false;
+                            uploadBtn.textContent = 'Upload Book';
+                            progressContainer.style.display = 'none';
+                            errorAlert.textContent = 'Upload failed due to a network error. Ensure the file size is not too large (Cloudflare limit is 100MB).';
+                            errorAlert.style.display = 'block';
+                        });
+                        
+                        xhr.open('POST', '/library/books/add');
+                        xhr.send(formData);
+                    });
+                </script>
             </div>
         </div>
 
