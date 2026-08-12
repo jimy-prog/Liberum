@@ -4,160 +4,456 @@
 
 {% block extra_styles %}
 <style>
-.ai-layout { display: flex; flex-direction: column; height: calc(100vh - 180px); max-height: 800px; background: var(--bg2); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
-.ai-header { padding: 16px 24px; background: var(--bg3); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.ai-title { font-family: var(--font-d); font-size: 1.2rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.ai-icon { color: var(--accent); }
+/* Full screen dark/premium minimal layout */
+.ai-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 100px); /* Adjust based on your header */
+    max-height: 900px;
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-s);
+}
 
-.context-bar { padding: 12px 24px; background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
-.context-label { font-size: 0.85rem; color: var(--text2); font-weight: 600; }
-.context-chip { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text); background: var(--bg3); padding: 4px 12px; border-radius: 999px; cursor: pointer; border: 1px solid var(--border); transition: all 0.2s; user-select: none; }
-.context-chip input { margin: 0; }
-.context-chip:hover { background: var(--bg-hover); }
+/* Centered Landing State */
+.landing-hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
 
-.chat-container { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
-.chat-msg { display: flex; gap: 16px; max-width: 85%; }
-.chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
-.chat-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
-.chat-msg.user .chat-avatar { background: var(--accent); color: white; }
-.chat-msg.lexi .chat-avatar { background: var(--success); color: white; }
+.landing-hero.hidden {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transform: translateY(-20px);
+}
 
-.chat-bubble { padding: 16px 20px; border-radius: 12px; background: var(--bg3); color: var(--text); font-size: 0.95rem; line-height: 1.6; }
-.chat-msg.user .chat-bubble { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
-.chat-msg.lexi .chat-bubble { border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+.lexi-logo {
+    font-family: var(--font-d);
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: var(--text);
+    margin-bottom: 40px;
+    text-transform: uppercase;
+}
 
-.chat-bubble p { margin-bottom: 12px; }
-.chat-bubble p:last-child { margin-bottom: 0; }
-.chat-bubble ul, .chat-bubble ol { margin-left: 24px; margin-bottom: 12px; }
-.chat-bubble code { background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; font-family: monospace; }
-.chat-bubble pre { background: var(--bg1); padding: 12px; border-radius: 8px; overflow-x: auto; margin-bottom: 12px; }
+/* Input Area - transitions from centered to bottom */
+.input-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    z-index: 10;
+}
 
-.input-area { padding: 16px 24px; background: var(--bg3); border-top: 1px solid var(--border); }
-.input-wrapper { display: flex; gap: 12px; align-items: flex-end; }
-.chat-input { flex: 1; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; color: var(--text); font-family: inherit; font-size: 0.95rem; resize: none; min-height: 24px; max-height: 120px; outline: none; }
-.chat-input:focus { border-color: var(--accent); }
+.input-container.active-chat {
+    margin-top: auto; /* Pushes to bottom */
+    padding-bottom: 24px;
+}
 
-.action-btn { width: 48px; height: 48px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-.btn-mic { background: var(--bg2); color: var(--text); border: 1px solid var(--border); }
-.btn-mic.recording { background: #ef4444; color: white; border-color: #ef4444; animation: pulse 1.5s infinite; }
-.btn-send { background: var(--accent); color: white; }
-.btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+.input-box {
+    background: var(--bg2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
 
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+.input-box:focus-within {
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+}
 
-/* Markdown Styles inside bubble */
-.chat-bubble h1, .chat-bubble h2, .chat-bubble h3 { font-family: var(--font-d); margin-bottom: 12px; margin-top: 16px; }
-.chat-bubble h1:first-child, .chat-bubble h2:first-child, .chat-bubble h3:first-child { margin-top: 0; }
-.chat-bubble strong { font-weight: 700; color: inherit; }
+.input-row-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-icon:hover {
+    background: var(--bg3);
+    color: var(--text);
+}
+
+.btn-icon.recording {
+    color: #ef4444;
+    animation: pulse-recording 1.5s infinite;
+}
+
+@keyframes pulse-recording {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.chat-textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1rem;
+    resize: none;
+    min-height: 24px;
+    max-height: 150px;
+    outline: none;
+    font-family: inherit;
+    padding: 8px 0;
+}
+.chat-textarea::placeholder {
+    color: var(--text3);
+}
+
+.btn-submit {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-submit:hover:not(:disabled) {
+    background: var(--text);
+    color: var(--bg1);
+}
+.btn-submit:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.input-row-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.context-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text2);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+.context-selector:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Suggestion Chips */
+.suggestions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 24px;
+    width: 100%;
+    max-width: 800px;
+}
+.suggestion-chip {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 8px 16px;
+    color: var(--text2);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+.suggestion-chip:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Active Chat Layout */
+.chat-history {
+    flex: 1;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow-y: auto;
+    padding: 24px 0;
+    display: none;
+    flex-direction: column;
+    gap: 32px;
+}
+.chat-history.visible {
+    display: flex;
+}
+
+/* Scrollbar hide for chat */
+.chat-history::-webkit-scrollbar { width: 6px; }
+.chat-history::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+.message-row {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+.message-row.user {
+    flex-direction: row-reverse;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+.message-row.user .avatar {
+    background: var(--bg3);
+    color: var(--text);
+}
+.message-row.lexi .avatar {
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    color: white;
+}
+
+.message-content {
+    max-width: 85%;
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+.message-row.user .message-content {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 16px;
+    border-radius: 12px;
+}
+
+/* Markdown parsing inside message */
+.message-content p { margin-bottom: 12px; }
+.message-content p:last-child { margin-bottom: 0; }
+.message-content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+.message-content pre { background: var(--bg1); padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
+.message-content ul, .message-content ol { margin-left: 24px; margin-bottom: 12px; }
+
+/* Context Dropdown */
+.context-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 16px;
+    background: var(--bg2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    margin-bottom: 8px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 200px;
+    z-index: 100;
+}
+.context-dropdown.show {
+    display: flex;
+}
+.context-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text);
+    cursor: pointer;
+}
+.context-option input { margin: 0; accent-color: var(--accent); }
 
 @media (max-width: 768px) {
-    .ai-layout { height: calc(100vh - 100px); }
-    .chat-msg { max-width: 95%; }
+    .lexi-logo { font-size: 2.5rem; }
+    .input-box { border-radius: 12px; }
+    .message-content { max-width: 90%; }
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 {% endblock %}
 
 {% block content %}
-    <div style="margin-bottom: 24px;">
-        <a href="/library" class="btn btn-sm" style="background: var(--bg3); color: var(--text);">&larr; Back to Library</a>
+<div class="ai-wrapper">
+    
+    <!-- Chat History (Hidden initially) -->
+    <div class="chat-history" id="chatHistory">
+        <!-- Messages will be appended here -->
     </div>
 
-    <div class="ai-layout">
-        <div class="ai-header">
-            <div class="ai-title">
-                <svg class="ai-icon" style="width:24px;height:24px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                Lexi AI Tutor
+    <!-- Centered Landing Hero -->
+    <div class="landing-hero" id="landingHero">
+        <div class="lexi-logo">LEXI</div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-container" id="inputContainer">
+        
+        <div class="context-dropdown" id="contextDropdown">
+            <label class="context-option">
+                <input type="checkbox" id="ctx-profile" checked> Include Profile & Goals
+            </label>
+            <label class="context-option">
+                <input type="checkbox" id="ctx-lessons" checked> Include Recent Lessons
+            </label>
+            <label class="context-option">
+                <input type="checkbox" id="ctx-tests" checked> Include Mock Tests
+            </label>
+            <label class="context-option">
+                <input type="checkbox" id="ctx-grammar"> Include Grammar Scores
+            </label>
+        </div>
+
+        <div class="input-box">
+            <div class="input-row-main">
+                <button class="btn-icon" id="micBtn" title="Dictate">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                </button>
+                <textarea class="chat-textarea" id="chatInput" rows="1" placeholder="Ask Lexi or give a command..."></textarea>
+                <button class="btn-submit" id="sendBtn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                </button>
             </div>
-            <span style="font-size: 0.8rem; color: var(--text3);">Context-Aware AI</span>
-        </div>
-
-        <div class="context-bar">
-            <span class="context-label">Include Context:</span>
-            <label class="context-chip">
-                <input type="checkbox" id="ctx-profile" checked>
-                Profile & Goals
-            </label>
-            <label class="context-chip">
-                <input type="checkbox" id="ctx-lessons">
-                Recent Lessons
-            </label>
-            <label class="context-chip">
-                <input type="checkbox" id="ctx-tests">
-                Mock Tests
-            </label>
-            <label class="context-chip">
-                <input type="checkbox" id="ctx-grammar">
-                Grammar Scores
-            </label>
-        </div>
-
-        <div class="chat-container" id="chatContainer">
-            <div class="chat-msg lexi">
-                <div class="chat-avatar">L</div>
-                <div class="chat-bubble">
-                    <p>Hi {{ user.full_name.split(' ')[0] if user.full_name else user.username }}! I'm Lexi, your strict but helpful AI tutor. I have access to your progress, test scores, and lessons.</p>
-                    <p>What would you like to focus on today? You can select the context options above to help me give you better guidance.</p>
+            
+            <div class="input-row-bottom">
+                <div class="context-selector" id="contextToggleBtn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Select Context Model</span>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
             </div>
         </div>
-
-        <div class="input-area">
-            <div class="input-wrapper">
-                <button type="button" class="action-btn btn-mic" id="micBtn" title="Dictate message">
-                    <svg style="width:20px;height:20px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                </button>
-                <textarea class="chat-input" id="chatInput" rows="1" placeholder="Ask Lexi a question... (Shift+Enter for new line)"></textarea>
-                <button type="button" class="action-btn btn-send" id="sendBtn" title="Send message">
-                    <svg style="width:20px;height:20px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                </button>
+        
+        <!-- Suggestions (Only visible in landing) -->
+        <div class="suggestions" id="suggestions">
+            <div class="suggestion-chip" onclick="document.getElementById('chatInput').value='Analyze my last Mock Test'; document.getElementById('sendBtn').click();">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Analyze last Mock Test
+            </div>
+            <div class="suggestion-chip" onclick="document.getElementById('chatInput').value='Why did I fail my recent grammar quiz?'; document.getElementById('sendBtn').click();">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Review Grammar
+            </div>
+            <div class="suggestion-chip" onclick="document.getElementById('chatInput').value='Give me a practice exercise based on my weaknesses.'; document.getElementById('sendBtn').click();">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                Practice Weaknesses
             </div>
         </div>
     </div>
+</div>
 
 <script>
-    const chatContainer = document.getElementById('chatContainer');
     const chatInput = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendBtn');
     const micBtn = document.getElementById('micBtn');
+    const chatHistoryEl = document.getElementById('chatHistory');
+    const landingHero = document.getElementById('landingHero');
+    const inputContainer = document.getElementById('inputContainer');
+    const suggestions = document.getElementById('suggestions');
+    const contextToggleBtn = document.getElementById('contextToggleBtn');
+    const contextDropdown = document.getElementById('contextDropdown');
     
+    let isFirstMessage = true;
+    let internalHistory = [];
+
     // Auto-resize textarea
     chatInput.addEventListener('input', function() {
         this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
+        this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        sendBtn.disabled = this.value.trim().length === 0;
+    });
+    
+    // Toggle Context
+    contextToggleBtn.addEventListener('click', () => {
+        contextDropdown.classList.toggle('show');
+    });
+    // Close context when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!contextToggleBtn.contains(e.target) && !contextDropdown.contains(e.target)) {
+            contextDropdown.classList.remove('show');
+        }
     });
 
-    let chatHistory = [];
+    function transitionToChat() {
+        if (isFirstMessage) {
+            isFirstMessage = false;
+            landingHero.classList.add('hidden');
+            suggestions.style.display = 'none';
+            inputContainer.classList.add('active-chat');
+            chatHistoryEl.classList.add('visible');
+            setTimeout(() => {
+                landingHero.style.display = 'none';
+            }, 400);
+        }
+    }
 
-    // Append Message to UI
-    function appendMessage(role, content) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `chat-msg ${role}`;
+    function appendMessage(role, content, id = null) {
+        const row = document.createElement('div');
+        row.className = `message-row ${role}`;
+        if (id) row.id = id;
         
         const avatar = document.createElement('div');
-        avatar.className = 'chat-avatar';
-        avatar.textContent = role === 'user' ? 'U' : 'L';
+        avatar.className = 'avatar';
+        avatar.textContent = role === 'user' ? '{{ user.full_name.split(" ")[0][0] if user.full_name else "U" }}' : 'L';
         
-        const bubble = document.createElement('div');
-        bubble.className = 'chat-bubble';
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
         
         if (role === 'lexi') {
-            bubble.innerHTML = marked.parse(content);
+            contentDiv.innerHTML = marked.parse(content);
         } else {
-            bubble.textContent = content;
+            contentDiv.textContent = content;
         }
         
-        msgDiv.appendChild(avatar);
-        msgDiv.appendChild(bubble);
-        chatContainer.appendChild(msgDiv);
+        row.appendChild(avatar);
+        row.appendChild(contentDiv);
+        chatHistoryEl.appendChild(row);
         
-        // Scroll to bottom
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
     }
 
     async function sendMessage() {
         const message = chatInput.value.trim();
         if (!message) return;
+        
+        transitionToChat();
         
         // Add User Message
         appendMessage('user', message);
@@ -165,24 +461,17 @@
         chatInput.style.height = 'auto';
         sendBtn.disabled = true;
         
-        // Context
         const payload = {
             message: message,
             include_profile: document.getElementById('ctx-profile').checked,
             include_lessons: document.getElementById('ctx-lessons').checked,
             include_tests: document.getElementById('ctx-tests').checked,
             include_grammar: document.getElementById('ctx-grammar').checked,
-            chat_history: chatHistory
+            chat_history: internalHistory
         };
         
-        // Add "Thinking..." bubble
         const thinkingId = 'thinking-' + Date.now();
-        const thinkingDiv = document.createElement('div');
-        thinkingDiv.className = 'chat-msg lexi';
-        thinkingDiv.id = thinkingId;
-        thinkingDiv.innerHTML = `<div class="chat-avatar">L</div><div class="chat-bubble"><span style="color: var(--text3);">Thinking...</span></div>`;
-        chatContainer.appendChild(thinkingDiv);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        appendMessage('lexi', 'Thinking...', thinkingId);
         
         try {
             const res = await fetch('/library/ai/chat', {
@@ -202,19 +491,19 @@
             appendMessage('lexi', data.reply);
             
             // Push to history
-            chatHistory.push({ role: 'user', parts: message });
-            chatHistory.push({ role: 'model', parts: data.reply });
+            internalHistory.push({ role: 'user', parts: message });
+            internalHistory.push({ role: 'model', parts: data.reply });
             
         } catch (err) {
             document.getElementById(thinkingId).remove();
-            appendMessage('lexi', 'Sorry, I encountered an error connecting to my servers. Please try again.');
+            appendMessage('lexi', 'Sorry, I encountered an error. Please try again.');
         } finally {
             sendBtn.disabled = false;
+            chatInput.focus();
         }
     }
 
     sendBtn.addEventListener('click', sendMessage);
-    
     chatInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -222,13 +511,12 @@
         }
     });
 
-    // Web Speech API for Dictation
+    // Web Speech API
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
-        
         let isRecording = false;
         
         micBtn.addEventListener('click', () => {
@@ -250,8 +538,7 @@
             chatInput.dispatchEvent(new Event('input'));
         };
         
-        recognition.onerror = (event) => {
-            console.error('Speech recognition error', event.error);
+        recognition.onerror = () => {
             isRecording = false;
             micBtn.classList.remove('recording');
         };
@@ -261,7 +548,7 @@
             micBtn.classList.remove('recording');
         };
     } else {
-        micBtn.style.display = 'none'; // Hide if not supported
+        micBtn.style.display = 'none';
     }
 </script>
 {% endblock %}
