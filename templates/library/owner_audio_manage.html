@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block page_title %}Manage Audio{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <a href="/library/audio" class="btn btn-ghost btn-sm" style="padding: 6px 10px; border-radius: 50%;">
+                <svg style="width:16px;height:16px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </a>
+            <h1 style="font-family: var(--font-d); font-size: 1.5rem; font-weight: 700;">Manage Audiobooks & Podcasts</h1>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+        <!-- Upload Form -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Upload New Audio</h2>
+            </div>
+            <div class="card-body">
+                <form action="/library/audio/add" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                        <label>Title</label>
+                        <input type="text" name="title" class="input" required>
+                    </div>
+                    <div>
+                        <label>Author / Host</label>
+                        <input type="text" name="author" class="input">
+                    </div>
+                    <div>
+                        <label>Type</label>
+                        <select name="book_type" class="input">
+                            <option value="audiobook">Audiobook</option>
+                            <option value="podcast">Podcast</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Target Level</label>
+                        <select name="level" class="input">
+                            <option value="All">All Levels</option>
+                            <option value="A1">A1 Beginner</option>
+                            <option value="A2">A2 Elementary</option>
+                            <option value="B1">B1 Intermediate</option>
+                            <option value="B2">B2 Upper Intermediate</option>
+                            <option value="C1">C1 Advanced</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Description</label>
+                        <textarea name="description" class="input" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <label>Cover Image (Optional)</label>
+                        <input type="file" name="cover_file" class="input" accept="image/*">
+                    </div>
+                    <div>
+                        <label>Audio File (Required)</label>
+                        <input type="file" name="audio_file" class="input" accept="audio/*" required>
+                    </div>
+                    <div>
+                        <label>Subtitles File (Optional, .vtt format recommended)</label>
+                        <input type="file" name="subtitles_file" class="input" accept=".vtt,.srt,.txt">
+                        <small style="color: var(--text3); font-size: 0.75rem;">Upload a WebVTT (.vtt) file for native web player subtitle support.</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Upload Audio</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Uploaded Items List -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Uploaded Audio</h2>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div style="display: flex; flex-direction: column; gap: 1px; background: var(--border);">
+                    {% for item in audio_items %}
+                    <div style="background: var(--bg); padding: 16px; display: flex; gap: 16px; align-items: center;">
+                        <div style="width: 50px; height: 50px; border-radius: {{ '50%' if item.book_type == 'podcast' else '6px' }}; background: var(--bg3); flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                            {% if item.cover_url %}
+                            <img src="{{ item.cover_url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                            🎧
+                            {% endif %}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+                                <span class="badge" style="background: var(--bg2); color: var(--text2);">{{ item.book_type }}</span>
+                                <span class="badge" style="background: var(--bg2); color: var(--text2);">{{ item.level }}</span>
+                                {% if item.subtitles_url %}
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">CC</span>
+                                {% endif %}
+                            </div>
+                            <h3 style="font-size: 1rem; font-weight: 600;">{{ item.title }}</h3>
+                            <p style="font-size: 0.8rem; color: var(--text2);">{{ item.author or 'Unknown' }}</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <a href="/library/audio/{{ item.id }}/play" class="btn btn-ghost btn-sm" target="_blank">Play</a>
+                            <form action="/library/audio/{{ item.id }}/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this audio?');" style="margin: 0;">
+                                <button type="submit" class="btn btn-sm" style="color: #ef4444; border: 1px solid #ef4444; background: transparent;">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div style="background: var(--bg); padding: 40px 20px; text-align: center; color: var(--text3);">
+                        <p>No audio files uploaded yet.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

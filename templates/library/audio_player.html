@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playing: {{ item.title }} | Liberum Audio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1115;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --panel: rgba(30, 41, 59, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Dynamic Blurred Background */
+        .bg-blur {
+            position: absolute;
+            top: -10%; left: -10%; right: -10%; bottom: -10%;
+            background-image: url('{{ item.cover_url or "" }}');
+            background-size: cover;
+            background-position: center;
+            filter: blur(60px) brightness(0.3) saturate(1.5);
+            z-index: -1;
+            transition: all 1s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 32px;
+            z-index: 10;
+        }
+        .back-btn {
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 999px;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 32px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .cover-art-container {
+            width: 320px;
+            height: 320px;
+            margin-bottom: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: {{ '50%' if item.book_type == 'podcast' else '16px' }};
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .cover-art-container:hover { transform: scale(1.02); }
+        .cover-art {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .no-cover {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 5rem;
+        }
+
+        .track-info {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        .track-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .track-author {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        
+        /* Subtitles Display */
+        .subtitles-display {
+            position: absolute;
+            bottom: 20px;
+            left: 0; right: 0;
+            text-align: center;
+            pointer-events: none;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            z-index: 5;
+        }
+        .subtitle-line {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.8), 0px 4px 12px rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.3);
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            margin: 0 auto;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+
+        /* Player Controls Area */
+        .player-bottom {
+            background: var(--panel);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 24px 40px;
+            z-index: 20;
+            width: 100%;
+        }
+        
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .time-display {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-variant-numeric: tabular-nums;
+            min-width: 45px;
+        }
+        
+        /* Custom Input Range */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 999px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            margin-top: -5px;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .side-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 200px;
+        }
+        
+        .center-controls {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        button.control-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            opacity: 0.8;
+        }
+        button.control-btn:hover { opacity: 1; transform: scale(1.1); color: var(--accent-hover); }
+        
+        .play-btn {
+            width: 64px; height: 64px;
+            background: var(--accent) !important;
+            border-radius: 50%;
+            color: white !important;
+            opacity: 1 !important;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+        .play-btn:hover {
+            transform: scale(1.05) !important;
+            background: var(--accent-hover) !important;
+        }
+        
+        /* Fullscreen utilities */
+        :fullscreen .top-bar { display: none; }
+        :fullscreen .player-bottom {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            border-top: none; padding-bottom: 40px;
+        }
+        
+        /* CC Button Active State */
+        .cc-active { color: var(--accent) !important; opacity: 1 !important; }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-blur"></div>
+
+    <div class="top-bar" id="topBar">
+        <a href="/library/audio" class="back-btn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back to Library
+        </a>
+        <div style="display: flex; gap: 8px;">
+            <span style="background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 999px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">{{ item.book_type }}</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 999px; font-size: 0.8rem;">{{ item.level }}</span>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="cover-art-container">
+            {% if item.cover_url %}
+            <img src="{{ item.cover_url }}" alt="Cover" class="cover-art">
+            {% else %}
+            <div class="no-cover">🎧</div>
+            {% endif %}
+        </div>
+        
+        <div class="track-info">
+            <h1 class="track-title">{{ item.title }}</h1>
+            <p class="track-author">{{ item.author or 'Unknown' }}</p>
+        </div>
+        
+        <div class="subtitles-display" id="subtitlesDisplay"></div>
+    </div>
+
+    <div class="player-bottom">
+        <audio id="audioElement" preload="metadata">
+            <source src="{{ item.file_url }}" type="audio/mpeg">
+            {% if item.subtitles_url %}
+            <track id="subtitlesTrack" label="English" kind="subtitles" srclang="en" src="{{ item.subtitles_url }}" default>
+            {% endif %}
+            Your browser does not support the audio element.
+        </audio>
+
+        <div class="progress-container">
+            <span class="time-display" id="currentTime">0:00</span>
+            <input type="range" id="progressBar" value="0" min="0" step="0.1">
+            <span class="time-display" id="durationTime">0:00</span>
+        </div>
+
+        <div class="controls-row">
+            <div class="side-controls">
+                <button class="control-btn" id="volMuteBtn" title="Mute/Unmute">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                </button>
+                <input type="range" id="volumeBar" value="1" min="0" max="1" step="0.01" style="width: 100px;">
+            </div>
+
+            <div class="center-controls">
+                <button class="control-btn" id="skipBackBtn" title="Skip back 10s">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"></path></svg>
+                </button>
+                
+                <button class="control-btn play-btn" id="playPauseBtn">
+                    <!-- Play Icon -->
+                    <svg id="playIcon" width="32" height="32" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                    <!-- Pause Icon (hidden initially) -->
+                    <svg id="pauseIcon" style="display:none;" width="32" height="32" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                </button>
+
+                <button class="control-btn" id="skipFwdBtn" title="Skip forward 10s">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.334-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"></path></svg>
+                </button>
+            </div>
+
+            <div class="side-controls" style="justify-content: flex-end;">
+                {% if item.subtitles_url %}
+                <button class="control-btn cc-active" id="ccBtn" title="Toggle Subtitles">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h18a2 2 0 012 2v10a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2zm4 8h2m4 0h2"></path></svg>
+                </button>
+                {% endif %}
+                <button class="control-btn" id="fullscreenBtn" title="Fullscreen">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audioElement');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationTimeEl = document.getElementById('durationTime');
+        const volumeBar = document.getElementById('volumeBar');
+        const volMuteBtn = document.getElementById('volMuteBtn');
+        const skipBackBtn = document.getElementById('skipBackBtn');
+        const skipFwdBtn = document.getElementById('skipFwdBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const ccBtn = document.getElementById('ccBtn');
+        const subtitlesDisplay = document.getElementById('subtitlesDisplay');
+        
+        let isPlaying = false;
+        let subtitlesEnabled = true;
+
+        // Formatting time in M:SS
+        function formatTime(seconds) {
+            if(isNaN(seconds)) return "0:00";
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // Initialize Audio
+        audio.addEventListener('loadedmetadata', () => {
+            progressBar.max = audio.duration;
+            durationTimeEl.textContent = formatTime(audio.duration);
+        });
+
+        // Play / Pause
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        });
+
+        audio.addEventListener('play', () => {
+            isPlaying = true;
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+        });
+
+        audio.addEventListener('pause', () => {
+            isPlaying = false;
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+        });
+
+        // Time Update / Progress Bar
+        audio.addEventListener('timeupdate', () => {
+            progressBar.value = audio.currentTime;
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+            
+            // Subtitles logic
+            if (subtitlesEnabled && audio.textTracks && audio.textTracks.length > 0) {
+                const track = audio.textTracks[0];
+                track.mode = 'hidden'; // Hide default browser subtitles
+                
+                let activeText = '';
+                if (track.activeCues && track.activeCues.length > 0) {
+                    activeText = track.activeCues[0].text;
+                }
+                
+                if (activeText) {
+                    subtitlesDisplay.innerHTML = `<div class="subtitle-line">${activeText.replace(/\\n/g, '<br>')}</div>`;
+                } else {
+                    subtitlesDisplay.innerHTML = '';
+                }
+            } else {
+                subtitlesDisplay.innerHTML = '';
+            }
+        });
+
+        // Scrubbing
+        progressBar.addEventListener('input', () => {
+            audio.currentTime = progressBar.value;
+        });
+
+        // Volume
+        volumeBar.addEventListener('input', () => {
+            audio.volume = volumeBar.value;
+            audio.muted = (audio.volume === 0);
+        });
+
+        // Skip Buttons
+        skipBackBtn.addEventListener('click', () => {
+            audio.currentTime = Math.max(0, audio.currentTime - 10);
+        });
+        
+        skipFwdBtn.addEventListener('click', () => {
+            audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+        });
+
+        // Fullscreen
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // Toggle Subtitles
+        if (ccBtn) {
+            ccBtn.addEventListener('click', () => {
+                subtitlesEnabled = !subtitlesEnabled;
+                if(subtitlesEnabled) {
+                    ccBtn.classList.add('cc-active');
+                } else {
+                    ccBtn.classList.remove('cc-active');
+                    subtitlesDisplay.innerHTML = '';
+                }
+            });
+        }
+        
+        // Handle Spacebar to Play/Pause
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && e.target === document.body) {
+                e.preventDefault();
+                playPauseBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -325,6 +325,11 @@ def init_master_db():
             conn.commit()
         except Exception:
             pass
+        try:
+            conn.execute(text("ALTER TABLE library_books ADD COLUMN subtitles_url VARCHAR"))
+            conn.commit()
+        except Exception:
+            pass
             
     db = SessionMaster()
     try:
@@ -344,8 +349,9 @@ class LibraryBook(MasterBase):
     description = Column(String, nullable=True)
     cover_url = Column(String, nullable=True)
     file_url = Column(String, nullable=True)
-    book_type = Column(String, default="ebook") # ebook, audiobook
+    book_type = Column(String, default="ebook") # ebook, audiobook, podcast
     level = Column(String, default="All")
+    subtitles_url = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     tenant = relationship("PlatformTenant")

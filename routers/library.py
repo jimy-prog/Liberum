@@ -422,3 +422,142 @@ def read_book(request: Request, book_id: int):
         "request": request, "user": user, "book": book, "active_page": "library"
     })
 
+# =======================
+# AUDIOBOOKS & PODCASTS ROUTES
+# =======================
+
+@router.get("/audio")
+def list_audio(request: Request, filter: str = "all", level: str = "all"):
+    user = get_current_user(request)
+    if not user: return RedirectResponse("/login", status_code=303)
+    
+    master_db = SessionMaster()
+    try:
+        query = master_db.query(LibraryBook).filter(LibraryBook.book_type.in_(["audiobook", "podcast"]))
+        if filter != "all":
+            query = query.filter(LibraryBook.book_type == filter)
+        if level != "all":
+            query = query.filter(LibraryBook.level == level)
+            
+        audio_items = query.order_by(LibraryBook.created_at.desc()).all()
+    finally:
+        master_db.close()
+
+    return templates.TemplateResponse("library/student_audio.html", {
+        "request": request, "user": user, "audio_items": audio_items, "active_page": "library", "current_filter": filter, "current_level": level
+    })
+
+@router.get("/audio/manage")
+def manage_audio(request: Request):
+    user = get_current_user(request)
+    if not user or user.role != "owner":
+        return RedirectResponse("/library/audio", status_code=303)
+        
+    master_db = SessionMaster()
+    try:
+        audio_items = master_db.query(LibraryBook).filter(LibraryBook.book_type.in_(["audiobook", "podcast"])).order_by(LibraryBook.created_at.desc()).all()
+    finally:
+        master_db.close()
+        
+    return templates.TemplateResponse("library/owner_audio_manage.html", {
+        "request": request, "user": user, "audio_items": audio_items, "active_page": "library"
+    })
+
+@router.post("/audio/add")
+async def add_audio(
+    request: Request,
+    title: str = Form(...),
+    author: str = Form(None),
+    description: str = Form(None),
+    level: str = Form("All"),
+    book_type: str = Form("audiobook"),
+    cover_file: UploadFile = File(None),
+    audio_file: UploadFile = File(...),
+    subtitles_file: UploadFile = File(None)
+):
+    user = get_current_user(request)
+    if not user or user.role != "owner":
+        raise HTTPException(status_code=403, detail="Unauthorized")
+        
+    os.makedirs(os.path.join(DATA_DIR, "uploads/audio"), exist_ok=True)
+    os.makedirs(os.path.join(DATA_DIR, "uploads/books"), exist_ok=True)
+    os.makedirs(os.path.join(DATA_DIR, "uploads/subtitles"), exist_ok=True)
+    
+    cover_url = None
+    if cover_file and cover_file.filename:
+        cover_path = f"/uploads/books/cover_{cover_file.filename}"
+        with open(os.path.join(DATA_DIR, cover_path.lstrip('/')), "wb") as buffer:
+            shutil.copyfileobj(cover_file.file, buffer)
+        cover_url = cover_path
+        
+    audio_url = None
+    if audio_file and audio_file.filename:
+        audio_path = f"/uploads/audio/{audio_file.filename}"
+        with open(os.path.join(DATA_DIR, audio_path.lstrip('/')), "wb") as buffer:
+            shutil.copyfileobj(audio_file.file, buffer)
+        audio_url = audio_path
+        
+    subtitles_url = None
+    if subtitles_file and subtitles_file.filename:
+        sub_path = f"/uploads/subtitles/{subtitles_file.filename}"
+        with open(os.path.join(DATA_DIR, sub_path.lstrip('/')), "wb") as buffer:
+            shutil.copyfileobj(subtitles_file.file, buffer)
+        subtitles_url = sub_path
+
+    master_db = SessionMaster()
+    try:
+        new_item = LibraryBook(
+            title=title,
+            author=author,
+            description=description,
+            cover_url=cover_url,
+            file_url=audio_url,
+            subtitles_url=subtitles_url,
+            book_type=book_type,
+            level=level
+        )
+        master_db.add(new_item)
+        master_db.commit()
+    finally:
+        master_db.close()
+        
+    return RedirectResponse("/library/audio/manage", status_code=303)
+
+@router.post("/audio/{item_id}/delete")
+def delete_audio(request: Request, item_id: int):
+    user = get_current_user(request)
+    if not user or user.role != "owner":
+        return RedirectResponse("/library/audio", status_code=303)
+        
+    master_db = SessionMaster()
+    try:
+        item = master_db.query(LibraryBook).filter_by(id=item_id).first()
+        if item:
+            for url in [item.cover_url, item.file_url, item.subtitles_url]:
+                if url:
+                    try: os.remove(os.path.join(DATA_DIR, url.lstrip('/')))
+                    except: pass
+            master_db.delete(item)
+            master_db.commit()
+    finally:
+        master_db.close()
+        
+    return RedirectResponse("/library/audio/manage", status_code=303)
+
+@router.get("/audio/{item_id}/play")
+def play_audio(request: Request, item_id: int):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+        
+    master_db = SessionMaster()
+    try:
+        item = master_db.query(LibraryBook).filter_by(id=item_id).first()
+        if not item:
+            raise HTTPException(status_code=404, detail="Audio not found")
+    finally:
+        master_db.close()
+        
+    return templates.TemplateResponse("library/audio_player.html", {
+        "request": request, "user": user, "item": item, "active_page": "library"
+    })
