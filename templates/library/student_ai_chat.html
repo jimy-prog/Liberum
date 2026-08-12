@@ -96,7 +96,7 @@
             <div class="chat-msg lexi">
                 <div class="chat-avatar">L</div>
                 <div class="chat-bubble">
-                    <p>Hi {{ user.name.split(' ')[0] }}! I'm Lexi, your strict but helpful AI tutor. I have access to your progress, test scores, and lessons.</p>
+                    <p>Hi {{ user.full_name.split(' ')[0] if user.full_name else user.username }}! I'm Lexi, your strict but helpful AI tutor. I have access to your progress, test scores, and lessons.</p>
                     <p>What would you like to focus on today? You can select the context options above to help me give you better guidance.</p>
                 </div>
             </div>
