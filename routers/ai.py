@@ -113,7 +113,7 @@ def ai_chat_endpoint(request: Request, payload: ChatRequest):
             student_info += f"Strengths: {student.strengths}\n"
             student_info += f"Weaknesses: {student.weaknesses}\n"
             
-        if payload.include_lessons and student.group_id:
+        if payload.include_lessons and student and student.group_id:
             attendances = tenant_db.query(Attendance).filter_by(student_id=student.id).order_by(Attendance.id.desc()).limit(10).all()
             lesson_ids = [a.lesson_id for a in attendances]
             if lesson_ids:
@@ -124,7 +124,7 @@ def ai_chat_endpoint(request: Request, payload: ChatRequest):
                     att_status = att.status if att else "Unknown"
                     lesson_info += f"- Date: {l.date}, Topic: {l.topic}, Homework: {l.homework}, Attendance: {att_status}\n"
                     
-        if payload.include_tests:
+        if payload.include_tests and student:
             tests = tenant_db.query(TestResult).filter_by(student_id=student.id).order_by(TestResult.date.desc()).all()
             test_info = "Mock Test Results:\n"
             for t in tests:
