@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ topic.title }}{% endblock %}
+
+{% block extra_styles %}
+<style>
+.explanation-area { 
+    background: var(--bg2); 
+    padding: 40px; 
+    border-radius: 12px; 
+    border: 1px solid var(--border); 
+    font-size: 1.05rem; 
+    line-height: 1.7; 
+    color: var(--text);
+    max-width: 900px;
+    margin: 0 auto;
+}
+.explanation-area h2 { 
+    margin-top: 0; 
+    margin-bottom: 24px; 
+    font-size: 1.8rem; 
+    color: var(--text); 
+    font-weight: 700;
+}
+.explanation-area h3 { 
+    margin-top: 32px; 
+    margin-bottom: 16px; 
+    font-size: 1.3rem; 
+    color: var(--text); 
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+}
+.explanation-area p { margin-bottom: 16px; color: var(--text2); }
+.explanation-area ul, .explanation-area ol { margin-left: 24px; margin-bottom: 24px; color: var(--text2); }
+.explanation-area li { margin-bottom: 10px; }
+.explanation-area table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-bottom: 24px; 
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.explanation-area th, .explanation-area td { 
+    border: 1px solid var(--border); 
+    padding: 12px 16px; 
+    text-align: left; 
+}
+.explanation-area th { 
+    background: var(--bg3); 
+    font-weight: 600; 
+    color: var(--text);
+}
+.explanation-area td {
+    background: var(--bg2);
+    color: var(--text2);
+}
+.explanation-area strong, .explanation-area b { color: var(--text); font-weight: 600; }
+.explanation-area em, .explanation-area i { color: var(--text); }
+
+.action-bar {
+    max-width: 900px;
+    margin: 0 auto 24px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.result-card { 
+    background: var(--bg2); 
+    border: 2px solid #10b981; 
+    border-radius: 12px; 
+    padding: 20px; 
+    text-align: center; 
+    margin-bottom: 24px; 
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="action-bar">
+    <a href="/library/grammar" class="btn btn-sm" style="background: var(--bg3); color: var(--text);">&larr; Back to Topics</a>
+    
+    {% if has_questions %}
+    <a href="/library/grammar/{{ topic.id }}/test" class="btn btn-primary">Take Quiz &rarr;</a>
+    {% endif %}
+</div>
+
+{% if request.query_params.get('result') == 'success' %}
+<div class="result-card">
+    <h2 style="color: #10b981; margin-top: 0; font-size: 1.5rem;">Quiz Submitted! 🎉</h2>
+    <p style="color: var(--text2);">Your score has been recorded. You can take the quiz again anytime to improve your score.</p>
+    {% if request.query_params.get('score') %}
+    <p style="font-weight: bold; font-size: 1.2rem; color: var(--text); margin-top: 10px;">
+        You scored: {{ request.query_params.get('score') }} / {{ request.query_params.get('total') }}
+    </p>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="explanation-area">
+    {% if best_attempt %}
+    <div style="background: var(--bg3); padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: var(--text2);">You have previously taken the quiz for this topic.</span>
+        <strong style="color: var(--text);">Best Score: {{ best_attempt.score }} / {{ best_attempt.total_questions }}</strong>
+    </div>
+    {% endif %}
+
+    {{ topic.explanation | safe }}
+</div>
+
+{% if has_questions %}
+<div style="max-width: 900px; margin: 32px auto 0 auto; text-align: center;">
+    <p style="margin-bottom: 16px; color: var(--text2);">Ready to test your knowledge?</p>
+    <a href="/library/grammar/{{ topic.id }}/test" class="btn btn-primary" style="padding: 12px 32px; font-size: 1.1rem;">Take Quiz</a>
+</div>
+{% endif %}
+
+{% endblock %}

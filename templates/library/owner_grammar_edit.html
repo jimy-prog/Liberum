@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block page_title %}Edit Grammar Topic{% endblock %}
+
+{% block extra_styles %}
+<style>
+.editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 900px) { .editor-layout { grid-template-columns: 1fr; } }
+
+.question-box { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.q-header { font-weight: 600; margin-bottom: 12px; font-size: 0.9rem; color: var(--text2); }
+.q-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 16px;">
+    <a href="/library/grammar/manage" class="btn btn-sm" style="background: var(--bg3);">&larr; Back to Topics</a>
+</div>
+
+<div class="editor-layout">
+    <!-- Left: Explanation Editor -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">1. Content & Settings</h2>
+        </div>
+        <div class="card-body">
+            <form action="/library/grammar/{{ topic.id }}/edit" method="post">
+                <div class="form-group">
+                    <label class="form-label">Topic Title</label>
+                    <input type="text" name="title" class="form-control" value="{{ topic.title }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">HTML Explanation</label>
+                    <textarea name="explanation" class="form-control" rows="15" required style="font-family: monospace; font-size: 0.85rem;">{{ topic.explanation }}</textarea>
+                </div>
+                
+                <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
+                    <input type="checkbox" name="is_published" id="is_published" {% if topic.is_published %}checked{% endif %} style="width:18px;height:18px;">
+                    <label for="is_published" style="font-weight: 500; cursor: pointer;">Published (Visible to students)</label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Content</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right: Quiz Editor -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">2. Edit Questions ({{ questions|length }})</h2>
+        </div>
+        <div class="card-body">
+            {% if questions %}
+            <form action="/library/grammar/{{ topic.id }}/questions/update" method="post">
+                <div style="max-height: 600px; overflow-y: auto; padding-right: 8px;">
+                    {% for q in questions %}
+                    <div class="question-box">
+                        <div class="q-header">Question {{ loop.index }}</div>
+                        <input type="text" name="q_{{ q.id }}_text" class="form-control" value="{{ q.question_text }}" required style="margin-bottom: 12px; font-weight: 500;">
+                        
+                        <div class="q-row">
+                            <input type="text" name="q_{{ q.id }}_opt_a" class="form-control" value="{{ q.option_a }}" placeholder="A" required>
+                            <input type="text" name="q_{{ q.id }}_opt_b" class="form-control" value="{{ q.option_b }}" placeholder="B" required>
+                        </div>
+                        <div class="q-row">
+                            <input type="text" name="q_{{ q.id }}_opt_c" class="form-control" value="{{ q.option_c }}" placeholder="C" required>
+                            <input type="text" name="q_{{ q.id }}_opt_d" class="form-control" value="{{ q.option_d }}" placeholder="D" required>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.75rem; color: var(--text3); display: block; margin-bottom: 4px;">Correct Option (A, B, C, D)</label>
+                                <input type="text" name="q_{{ q.id }}_correct" class="form-control" value="{{ q.correct_option }}" required pattern="[A-Da-d]" style="text-transform: uppercase;">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label style="font-size: 0.75rem; color: var(--text3); display: block; margin-bottom: 4px;">Explanation (Optional)</label>
+                            <input type="text" name="q_{{ q.id }}_exp" class="form-control" value="{{ q.explanation or '' }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Save All Questions</button>
+            </form>
+            {% else %}
+            <div style="text-align: center; padding: 40px; color: var(--text3);">
+                No questions generated yet. The background AI is likely still working on this topic. Check back soon!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

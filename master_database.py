@@ -357,6 +357,7 @@ class GrammarTopic(MasterBase):
     title = Column(String, nullable=False)
     level = Column(String, default="A1") # A1, A2, B1, B2, C1, C2
     explanation = Column(String, nullable=False) # Markdown/HTML content
+    is_published = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 

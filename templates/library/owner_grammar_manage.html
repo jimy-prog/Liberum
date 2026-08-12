@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block page_title %}Manage Grammar Topics{% endblock %}
+
+{% block extra_styles %}
+<style>
+.table-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg2); }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text3); background: var(--bg3); }
+tr:last-child td { border-bottom: none; }
+tr:hover { background: var(--bg3); }
+.status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+.status-draft { background: #fee2e2; color: #991b1b; }
+.status-pub { background: #dcfce7; color: #166534; }
+body.dark-mode .status-draft { background: #7f1d1d; color: #fecaca; }
+body.dark-mode .status-pub { background: #14532d; color: #bbf7d0; }
+.level-badge { padding: 4px 8px; border-radius: 6px; background: var(--bg3); font-size: 0.75rem; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 24px;">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 class="card-title">All Grammar Topics</h2>
+        <a href="/library/grammar" class="btn btn-primary" style="text-decoration: none;">&larr; Back to Grammar List</a>
+    </div>
+    
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Topic Title</th>
+                    <th>Questions</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for topic in topics %}
+                <tr>
+                    <td><span class="level-badge">{{ topic.level }}</span></td>
+                    <td style="font-weight: 500;">{{ topic.title }}</td>
+                    <td>
+                        {% if topic.q_count == 10 %}
+                        <span style="color: #10b981;">10/10</span>
+                        {% elif topic.q_count > 0 %}
+                        <span style="color: #f59e0b;">{{ topic.q_count }}/10</span>
+                        {% else %}
+                        <span style="color: var(--text3);">0/10 (Waiting for AI)</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if topic.is_published %}
+                        <span class="status-badge status-pub">Published</span>
+                        {% else %}
+                        <span class="status-badge status-draft">Draft</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                        <form action="/library/grammar/{{ topic.id }}/toggle_publish" method="post" style="margin: 0;">
+                            {% if topic.is_published %}
+                            <button type="submit" class="btn btn-sm" style="background: #fee2e2; color: #991b1b; border: none;">Unpublish</button>
+                            {% else %}
+                            <button type="submit" class="btn btn-sm" style="background: #dcfce7; color: #166534; border: none;">Publish</button>
+                            {% endif %}
+                        </form>
+                        <a href="/library/grammar/{{ topic.id }}/edit" class="btn btn-sm" style="background: var(--bg3); color: var(--text);">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
