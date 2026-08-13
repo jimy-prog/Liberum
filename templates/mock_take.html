@@ -160,6 +160,43 @@
         }
         .btn-nav:hover { background: rgba(255,255,255,0.1); }
         
+        /* Auto-save indicator */
+        .save-status {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        .save-status.show { opacity: 1; }
+        .save-status.saving { background: #f59e0b; }
+        .save-status.error { background: #ef4444; }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .top-bar { padding: 0 12px; height: 50px; }
+            .candidate-info { font-size: 0.8rem; }
+            .timer-container { font-size: 0.9rem; padding: 4px 10px; }
+            .workspace { flex-direction: column; height: calc(100vh - 110px); }
+            .left-pane { border-right: none; border-bottom: 2px solid var(--ielts-border); padding: 20px; max-height: 40vh; }
+            .right-pane { padding: 20px; }
+            .passage-title { font-size: 1.2rem; }
+            .q-prompt { font-size: 0.95rem; }
+            .gap-fill { width: 100%; margin-left: 0; }
+            .bottom-bar { padding: 0 12px; height: 50px; }
+            .nav-section-btn { padding: 6px 10px; font-size: 0.8rem; }
+            .q-badge { width: 28px; height: 28px; font-size: 0.8rem; }
+            .number-pad { flex-wrap: wrap; max-width: 50%; }
+        }
+        
         @keyframes pulse {
             0% { opacity: 0.3; }
             50% { opacity: 1; }
@@ -167,6 +204,7 @@
         }
     </style>
 </head>
+<body>
 <form id="submitExamForm" action="/mock/{{ exam.id }}/submit" method="POST" style="display: contents;">
     <input type="hidden" name="attempt_id" value="{{ attempt.id }}">
 
@@ -253,7 +291,7 @@
                             {% set current_q = q_counter.value %}
                             <div class="q-item" id="q-container-{{ current_q }}" onclick="focusQuestion({{ current_q }})" style="border-bottom: none; padding: 0;">
                                 <div style="display: flex; flex-direction: column; margin-bottom: 20px;">
-                                    <textarea name="q{{ q.id }}" id="input-{{ current_q }}" style="width:100%; height:450px; resize:vertical; padding:20px; border:1px solid var(--ielts-border); border-radius:12px; font-family:inherit; font-size:1.1rem; line-height:1.7; outline:none; background: #fff;" placeholder="Type your response here..." oninput="countWords(this.value, {{ current_q }}); markAnswered({{ current_q }});"></textarea>
+                                    <textarea name="q{{ q.id }}" id="input-{{ current_q }}" style="width:100%; height:450px; resize:vertical; padding:20px; border:1px solid var(--ielts-border); border-radius:12px; font-family:inherit; font-size:1.1rem; line-height:1.7; outline:none; background: #fff;" placeholder="Type your response here..." oninput="countWords(this.value, {{ current_q }}); markAnswered({{ current_q }}); autoSave();"></textarea>
                                     <div style="margin-top:12px; font-weight:600; color:var(--text2); display:flex; justify-content:space-between; align-items:center;">
                                         <span>Word Count: <span id="word-count-{{ current_q }}" style="color:#ef4444; font-size:1.2rem;">0</span></span>
                                         <span style="font-size:0.9rem; font-weight:normal; opacity:0.8;">
@@ -350,7 +388,7 @@
                                             {% endfor %}
                                         </div>
                                     {% elif q.q_type == "TFNG" %}
-                                        <select class="gap-fill" name="q{{ q.id }}" id="input-{{ current_q }}" onchange="markAnswered({{ current_q }})" onclick="focusQuestion({{ current_q }})" style="width: auto; min-width: 160px; padding: 10px 12px; margin-top: 12px; margin-left: 36px; border-radius: 6px; border: 1px solid var(--ielts-border); font-size: 0.95rem; color: var(--text); font-weight: 600; outline:none; background:#fff;">
+                                        <select class="gap-fill" name="q{{ q.id }}" id="input-{{ current_q }}" onchange="markAnswered({{ current_q }}); autoSave();" onclick="focusQuestion({{ current_q }})" style="width: auto; min-width: 160px; padding: 10px 12px; margin-top: 12px; margin-left: 36px; border-radius: 6px; border: 1px solid var(--ielts-border); font-size: 0.95rem; color: var(--text); font-weight: 600; outline:none; background:#fff;">
                                             <option value="" selected disabled>Select...</option>
                                             <option value="TRUE">TRUE</option>
                                             <option value="FALSE">FALSE</option>
@@ -359,7 +397,7 @@
                                             <option value="NO">NO</option>
                                         </select>
                                     {% else %}
-                                        <input type="text" class="gap-fill" name="q{{ q.id }}" style="width:280px" id="input-{{ current_q }}" autocomplete="off" oninput="markAnswered({{ current_q }})" onclick="focusQuestion({{ current_q }})">
+                                        <input type="text" class="gap-fill" name="q{{ q.id }}" style="width:280px" id="input-{{ current_q }}" autocomplete="off" oninput="markAnswered({{ current_q }}); autoSave();" onclick="focusQuestion({{ current_q }})">
                                     {% endif %}
                                 </div>
                                 {% set q_counter.value = q_counter.value + 1 %}
@@ -395,10 +433,15 @@
         </div>
     </div>
 
+    <!-- Auto-save status indicator -->
+    <div class="save-status" id="saveStatus">Saved</div>
+
     <script>
         const TOTAL_QUESTIONS = {{ q_counter.value - 1 }};
         let currentQuestion = 1;
         let currentPart = 1;
+        let autoSaveTimer = null;
+        let lastSavedData = "";
 
         // Map questions to parts
         const questionToPart = {};
@@ -417,6 +460,7 @@
         const numberPad = document.getElementById('number-pad');
         for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
             const btn = document.createElement('button');
+            btn.type = 'button';
             btn.className = 'q-badge';
             btn.id = 'badge-' + i;
             btn.innerText = i;
@@ -435,6 +479,15 @@
         if (TOTAL_QUESTIONS > 0) {
             document.getElementById('badge-1').classList.add('current');
         }
+
+        // Warn before leaving page
+        window.addEventListener('beforeunload', function(e) {
+            if (document.getElementById('submitExamForm')) {
+                e.preventDefault();
+                e.returnValue = 'You have an exam in progress. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
 
         function jumpToQuestion(qNum) {
             if (qNum > TOTAL_QUESTIONS || qNum < 1) return;
@@ -489,7 +542,18 @@
         }
 
         function markAnswered(qNum) {
-            const val = document.getElementById('input-' + qNum).value.trim();
+            const input = document.getElementById('input-' + qNum);
+            let val = "";
+            if (input) {
+                val = input.value.trim();
+            }
+            // Also handle radio buttons
+            const qContainer = document.getElementById('q-container-' + qNum);
+            if (qContainer) {
+                const checkedRadio = qContainer.querySelector('input[type="radio"]:checked');
+                if (checkedRadio) val = checkedRadio.value;
+            }
+            
             const badge = document.getElementById('badge-' + qNum);
             if (val.length > 0) badge.classList.add('answered');
             else badge.classList.remove('answered');
@@ -508,6 +572,7 @@
             }
             // Mark answered visually
             document.getElementById('badge-' + qNum).classList.add('answered');
+            autoSave();
         }
 
         // Timer simulation
@@ -525,6 +590,11 @@
                 timerEl.style.borderColor = '#E11B22';
                 timerEl.querySelector('.timer-icon').style.color = '#E11B22';
             }
+            
+            // Auto-save every 30 seconds
+            if (timeRemaining % 30 === 0) {
+                autoSave();
+            }
         }, 1000);
 
         function toggleFullscreen() {
@@ -540,9 +610,69 @@
         }
         
         function confirmSubmit() {
-            if(confirm("Are you sure you want to submit your exam early?")) {
+            const answeredCount = document.querySelectorAll('.q-badge.answered').length;
+            const msg = answeredCount < TOTAL_QUESTIONS 
+                ? `You have answered ${answeredCount} of ${TOTAL_QUESTIONS} questions. Are you sure you want to submit?` 
+                : "Are you sure you want to submit your exam?";
+            if(confirm(msg)) {
+                window.removeEventListener('beforeunload', beforeUnloadHandler);
                 document.getElementById("submitExamForm").submit();
             }
+        }
+        
+        function beforeUnloadHandler(e) {
+            e.preventDefault();
+            e.returnValue = 'You have an exam in progress. Are you sure you want to leave?';
+            return e.returnValue;
+        }
+        window.addEventListener('beforeunload', beforeUnloadHandler);
+        
+        // Auto-save function
+        function autoSave() {
+            if (autoSaveTimer) clearTimeout(autoSaveTimer);
+            
+            const statusEl = document.getElementById('saveStatus');
+            statusEl.textContent = 'Saving...';
+            statusEl.className = 'save-status show saving';
+            
+            autoSaveTimer = setTimeout(() => {
+                const formData = new FormData(document.getElementById('submitExamForm'));
+                const data = {};
+                for (let [key, val] of formData.entries()) {
+                    data[key] = val;
+                }
+                
+                const jsonData = JSON.stringify(data);
+                if (jsonData === lastSavedData) {
+                    statusEl.className = 'save-status';
+                    return;
+                }
+                
+                fetch('/mock/{{ exam.id }}/save-progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        attempt_id: {{ attempt.id }},
+                        answers: data
+                    })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        lastSavedData = jsonData;
+                        statusEl.textContent = 'Saved';
+                        statusEl.className = 'save-status show';
+                        setTimeout(() => { statusEl.className = 'save-status'; }, 2000);
+                    } else {
+                        throw new Error('Save failed');
+                    }
+                })
+                .catch(err => {
+                    statusEl.textContent = 'Save failed';
+                    statusEl.className = 'save-status show error';
+                    setTimeout(() => { statusEl.className = 'save-status'; }, 3000);
+                });
+            }, 1500);
         }
         
         // ─── AUDIO LOGIC ───────────────────────────────────────────────────
@@ -663,6 +793,7 @@
                             hiddenInput.value = reader.result;
                             const badge = document.getElementById('badge-' + qId);
                             if (badge) badge.classList.add('answered');
+                            autoSave();
                         };
 
                         const audioUrl = URL.createObjectURL(blob);
