@@ -1,0 +1,47 @@
+name: Debug Server
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'trigger_debug.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Fetch Server Logs
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H 130.61.234.227 >> ~/.ssh/known_hosts
+          
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << 'INNEREOF' > server_logs.txt 2>&1
+          cd /home/ubuntu/Liberum
+          echo "==== DOCKER LOGS ===="
+          sudo docker compose -f deploy/docker-compose.yml logs --tail=200 app || echo "Failed to get logs"
+          echo "==== DOCKER PS ===="
+          sudo docker ps -a
+          echo "==== ENV FILE ===="
+          sudo tail -n 5 deploy/.env || echo "No env file"
+          echo "==== REBUILDING CONTAINER ===="
+          sudo docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build
+          INNEREOF
+
+      - name: Commit Logs to Repository
+        if: always()
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "bot@github.com"
+          git add server_logs.txt
+          git commit -m "chore: upload server logs" || echo "No changes to commit"
+          git pull --rebase origin main
+          git push origin HEAD:main
