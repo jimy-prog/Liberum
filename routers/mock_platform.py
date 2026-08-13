@@ -327,6 +327,99 @@ async def mock_take(request: Request, exam_id: int, attempt_id: int = None, db: 
         "attempt": attempt
     })
 
+@router.post("/{exam_id}/save-progress")
+async def save_progress(request: Request, exam_id: int, db: SessionMaster = Depends(get_mdb)):
+    """Auto-save endpoint: saves student answers without submitting the exam."""
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    try:
+        data = await request.json()
+    except Exception:
+        return JSONResponse({"success": False, "error": "Invalid JSON"}, status_code=400)
+    
+    attempt_id = data.get("attempt_id")
+    answers = data.get("answers", {})
+    
+    if not attempt_id:
+        return JSONResponse({"success": False, "error": "Missing attempt_id"}, status_code=400)
+    
+    attempt = db.query(MockAttempt).filter(
+        MockAttempt.id == attempt_id,
+        MockAttempt.student_id == user.id
+    ).first()
+    
+    if not attempt:
+        return JSONResponse({"success": False, "error": "Attempt not found"}, status_code=404)
+    
+    if attempt.status != "in_progress":
+        return JSONResponse({"success": False, "error": "Attempt already completed"}, status_code=400)
+    
+    try:
+        for key, val in answers.items():
+            if not key.startswith("q"):
+                continue
+            try:
+                q_id = int(key[1:])
+            except ValueError:
+                continue
+            
+            question = db.query(Question).filter(Question.id == q_id).first()
+            if not question:
+                continue
+            
+            # Check if an answer already exists for this question in this attempt
+            existing = db.query(AttemptAnswer).filter(
+                AttemptAnswer.attempt_id == attempt.id,
+                AttemptAnswer.question_id == q_id
+            ).first()
+            
+            option_id = None
+            text_resp = ""
+            is_correct = False
+            
+            if question.q_type == "MCQ":
+                try:
+                    option_id = int(val)
+                    opt = db.query(AnswerOption).filter(AnswerOption.id == option_id).first()
+                    if opt and opt.is_correct:
+                        is_correct = True
+                except (ValueError, TypeError):
+                    pass
+            elif val and val.startswith("data:audio/"):
+                text_resp = val  # Keep base64 audio as-is for now
+            else:
+                text_resp = val if val else ""
+                expected = normalize_text(question.correct_answer_text)
+                provided = normalize_text(text_resp)
+                is_writing = (question.q_type == "WRITING")
+                if not is_writing and question.block and question.block.section:
+                    is_writing = "writing" in question.block.section.section_type.lower()
+                if not is_writing:
+                    if expected and provided == expected:
+                        is_correct = True
+            
+            if existing:
+                existing.text_response = text_resp
+                existing.option_id = option_id
+                existing.is_correct = is_correct
+            else:
+                ans = AttemptAnswer(
+                    attempt_id=attempt.id,
+                    question_id=q_id,
+                    text_response=text_resp,
+                    option_id=option_id,
+                    is_correct=is_correct
+                )
+                db.add(ans)
+        
+        db.commit()
+        return JSONResponse({"success": True, "saved_at": datetime.utcnow().isoformat()})
+    except Exception as e:
+        db.rollback()
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
+
 
 from fastapi import BackgroundTasks
 from fastapi.responses import JSONResponse
@@ -766,14 +859,25 @@ async def submit_exam(request: Request, exam_id: int, db: SessionMaster = Depend
             if is_correct:
                 raw_score += question.points
                 
-            ans = AttemptAnswer(
-                attempt_id=attempt.id,
-                question_id=q_id,
-                text_response=text_resp,
-                option_id=option_id,
-                is_correct=is_correct
-            )
-            db.add(ans)
+            # Upsert answer: update if exists from auto-save, else insert
+            existing = db.query(AttemptAnswer).filter(
+                AttemptAnswer.attempt_id == attempt.id,
+                AttemptAnswer.question_id == q_id
+            ).first()
+            
+            if existing:
+                existing.text_response = text_resp
+                existing.option_id = option_id
+                existing.is_correct = is_correct
+            else:
+                ans = AttemptAnswer(
+                    attempt_id=attempt.id,
+                    question_id=q_id,
+                    text_response=text_resp,
+                    option_id=option_id,
+                    is_correct=is_correct
+                )
+                db.add(ans)
             
     attempt.total_score = raw_score
     
