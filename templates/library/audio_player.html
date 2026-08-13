@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Playing: {{ item.title }} | Liberum Audio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -176,6 +176,7 @@
             width: 100%;
             background: transparent;
             cursor: pointer;
+            min-height: 30px; /* Larger touch target */
         }
         input[type=range]:focus { outline: none; }
         input[type=range]::-webkit-slider-runnable-track {
@@ -186,10 +187,10 @@
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 16px; width: 16px;
+            height: 18px; width: 18px;
             border-radius: 50%;
             background: var(--accent);
-            margin-top: -5px;
+            margin-top: -6px;
             box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
             transition: transform 0.1s;
         }
@@ -213,7 +214,7 @@
         .center-controls {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 16px;
         }
         
         button.control-btn {
@@ -226,6 +227,8 @@
             justify-content: center;
             transition: all 0.2s;
             opacity: 0.8;
+            min-width: 44px;
+            min-height: 44px;
         }
         button.control-btn:hover { opacity: 1; transform: scale(1.1); color: var(--accent-hover); }
         
@@ -242,6 +245,21 @@
             background: var(--accent-hover) !important;
         }
         
+        .skip-btn {
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-direction: column;
+            gap: 2px !important;
+        }
+        .skip-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        .skip-btn span {
+            font-size: 0.6rem;
+            letter-spacing: 0.05em;
+        }
+
         /* Fullscreen utilities */
         :fullscreen .top-bar { display: none; }
         :fullscreen .player-bottom {
@@ -249,9 +267,38 @@
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
             border-top: none; padding-bottom: 40px;
         }
+        :fullscreen .subtitles-display {
+            bottom: 140px; /* Move above controls in fullscreen */
+        }
         
         /* CC Button Active State */
         .cc-active { color: var(--accent) !important; opacity: 1 !important; }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .top-bar { padding: 16px; }
+            .main-content { padding: 0 16px; }
+            .cover-art-container { width: 200px; height: 200px; margin-bottom: 24px; }
+            .track-title { font-size: 1.4rem; }
+            .track-author { font-size: 0.9rem; }
+            .player-bottom { padding: 16px 20px; }
+            .progress-container { gap: 10px; }
+            .time-display { font-size: 0.75rem; min-width: 38px; }
+            .controls-row { gap: 8px; }
+            .side-controls { width: auto; gap: 10px; }
+            .center-controls { gap: 12px; }
+            .play-btn { width: 56px; height: 56px; }
+            button.control-btn { min-width: 40px; min-height: 40px; }
+            .skip-btn svg { width: 18px; height: 18px; }
+            .subtitle-line { font-size: 1.1rem; padding: 3px 10px; max-width: 95%; }
+            input[type=range]::-webkit-slider-thumb {
+                height: 22px; width: 22px;
+                margin-top: -8px;
+            }
+            input[type=range]::-webkit-slider-runnable-track {
+                height: 8px;
+            }
+        }
 
     </style>
 </head>
@@ -311,8 +358,9 @@
             </div>
 
             <div class="center-controls">
-                <button class="control-btn" id="skipBackBtn" title="Skip back 10s">
-                    <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"></path></svg>
+                <button class="control-btn skip-btn" id="skipBackBtn" title="Skip back 5s">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"></path></svg>
+                    <span>5s</span>
                 </button>
                 
                 <button class="control-btn play-btn" id="playPauseBtn">
@@ -322,8 +370,9 @@
                     <svg id="pauseIcon" style="display:none;" width="32" height="32" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
                 </button>
 
-                <button class="control-btn" id="skipFwdBtn" title="Skip forward 10s">
-                    <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.334-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"></path></svg>
+                <button class="control-btn skip-btn" id="skipFwdBtn" title="Skip forward 5s">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.334-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"></path></svg>
+                    <span>5s</span>
                 </button>
             </div>
 
@@ -451,13 +500,13 @@
             audio.muted = (audio.volume === 0);
         });
 
-        // Skip Buttons
+        // Skip Buttons - 5 seconds
         skipBackBtn.addEventListener('click', () => {
-            audio.currentTime = Math.max(0, audio.currentTime - 10);
+            audio.currentTime = Math.max(0, audio.currentTime - 5);
         });
         
         skipFwdBtn.addEventListener('click', () => {
-            audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+            audio.currentTime = Math.min(audio.duration || Infinity, audio.currentTime + 5);
         });
 
         // Fullscreen
