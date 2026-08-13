@@ -5,6 +5,11 @@ from fastapi.responses import RedirectResponse, HTMLResponse, PlainTextResponse
 from starlette.middleware.sessions import SessionMiddleware
 import uvicorn, os
 
+# --- Rate Limiting ---
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
 from config import APP_NAME, SECRET_KEY, STATIC_DIR, UPLOADS_DIR
 from master_database import init_master_db
 from autobackup import run_backup
@@ -16,6 +21,8 @@ from auth import (
     is_authenticated,
     logout,
     SESSION_KEY,
+    generate_csrf_token,
+    validate_csrf_token,
 )
 from scheduler import fix_archived_future_lessons
 
@@ -40,24 +47,13 @@ from routers import library
 from routers import ai
 
 app = FastAPI(title=APP_NAME)
-app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
-@app.on_event("startup")
-async def startup_event():
-    from master_database import SessionMaster, User
-    from auth import set_password
-    db = SessionMaster()
-    try:
-        # Reset demo accounts to a known password so the user can test
-        for uname in ["owner", "teacher_demo", "student_demo"]:
-            u = db.query(User).filter(User.username == uname).first()
-            if u:
-                set_password("Liberum2026!", user=u)
-        db.commit()
-    except Exception as e:
-        print(f"Error resetting passwords: {e}")
-    finally:
-        db.close()
+# --- Rate Limiter ---
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
 os.makedirs(STATIC_DIR, exist_ok=True)
 os.makedirs(UPLOADS_DIR, exist_ok=True)
@@ -237,6 +233,17 @@ async def healthz():
     return "ok"
 
 
+# --- Security Headers Middleware ---
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(self), geolocation=()"
+    return response
+
+
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
     path = request.url.path
@@ -282,21 +289,27 @@ async def root(request: Request):
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request, next: str = "/dashboard"):
-    return templates.TemplateResponse("login.html", {
-        "request": request, "next": next, "error": None
+    csrf_token = generate_csrf_token()
+    response = templates.TemplateResponse("login.html", {
+        "request": request, "next": next, "error": None, "csrf_token": csrf_token
     })
+    # Store CSRF token in a short-lived cookie so we can validate it on POST
+    response.set_cookie("csrf_token", csrf_token, httponly=False, max_age=3600, samesite="lax")
+    return response
 
 
 
 from fastapi.responses import JSONResponse
 
 @app.post("/login")
+@limiter.limit("10/minute")
 async def login_post(request: Request):
     content_type = request.headers.get("content-type", "")
     
     identifier = None
     password = None
     next_url = "/dashboard"
+    csrf_token = None
     
     if "application/json" in content_type:
         try:
@@ -304,6 +317,7 @@ async def login_post(request: Request):
             identifier = data.get("identifier")
             password = data.get("password")
             next_url = data.get("next", "/dashboard")
+            csrf_token = data.get("csrf_token")
         except Exception:
             pass
     else:
@@ -312,8 +326,21 @@ async def login_post(request: Request):
             identifier = form.get("identifier")
             password = form.get("password")
             next_url = form.get("next", "/dashboard")
+            csrf_token = form.get("csrf_token")
         except Exception:
             pass
+    
+    # --- CSRF Validation ---
+    # For JSON requests from our own frontend, we also accept the cookie-based token
+    if not csrf_token:
+        csrf_token = request.cookies.get("csrf_token", "")
+    if not validate_csrf_token(csrf_token):
+        if "application/json" in content_type:
+            return JSONResponse(status_code=403, content={"detail": "Invalid or missing CSRF token. Please refresh the page."})
+        return templates.TemplateResponse("login.html", {
+            "request": request, "next": next_url,
+            "error": "Security validation failed. Please refresh the page and try again."
+        })
             
     if not identifier or not password:
         if "application/json" in content_type:
@@ -337,6 +364,8 @@ async def login_post(request: Request):
             
         response.set_cookie(SESSION_KEY, token, httponly=True,
                             max_age=60*60*24*30, samesite="lax")
+        # Clear CSRF cookie after successful login
+        response.delete_cookie("csrf_token")
         return response
         
     if "application/json" in content_type:
@@ -352,6 +381,7 @@ async def logout_route(request: Request):
     logout(request)
     response = RedirectResponse("/login", status_code=302)
     response.delete_cookie(SESSION_KEY)
+    response.delete_cookie("csrf_token")
     return response
 
 @app.get("/register", response_class=HTMLResponse)
@@ -369,6 +399,7 @@ from master_database import SessionMaster, EmailOTP, PhoneOTP, PlatformTenant, U
 from auth import hash_pw
 
 @app.post("/register/send-otp", response_class=HTMLResponse)
+@limiter.limit("5/minute")
 async def register_send_otp(request: Request, email: str = Form(...), account_type: str = Form("student")):
     db = SessionMaster()
     try:
@@ -405,6 +436,7 @@ async def register_send_otp(request: Request, email: str = Form(...), account_ty
         db.close()
 
 @app.post("/register/send-otp-phone", response_class=HTMLResponse)
+@limiter.limit("5/minute")
 async def register_send_otp_phone(request: Request, phone: str = Form(...), account_type: str = Form("student")):
     db = SessionMaster()
     try:
@@ -436,6 +468,7 @@ async def register_send_otp_phone(request: Request, phone: str = Form(...), acco
         db.close()
 
 @app.post("/register/verify")
+@limiter.limit("5/minute")
 async def register_verify(request: Request, email: str = Form(""), phone: str = Form(""),
                           channel: str = Form("email"), otp: str = Form(...), 
                           full_name: str = Form(...), password: str = Form(...), 
@@ -578,7 +611,7 @@ async def support_page(request: Request):
 for r in [dashboard.router, students.router, groups.router, lessons.router,
           attendance.router, finance.router, reports.router, payments.router,
           backup.router, settings_router.router, calendar_router.router,
-          timetable_router.router, homework_router.router, performance.router,
+          timetable_router.router, homework_router, performance.router,
           reportcard.router, courses.router, waitlist.router,
           profile_router.router, monthly_report.router,
           timetable_export.router, holidays_router.router,

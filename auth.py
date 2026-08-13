@@ -14,6 +14,7 @@ from config import (
     OWNER_USERNAME,
     PASSWORD_FILE,
     SESSION_COOKIE_NAME,
+    SECRET_KEY,
 )
 from master_database import SessionMaster, User, AuthSession, PlatformTenant
 
@@ -219,3 +220,24 @@ def logout(request: Request):
             db.commit()
     finally:
         db.close()
+
+
+# --- CSRF Protection ---
+import itsdangerous
+
+_csrf_signer = itsdangerous.URLSafeTimedSerializer(SECRET_KEY, salt="csrf-token")
+CSRF_TOKEN_MAX_AGE = 3600  # 1 hour
+
+def generate_csrf_token() -> str:
+    """Generate a new CSRF token."""
+    return _csrf_signer.dumps(secrets.token_hex(16))
+
+def validate_csrf_token(token: str) -> bool:
+    """Validate a CSRF token. Returns True if valid, False otherwise."""
+    if not token:
+        return False
+    try:
+        _csrf_signer.loads(token, max_age=CSRF_TOKEN_MAX_AGE)
+        return True
+    except Exception:
+        return False
