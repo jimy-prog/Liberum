@@ -4,12 +4,9 @@ import time
 import google.generativeai as genai
 from master_database import SessionMaster, GrammarTopic, GrammarQuestion
 
-import os
+from services.ai_client import UniversalAIClient
 
-# API Configuration
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('models/gemini-2.5-flash')
+ai_client = UniversalAIClient(primary_provider="openai")
 
 def generate_content_for_topic(topic):
     prompt = f"""
@@ -37,16 +34,16 @@ You MUST return your response in the following strict JSON format, and NOTHING E
 }}
 """
     try:
-        response = model.generate_content(prompt)
-        text = response.text
-        if text.startswith("```json"):
-            text = text[7:]
-        if text.startswith("```"):
-            text = text[3:]
-        if text.endswith("```"):
-            text = text[:-3]
-        
-        return json.loads(text.strip())
+        raw_text = ai_client.generate_structured_response(prompt)
+        # Parse output
+        raw_text = raw_text.strip()
+        if raw_text.startswith("```json"):
+            raw_text = raw_text.replace("```json", "", 1)
+        if raw_text.endswith("```"):
+            raw_text = raw_text[:-3]
+            
+        data = json.loads(raw_text.strip())
+        return data
     except Exception as e:
         print(f"Failed to parse JSON for topic {topic.id}: {e}")
         # Return fallback dummy data so the UI can still be tested

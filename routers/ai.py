@@ -13,9 +13,11 @@ from sqlalchemy.orm import sessionmaker
 router = APIRouter(prefix="/library/ai")
 templates = Jinja2Templates(directory="templates")
 
-# Initialize Gemini
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-2.5-flash')
+from services.ai_client import UniversalAIClient
+
+# Initialize Client
+# We default to Gemini primary because it was the old behavior, but it will fallback to OpenAI
+ai_client = UniversalAIClient(primary_provider="gemini")
 
 class ChatRequest(BaseModel):
     message: str
@@ -168,16 +170,7 @@ Use this context to personalize your responses. If they ask about their recent l
                 "parts": [msg["parts"]]
             })
             
-        chat = model.start_chat(history=formatted_history)
-        
-        # We inject the system prompt along with the user's latest message if the history is empty,
-        # or we just prepend it. Since Gemini 1.5 doesn't have a direct "system_instruction" parameter in start_chat in older SDK versions, 
-        # we can just pass it as the first message if needed, or better, we can inject it into the current prompt.
-        
-        full_message = f"SYSTEM INSTRUCTION (DO NOT SHOW THIS TO THE USER):\n{system_prompt}\n\nUSER MESSAGE:\n{payload.message}"
-        
-        response = chat.send_message(full_message)
-        reply_text = response.text
+        reply_text = ai_client.generate_chat_response(system_prompt, formatted_history, payload.message)
         
         # Save to DB
         engine = get_tenant_engine(tenant_db_filename)

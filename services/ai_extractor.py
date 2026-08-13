@@ -4,15 +4,10 @@ from PIL import Image
 import io
 import json
 import re
-import google.generativeai as genai
-from dotenv import load_dotenv
+from services.ai_client import UniversalAIClient
 
-load_dotenv()
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-
-# Configure Gemini if the key is present
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+# Initialize AI Client with ChatGPT fallback support
+ai_client = UniversalAIClient(primary_provider="openai")
 
 def convert_pdf_to_images(pdf_path: str, progress_callback=None) -> list[Image.Image]:
     doc = fitz.open(pdf_path)
@@ -196,23 +191,17 @@ def extract_ielts_exam_from_pdf(pdf_path: str, test_scope: str = "Reading Sectio
     }
     """
     
-    model = genai.GenerativeModel('gemini-2.5-flash')
-    
     try:
-        contents = [prompt] + images
         if progress_callback:
-            progress_callback(60, "Uploading data to Gemini and analyzing document structure...")
+            progress_callback(60, "Uploading data to AI and analyzing document structure...")
             
-        response = model.generate_content(
-            contents, 
-            generation_config={"response_mime_type": "application/json"}
-        )
+        raw_text = ai_client.generate_structured_response(prompt, images=images)
         
         if progress_callback:
             progress_callback(90, "Received AI Schema. Parsing JSON map...")
             
         # Clean markdown code blocks if the model hallucinates them
-        raw_text = response.text.strip()
+        raw_text = raw_text.strip()
         raw_text = re.sub(r'^```json\s*', '', raw_text)
         raw_text = re.sub(r'\s*```$', '', raw_text)
         

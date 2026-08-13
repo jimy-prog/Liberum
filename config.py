@@ -18,6 +18,9 @@ LEGACY_DB_FILENAME = "teacher_admin.db"
 _raw_key = os.getenv("GEMINI_API_KEY", "")
 GEMINI_API_KEY = _raw_key.split(",")[0].strip() if _raw_key else ""
 
+_raw_openai_key = os.getenv("OPENAI_API_KEY", "")
+OPENAI_API_KEY = _raw_openai_key.split(",")[0].strip() if _raw_openai_key else ""
+
 # Firebase
 FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, "firebase-service-account.json")
 

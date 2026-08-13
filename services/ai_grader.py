@@ -2,45 +2,14 @@ import os
 import json
 import google.generativeai as genai
 from dotenv import load_dotenv
+from services.ai_client import UniversalAIClient
 
 # ─── Always reload .env so the key is picked up even if .env was created
 # after the module was first imported (e.g. mid-session).
 load_dotenv(override=True)
 
+ai_client = UniversalAIClient(primary_provider="openai")
 
-class APIKeyManager:
-    _keys = []
-    _current_idx = 0
-
-    @classmethod
-    def get_keys(cls):
-        load_dotenv(override=True)
-        raw = os.environ.get("GEMINI_API_KEY", "").strip()
-        cls._keys = [k.strip() for k in raw.split(",") if k.strip()]
-        return cls._keys
-
-    @classmethod
-    def get_current_key(cls):
-        keys = cls.get_keys()
-        if not keys:
-            return None
-        cls._current_idx = cls._current_idx % len(keys)
-        return keys[cls._current_idx]
-
-    @classmethod
-    def rotate_to_next(cls):
-        keys = cls.get_keys()
-        if keys:
-            cls._current_idx = (cls._current_idx + 1) % len(keys)
-            print(f"[APIKeyManager] Rotated to key index {cls._current_idx}")
-
-
-def _get_model():
-    key = APIKeyManager.get_current_key()
-    if not key:
-        return None
-    genai.configure(api_key=key)
-    return genai.GenerativeModel("gemini-2.5-flash")
 
 
 def _log_platform_error(attempt_id: int, error_type: str, message: str, details: str):
@@ -72,44 +41,27 @@ STUDENT_FRIENDLY_AI_FALLBACK = (
 
 def _generate_content_with_retry(contents, generation_config=None, attempt_id=None):
     import time
-    import re
     for attempt in range(6):
-        model = _get_model()
-        if not model:
-            raise ValueError("No API keys configured.")
         try:
-            if generation_config:
-                return model.generate_content(contents, generation_config=generation_config)
-            else:
-                return model.generate_content(contents)
+            res_text = ai_client.generate_structured_response(contents)
+            class MockResponse:
+                def __init__(self, t):
+                    self.text = t
+            return MockResponse(res_text)
         except Exception as e:
             err_str = str(e).lower()
             if "429" in err_str or "quota" in err_str or "rate limit" in err_str:
-                keys = APIKeyManager.get_keys()
-                if len(keys) > 1:
-                    APIKeyManager.rotate_to_next()
-                    print(f"[AI Grader] Rotated API Key due to 429. Attempt {attempt+1}/6...")
-                    time.sleep(2)
-                    continue
-
-                delay = 15
-                if "retry in" in err_str:
-                    try:
-                        match = re.search(r"retry in ([\d\.]+)", err_str)
-                        if match:
-                            delay = int(float(match.group(1))) + 2
-                    except Exception:
-                        pass
-                print(f"[AI Grader] Hit 429 Rate Limit. Waiting {delay} seconds (attempt {attempt+1}/6)...")
-                time.sleep(delay)
+                print(f"[AI Grader] Hit 429 Rate Limit. Waiting 15 seconds (attempt {attempt+1}/6)...")
+                time.sleep(15)
             else:
                 raise e
-
-    model = _get_model()
-    if generation_config:
-        return model.generate_content(contents, generation_config=generation_config)
-    else:
-        return model.generate_content(contents)
+    
+    # Final attempt
+    res_text = ai_client.generate_structured_response(contents)
+    class MockResponse:
+        def __init__(self, t):
+            self.text = t
+    return MockResponse(res_text)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
