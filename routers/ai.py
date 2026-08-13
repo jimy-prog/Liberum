@@ -5,7 +5,7 @@ from pydantic import BaseModel
 import google.generativeai as genai
 
 from master_database import SessionMaster, User, GrammarQuizAttempt, GrammarTopic
-from database import get_tenant_engine, Student, Group, Lesson, Attendance, TestResult, AIChatSession, AIChatMessage
+from database import get_tenant_engine, Student, Group, Lesson, Attendance, TestResult, AIChatSession, AIChatMessage, Notification
 from auth import get_current_user
 from config import GEMINI_API_KEY
 from sqlalchemy.orm import sessionmaker
@@ -216,11 +216,23 @@ Use this context to personalize your responses. If they ask about their recent l
         import traceback
         traceback.print_exc()
         error_msg = str(e)
-        reply_msg = "I'm sorry, my AI servers are currently experiencing issues. Please try again later."
         if "429" in error_msg or "ResourceExhausted" in error_msg or "quota" in error_msg.lower():
-            reply_msg = "I'm sorry, but your Gemini API Key has exceeded its free tier rate limits (or daily quota). Please add billing to your Google AI Studio account or try again later."
+            if user_role == 'owner':
+                try:
+                    engine2 = get_tenant_engine(tenant_db_filename)
+                    SessionLocal2 = sessionmaker(bind=engine2)
+                    notif_db = SessionLocal2()
+                    new_notif = Notification(message="AI Assistant Limit Reached: The AI API Key has exceeded its free tier rate limits.", type="error")
+                    notif_db.add(new_notif)
+                    notif_db.commit()
+                    notif_db.close()
+                except Exception as ex:
+                    pass
+                reply_msg = "Your API Key has exceeded its limit (or daily quota). Please add billing to your AI provider account."
+            else:
+                reply_msg = "We are currently experiencing a technical issue with the learning assistant. Please try again later."
             return JSONResponse(status_code=200, content={"reply": reply_msg, "session_id": payload.session_id})
-        return JSONResponse(status_code=500, content={"reply": reply_msg, "error": error_msg})
+        return JSONResponse(status_code=500, content={"reply": "We are currently experiencing a technical issue. Please try again later.", "error": error_msg})
 
 @router.get("/session/{session_id}")
 def load_session(request: Request, session_id: int):
