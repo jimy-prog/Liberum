@@ -42,23 +42,6 @@ from routers import ai
 app = FastAPI(title=APP_NAME)
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
-@app.on_event("startup")
-async def startup_event():
-    from master_database import SessionMaster, User
-    from auth import set_password
-    db = SessionMaster()
-    try:
-        # Reset demo accounts to a known password so the user can test
-        for uname in ["owner", "teacher_demo", "student_demo"]:
-            u = db.query(User).filter(User.username == uname).first()
-            if u:
-                set_password("Liberum2026!", user=u)
-        db.commit()
-    except Exception as e:
-        print(f"Error resetting passwords: {e}")
-    finally:
-        db.close()
-
 os.makedirs(STATIC_DIR, exist_ok=True)
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
@@ -578,7 +561,7 @@ async def support_page(request: Request):
 for r in [dashboard.router, students.router, groups.router, lessons.router,
           attendance.router, finance.router, reports.router, payments.router,
           backup.router, settings_router.router, calendar_router.router,
-          timetable_router.router, homework_router.router, performance.router,
+          timetable_router.router, homework_router, performance.router,
           reportcard.router, courses.router, waitlist.router,
           profile_router.router, monthly_report.router,
           timetable_export.router, holidays_router.router,
