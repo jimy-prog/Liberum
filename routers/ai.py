@@ -213,8 +213,14 @@ Use this context to personalize your responses. If they ask about their recent l
             
         return JSONResponse({"reply": reply_text, "session_id": session_id})
     except Exception as e:
-        print("Gemini API Error:", str(e))
-        return JSONResponse({"reply": "I'm sorry, my AI servers are currently experiencing issues. Please try again later.", "error": str(e)}, status_code=500)
+        import traceback
+        traceback.print_exc()
+        error_msg = str(e)
+        reply_msg = "I'm sorry, my AI servers are currently experiencing issues. Please try again later."
+        if "429" in error_msg or "ResourceExhausted" in error_msg or "quota" in error_msg.lower():
+            reply_msg = "I'm sorry, but your Gemini API Key has exceeded its free tier rate limits (or daily quota). Please add billing to your Google AI Studio account or try again later."
+            return JSONResponse(status_code=200, content={"reply": reply_msg, "session_id": payload.session_id})
+        return JSONResponse(status_code=500, content={"reply": reply_msg, "error": error_msg})
 
 @router.get("/session/{session_id}")
 def load_session(request: Request, session_id: int):
