@@ -51,7 +51,7 @@ def ai_chat_page(request: Request):
         student = tenant_db.query(Student).filter(
             (Student.email == user_email) | (Student.phone == user_phone) | (Student.name == user_full_name)
         ).first()
-        student_id = student.id if student else None
+        student_id = student.id if student else 0
         sessions = tenant_db.query(AIChatSession).filter_by(student_id=student_id).order_by(AIChatSession.updated_at.desc()).all()
     finally:
         tenant_db.close()
@@ -76,6 +76,7 @@ def ai_chat_endpoint(request: Request, payload: ChatRequest):
         user_email = user_record.email
         user_phone = user_record.phone
         user_full_name = user_record.full_name
+        user_role = user_record.role
     finally:
         master_db.close()
 
@@ -92,7 +93,7 @@ def ai_chat_endpoint(request: Request, payload: ChatRequest):
         student = tenant_db.query(Student).filter(
             (Student.email == user_email) | (Student.phone == user_phone) | (Student.name == user_full_name)
         ).first()
-        student_id = student.id if student else None
+        student_id = student.id if student else 0
         
         # Now get grammar attempts from master_db since we have student_id
         grammar_data = []
@@ -134,7 +135,17 @@ def ai_chat_endpoint(request: Request, payload: ChatRequest):
         tenant_db.close()
         
     # Construct System Prompt
-    system_prompt = f"""You are Lexi, a strict but highly intelligent AI tutor for the Liberum English Learning Platform.
+    # Construct System Prompt based on role
+    if user_role == 'owner':
+        system_prompt = f"""You are Lexi, the intelligent AI assistant for the Liberum English Learning Platform.
+You are currently talking to the Platform Owner / Admin. Your goal is to assist them in managing the platform, students, or generating content. You are helpful, professional, and understand you are talking to the boss. Use markdown formatting to make your responses look premium and organized.
+"""
+    elif user_role == 'teacher':
+        system_prompt = f"""You are Lexi, the intelligent AI assistant for the Liberum English Learning Platform.
+You are currently talking to a Teacher. Your goal is to help them with their lessons, grading, and tasks. You can help them generate materials, structure classes, or organize their workload. Use markdown formatting to make your responses look premium and organized.
+"""
+    else:
+        system_prompt = f"""You are Lexi, a strict but highly intelligent AI tutor for the Liberum English Learning Platform.
 Your goal is to help the student learn, but NEVER just give them the direct answers to homework or tests. Instead, ask leading questions, explain the concepts, and guide them to figure it out themselves. Be encouraging but firm in your role as a tutor. Use markdown formatting to make your responses look premium and organized.
 
 --- STUDENT CONTEXT ---
@@ -228,7 +239,7 @@ def load_session(request: Request, session_id: int):
         student = tenant_db.query(Student).filter(
             (Student.email == user_email) | (Student.phone == user_phone) | (Student.name == user_full_name)
         ).first()
-        student_id = student.id if student else None
+        student_id = student.id if student else 0
         
         session = tenant_db.query(AIChatSession).filter_by(id=session_id, student_id=student_id).first()
         if not session:
