@@ -611,7 +611,7 @@ async def support_page(request: Request):
 for r in [dashboard.router, students.router, groups.router, lessons.router,
           attendance.router, finance.router, reports.router, payments.router,
           backup.router, settings_router.router, calendar_router.router,
-          timetable_router.router, homework_router, performance.router,
+          timetable_router.router, homework_router.router, performance.router,
           reportcard.router, courses.router, waitlist.router,
           profile_router.router, monthly_report.router,
           timetable_export.router, holidays_router.router,
