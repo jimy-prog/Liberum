@@ -5,6 +5,11 @@ from fastapi.responses import RedirectResponse, HTMLResponse, PlainTextResponse
 from starlette.middleware.sessions import SessionMiddleware
 import uvicorn, os
 
+# --- Rate Limiting ---
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
 from config import APP_NAME, SECRET_KEY, STATIC_DIR, UPLOADS_DIR
 from master_database import init_master_db
 from autobackup import run_backup
@@ -40,6 +45,12 @@ from routers import library
 from routers import ai
 
 app = FastAPI(title=APP_NAME)
+
+# --- Rate Limiter ---
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
 os.makedirs(STATIC_DIR, exist_ok=True)
@@ -220,6 +231,17 @@ async def healthz():
     return "ok"
 
 
+# --- Security Headers Middleware ---
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(self), geolocation=()"
+    return response
+
+
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
     path = request.url.path
@@ -274,6 +296,7 @@ async def login_page(request: Request, next: str = "/dashboard"):
 from fastapi.responses import JSONResponse
 
 @app.post("/login")
+@limiter.limit("10/minute")
 async def login_post(request: Request):
     content_type = request.headers.get("content-type", "")
     
@@ -352,6 +375,7 @@ from master_database import SessionMaster, EmailOTP, PhoneOTP, PlatformTenant, U
 from auth import hash_pw
 
 @app.post("/register/send-otp", response_class=HTMLResponse)
+@limiter.limit("5/minute")
 async def register_send_otp(request: Request, email: str = Form(...), account_type: str = Form("student")):
     db = SessionMaster()
     try:
@@ -388,6 +412,7 @@ async def register_send_otp(request: Request, email: str = Form(...), account_ty
         db.close()
 
 @app.post("/register/send-otp-phone", response_class=HTMLResponse)
+@limiter.limit("5/minute")
 async def register_send_otp_phone(request: Request, phone: str = Form(...), account_type: str = Form("student")):
     db = SessionMaster()
     try:
@@ -419,6 +444,7 @@ async def register_send_otp_phone(request: Request, phone: str = Form(...), acco
         db.close()
 
 @app.post("/register/verify")
+@limiter.limit("5/minute")
 async def register_verify(request: Request, email: str = Form(""), phone: str = Form(""),
                           channel: str = Form("email"), otp: str = Form(...), 
                           full_name: str = Form(...), password: str = Form(...), 
