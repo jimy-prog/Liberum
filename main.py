@@ -21,6 +21,8 @@ from auth import (
     is_authenticated,
     logout,
     SESSION_KEY,
+    generate_csrf_token,
+    validate_csrf_token,
 )
 from scheduler import fix_archived_future_lessons
 
@@ -287,9 +289,13 @@ async def root(request: Request):
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request, next: str = "/dashboard"):
-    return templates.TemplateResponse("login.html", {
-        "request": request, "next": next, "error": None
+    csrf_token = generate_csrf_token()
+    response = templates.TemplateResponse("login.html", {
+        "request": request, "next": next, "error": None, "csrf_token": csrf_token
     })
+    # Store CSRF token in a short-lived cookie so we can validate it on POST
+    response.set_cookie("csrf_token", csrf_token, httponly=False, max_age=3600, samesite="lax")
+    return response
 
 
 
@@ -303,6 +309,7 @@ async def login_post(request: Request):
     identifier = None
     password = None
     next_url = "/dashboard"
+    csrf_token = None
     
     if "application/json" in content_type:
         try:
@@ -310,6 +317,7 @@ async def login_post(request: Request):
             identifier = data.get("identifier")
             password = data.get("password")
             next_url = data.get("next", "/dashboard")
+            csrf_token = data.get("csrf_token")
         except Exception:
             pass
     else:
@@ -318,8 +326,21 @@ async def login_post(request: Request):
             identifier = form.get("identifier")
             password = form.get("password")
             next_url = form.get("next", "/dashboard")
+            csrf_token = form.get("csrf_token")
         except Exception:
             pass
+    
+    # --- CSRF Validation ---
+    # For JSON requests from our own frontend, we also accept the cookie-based token
+    if not csrf_token:
+        csrf_token = request.cookies.get("csrf_token", "")
+    if not validate_csrf_token(csrf_token):
+        if "application/json" in content_type:
+            return JSONResponse(status_code=403, content={"detail": "Invalid or missing CSRF token. Please refresh the page."})
+        return templates.TemplateResponse("login.html", {
+            "request": request, "next": next_url,
+            "error": "Security validation failed. Please refresh the page and try again."
+        })
             
     if not identifier or not password:
         if "application/json" in content_type:
@@ -343,6 +364,8 @@ async def login_post(request: Request):
             
         response.set_cookie(SESSION_KEY, token, httponly=True,
                             max_age=60*60*24*30, samesite="lax")
+        # Clear CSRF cookie after successful login
+        response.delete_cookie("csrf_token")
         return response
         
     if "application/json" in content_type:
@@ -358,6 +381,7 @@ async def logout_route(request: Request):
     logout(request)
     response = RedirectResponse("/login", status_code=302)
     response.delete_cookie(SESSION_KEY)
+    response.delete_cookie("csrf_token")
     return response
 
 @app.get("/register", response_class=HTMLResponse)
