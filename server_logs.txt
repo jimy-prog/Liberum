@@ -1,0 +1,48 @@
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.4 LTS (GNU/Linux 6.17.0-1018-oracle x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Thu Aug 13 13:36:54 UTC 2026
+
+  System load:  0.12               Processes:               165
+  Usage of /:   33.7% of 44.07GB   Users logged in:         0
+  Memory usage: 9%                 IPv4 address for enp0s5: 10.0.0.18
+  Swap usage:   0%
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+10 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+2 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+*** System restart required ***
+==== DOCKER LOGS ====
+unknown shorthand flag: 'f' in -f
+
+Usage:  docker [OPTIONS] COMMAND [ARG...]
+
+Run 'docker --help' for more information
+Failed to get logs
+==== DOCKER PS ====
+CONTAINER ID   IMAGE                      COMMAND                  CREATED             STATUS                          PORTS     NAMES
+742be874ace5   liberum-data_liberum-app   "/app/cloudflare_dep…"   About an hour ago   Restarting (3) 38 seconds ago             liberum-app
+==== ENV FILE ====
+tail: cannot open 'deploy/.env' for reading: No such file or directory
+No env file
+==== REBUILDING CONTAINER ====
+unknown shorthand flag: 'f' in -f
+
+Usage:  docker [OPTIONS] COMMAND [ARG...]
+
+Run 'docker --help' for more information
