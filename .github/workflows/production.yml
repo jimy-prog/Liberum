@@ -56,17 +56,27 @@ jobs:
           sleep 5
           
           echo "Syncing deployment to Platform Updates..."
-          sudo docker exec liberum-app python -c "
-from master_database import SessionMaster, PlatformUpdate
+          CONTAINER=$(sudo docker ps -qf "name=liberum-app" | head -n 1)
+          if [ -n "$CONTAINER" ]; then
+              sudo docker exec $CONTAINER python -c "
 import sys
 import base64
-b64_msg = sys.argv[1]
-msg = base64.b64decode(b64_msg).decode('utf-8')
-db = SessionMaster()
-db.add(PlatformUpdate(version='Deploy #' + sys.argv[2], title='GitHub Deployment', description=msg, status='Live'))
-db.commit()
-db.close()
-" "$B64_MSG" "$RUN_NUMBER"
+try:
+    from master_database import SessionMaster, PlatformUpdate
+    b64_msg = sys.argv[1]
+    b64_msg += '=' * ((4 - len(b64_msg) % 4) % 4)
+    msg = base64.b64decode(b64_msg).decode('utf-8', errors='replace')
+    db = SessionMaster()
+    db.add(PlatformUpdate(version='Deploy #' + sys.argv[2], title='GitHub Deployment', description=msg, status='Live'))
+    db.commit()
+    db.close()
+    print('Sync successful')
+except Exception as e:
+    print('Error syncing platform update:', str(e))
+" "$B64_MSG" "$RUN_NUMBER" || true
+          else
+              echo "Could not find liberum-app container"
+          fi
           
           echo "Server pulls automatically via cron. Action green."
           EOF
