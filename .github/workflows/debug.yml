@@ -25,12 +25,9 @@ jobs:
           ssh-keyscan -H 130.61.234.227 >> ~/.ssh/known_hosts
           
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << 'INNEREOF' > server_logs.txt 2>&1
-          echo "==== CRONTAB ===="
-          crontab -l || sudo crontab -l || echo "No crontab"
-          echo "==== ALL CONTAINERS ===="
-          sudo docker ps -a
-          echo "==== CLOUDFLARE LOGS ===="
-          sudo docker logs --tail=50 cloudflared || echo "no cloudflare logs"
+          echo "==== AUTO DEPLOY SH ===="
+          cat /home/ubuntu/auto_deploy.sh || echo "Missing"
+          INNEREOF
           echo "==== DOCKER LOGS ===="
           sudo docker logs --tail=200 liberum-app || echo "Failed to get logs"
           echo "==== DOCKER PS ===="
