@@ -25,18 +25,10 @@ jobs:
           ssh-keyscan -H 130.61.234.227 >> ~/.ssh/known_hosts
           
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << 'INNEREOF' > server_logs.txt 2>&1
-          echo "==== TEST DOCKER EXEC ===="
-          sudo docker exec liberum-app python -c "
-import sys
-try:
-    from master_database import SessionMaster, PlatformUpdate
-    print('Import successful')
-    db = SessionMaster()
-    print('DB connection successful')
-    db.close()
-except Exception as e:
-    print('Error:', e)
-" || echo "Exec failed"
+          cd /home/ubuntu/Liberum
+          echo "==== TEST DOCKER COMPOSE ===="
+          export OPENAI_API_KEY="dummy"
+          docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build || docker-compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build || echo "Both failed"
           echo "==== DOCKER LOGS ===="
           sudo docker logs --tail=200 liberum-app || echo "Failed to get logs"
           echo "==== DOCKER PS ===="
