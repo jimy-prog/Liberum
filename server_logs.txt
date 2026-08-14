@@ -5,11 +5,11 @@ Welcome to Ubuntu 24.04.4 LTS (GNU/Linux 6.17.0-1018-oracle x86_64)
  * Management:     https://landscape.canonical.com
  * Support:        https://ubuntu.com/pro
 
- System information as of Fri Aug 14 05:29:57 UTC 2026
+ System information as of Fri Aug 14 05:31:17 UTC 2026
 
-  System load:  0.03               Processes:               173
-  Usage of /:   36.3% of 44.07GB   Users logged in:         0
-  Memory usage: 11%                IPv4 address for enp0s5: 10.0.0.18
+  System load:  0.11               Processes:               172
+  Usage of /:   36.6% of 44.07GB   Users logged in:         0
+  Memory usage: 12%                IPv4 address for enp0s5: 10.0.0.18
   Swap usage:   0%
 
  * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
@@ -27,34 +27,34 @@ Learn more about enabling ESM Apps service at https://ubuntu.com/esm
 
 
 *** System restart required ***
-==== TEST DOCKER COMPOSE ====
-unknown shorthand flag: 'f' in -f
-
-Usage:  docker [OPTIONS] COMMAND [ARG...]
-
-Run 'docker --help' for more information
-Couldn't find env file: /home/ubuntu/Liberum/deploy/.env
-Both failed
+==== CRONTAB ====
+* * * * * /home/ubuntu/auto_deploy.sh
+==== ALL CONTAINERS ====
+CONTAINER ID   IMAGE                      COMMAND                  CREATED              STATUS              PORTS                      NAMES
+23b8fa52a716   liberum-data_liberum-app   "/app/cloudflare_dep…"   About a minute ago   Up About a minute   127.0.0.1:8000->8000/tcp   liberum-app
+==== CLOUDFLARE LOGS ====
+Error response from daemon: No such container: cloudflared
+no cloudflare logs
 ==== DOCKER LOGS ====
 [Liberum] Synced database_tenants to /app/data/
 Application starting up...
-[2026-08-14 05:27:18 +0000] [1] [INFO] Starting gunicorn 22.0.0
-[2026-08-14 05:27:18 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
-[2026-08-14 05:27:18 +0000] [1] [INFO] Using worker: uvicorn.workers.UvicornWorker
-[2026-08-14 05:27:18 +0000] [11] [INFO] Booting worker with pid: 11
-[2026-08-14 05:27:18 +0000] [12] [INFO] Booting worker with pid: 12
-[2026-08-14 05:27:20 +0000] [11] [INFO] Started server process [11]
-[2026-08-14 05:27:20 +0000] [11] [INFO] Waiting for application startup.
 Application starting up...
 Firebase Admin initialized successfully.
 Firebase Admin initialized successfully.
-[2026-08-14 05:27:20 +0000] [12] [INFO] Started server process [12]
-[2026-08-14 05:27:20 +0000] [12] [INFO] Waiting for application startup.
-[2026-08-14 05:27:20 +0000] [11] [INFO] Application startup complete.
-[2026-08-14 05:27:20 +0000] [12] [INFO] Application startup complete.
+[2026-08-14 05:30:18 +0000] [1] [INFO] Starting gunicorn 22.0.0
+[2026-08-14 05:30:18 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
+[2026-08-14 05:30:18 +0000] [1] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2026-08-14 05:30:18 +0000] [9] [INFO] Booting worker with pid: 9
+[2026-08-14 05:30:18 +0000] [10] [INFO] Booting worker with pid: 10
+[2026-08-14 05:30:20 +0000] [10] [INFO] Started server process [10]
+[2026-08-14 05:30:20 +0000] [10] [INFO] Waiting for application startup.
+[2026-08-14 05:30:20 +0000] [9] [INFO] Started server process [9]
+[2026-08-14 05:30:20 +0000] [9] [INFO] Waiting for application startup.
+[2026-08-14 05:30:21 +0000] [10] [INFO] Application startup complete.
+[2026-08-14 05:30:21 +0000] [9] [INFO] Application startup complete.
 ==== DOCKER PS ====
-CONTAINER ID   IMAGE                      COMMAND                  CREATED         STATUS         PORTS                      NAMES
-43970c9b2438   liberum-data_liberum-app   "/app/cloudflare_dep…"   2 minutes ago   Up 2 minutes   127.0.0.1:8000->8000/tcp   liberum-app
+CONTAINER ID   IMAGE                      COMMAND                  CREATED              STATUS              PORTS                      NAMES
+23b8fa52a716   liberum-data_liberum-app   "/app/cloudflare_dep…"   About a minute ago   Up About a minute   127.0.0.1:8000->8000/tcp   liberum-app
 ==== FIND DEPLOY DIR ====
 /home/ubuntu/Liberum/deploy/docker-compose.yml
 /home/ubuntu/Liberum/cloudflare_deploy/docker-compose.yml
