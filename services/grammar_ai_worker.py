@@ -66,8 +66,12 @@ def run_worker():
     print("Starting Grammar AI Worker...")
     db = SessionMaster()
     try:
-        # Find topics that haven't been generated yet (explanation is empty)
-        topics = db.query(GrammarTopic).filter(GrammarTopic.explanation == "").all()
+        # Find topics that haven't been generated yet (explanation is empty or has placeholder)
+        topics = db.query(GrammarTopic).filter(
+            (GrammarTopic.explanation == "") | 
+            (GrammarTopic.explanation.like("%Due to API limits%")) |
+            (GrammarTopic.is_published == False)
+        ).all()
         print(f"Found {len(topics)} topics to process.")
         
         for topic in topics:
@@ -75,8 +79,17 @@ def run_worker():
             data = generate_content_for_topic(topic)
             
             if data and "explanation_html" in data and "questions" in data:
-                # Update topic explanation
+                # Update topic explanation and publish status
                 topic.explanation = data["explanation_html"]
+                topic.is_published = True
+                
+                # Save generated lesson to a separate file as requested
+                os.makedirs("docs/grammar_lessons", exist_ok=True)
+                with open(f"docs/grammar_lessons/topic_{topic.id}_{topic.title.replace(' ', '_').replace('/', '_')}.html", "w") as f:
+                    f.write(data["explanation_html"])
+                
+                # Delete old dummy questions
+                db.query(GrammarQuestion).filter(GrammarQuestion.topic_id == topic.id).delete()
                 
                 # Insert questions
                 for q_data in data["questions"]:
