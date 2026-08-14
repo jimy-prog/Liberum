@@ -5,10 +5,10 @@ Welcome to Ubuntu 24.04.4 LTS (GNU/Linux 6.17.0-1018-oracle x86_64)
  * Management:     https://landscape.canonical.com
  * Support:        https://ubuntu.com/pro
 
- System information as of Fri Aug 14 05:31:17 UTC 2026
+ System information as of Fri Aug 14 05:32:29 UTC 2026
 
-  System load:  0.11               Processes:               172
-  Usage of /:   36.6% of 44.07GB   Users logged in:         0
+  System load:  0.48               Processes:               171
+  Usage of /:   36.9% of 44.07GB   Users logged in:         0
   Memory usage: 12%                IPv4 address for enp0s5: 10.0.0.18
   Swap usage:   0%
 
@@ -27,38 +27,19 @@ Learn more about enabling ESM Apps service at https://ubuntu.com/esm
 
 
 *** System restart required ***
-==== CRONTAB ====
-* * * * * /home/ubuntu/auto_deploy.sh
-==== ALL CONTAINERS ====
-CONTAINER ID   IMAGE                      COMMAND                  CREATED              STATUS              PORTS                      NAMES
-23b8fa52a716   liberum-data_liberum-app   "/app/cloudflare_dep…"   About a minute ago   Up About a minute   127.0.0.1:8000->8000/tcp   liberum-app
-==== CLOUDFLARE LOGS ====
-Error response from daemon: No such container: cloudflared
-no cloudflare logs
-==== DOCKER LOGS ====
-[Liberum] Synced database_tenants to /app/data/
-Application starting up...
-Application starting up...
-Firebase Admin initialized successfully.
-Firebase Admin initialized successfully.
-[2026-08-14 05:30:18 +0000] [1] [INFO] Starting gunicorn 22.0.0
-[2026-08-14 05:30:18 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
-[2026-08-14 05:30:18 +0000] [1] [INFO] Using worker: uvicorn.workers.UvicornWorker
-[2026-08-14 05:30:18 +0000] [9] [INFO] Booting worker with pid: 9
-[2026-08-14 05:30:18 +0000] [10] [INFO] Booting worker with pid: 10
-[2026-08-14 05:30:20 +0000] [10] [INFO] Started server process [10]
-[2026-08-14 05:30:20 +0000] [10] [INFO] Waiting for application startup.
-[2026-08-14 05:30:20 +0000] [9] [INFO] Started server process [9]
-[2026-08-14 05:30:20 +0000] [9] [INFO] Waiting for application startup.
-[2026-08-14 05:30:21 +0000] [10] [INFO] Application startup complete.
-[2026-08-14 05:30:21 +0000] [9] [INFO] Application startup complete.
-==== DOCKER PS ====
-CONTAINER ID   IMAGE                      COMMAND                  CREATED              STATUS              PORTS                      NAMES
-23b8fa52a716   liberum-data_liberum-app   "/app/cloudflare_dep…"   About a minute ago   Up About a minute   127.0.0.1:8000->8000/tcp   liberum-app
-==== FIND DEPLOY DIR ====
-/home/ubuntu/Liberum/deploy/docker-compose.yml
-/home/ubuntu/Liberum/cloudflare_deploy/docker-compose.yml
-/home/ubuntu/liberum-data-backup-1786526061/docker-compose.yml
-/home/ubuntu/liberum-data/docker-compose.yml
-/home/ubuntu/liberum/deploy/docker-compose.yml
-/home/ubuntu/liberum/cloudflare_deploy/docker-compose.yml
+==== AUTO DEPLOY SH ====
+#!/bin/bash
+cd /home/ubuntu/liberum
+git fetch origin main
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git rev-parse origin/main)
+
+if [ $LOCAL != $REMOTE ]; then
+    echo "$(date) - Changes detected. Pulling..." >> /home/ubuntu/auto_deploy.log
+    git pull origin main
+    echo "$(date) - Rebuilding docker containers..." >> /home/ubuntu/auto_deploy.log
+    cd /home/ubuntu/liberum-data
+    docker-compose down
+    docker-compose up -d --build
+    echo "$(date) - Deployment complete." >> /home/ubuntu/auto_deploy.log
+fi
