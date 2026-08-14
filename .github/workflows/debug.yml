@@ -25,12 +25,8 @@ jobs:
           ssh-keyscan -H 130.61.234.227 >> ~/.ssh/known_hosts
           
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << 'INNEREOF' > server_logs.txt 2>&1
-          echo "==== NGINX CONFIG ===="
-          cat /etc/nginx/sites-available/default || echo "No nginx config"
-          echo "==== NGINX ERROR LOG ===="
-          sudo tail -n 50 /var/log/nginx/error.log || echo "No nginx error log"
-          echo "==== ALL CONTAINERS ===="
-          sudo docker ps -a
+          echo "==== PLATFORM UPDATES ===="
+          sudo docker exec liberum-app sqlite3 /app/database_tenants/master.db "SELECT * FROM platform_updates;" || echo "No platform_updates"
           INNEREOF
           
       - name: Commit Logs to Repository
