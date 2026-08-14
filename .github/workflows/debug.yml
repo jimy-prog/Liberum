@@ -24,24 +24,30 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H 130.61.234.227 >> ~/.ssh/known_hosts
           
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << 'INNEREOF' > server_logs.txt 2>&1
-          echo "==== AUTO DEPLOY SH ===="
-          cat /home/ubuntu/auto_deploy.sh || echo "Missing"
-          INNEREOF
-          echo "==== DOCKER LOGS ===="
-          sudo docker logs --tail=200 liberum-app || echo "Failed to get logs"
-          echo "==== DOCKER PS ===="
-          sudo docker ps -a
-          echo "==== FIND DEPLOY DIR ===="
-          find /home/ubuntu -name "docker-compose.yml" -type f || true
-          INNEREOF
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << 'INNEREOF'
+          # Fix auto_deploy.sh on server
+          cat << 'SH_EOF' > /home/ubuntu/auto_deploy.sh
+#!/bin/bash
+cd /home/ubuntu/liberum
+git fetch origin main
+LOCAL=\$(git rev-parse HEAD)
+REMOTE=\$(git rev-parse origin/main)
 
-      - name: Commit Logs to Repository
-        if: always()
-        run: |
-          git config --global user.name "GitHub Action Bot"
-          git config --global user.email "bot@github.com"
-          git add server_logs.txt
-          git commit -m "chore: upload server logs" || echo "No changes to commit"
-          git pull --rebase origin main
-          git push origin HEAD:main
+if [ \$LOCAL != \$REMOTE ]; then
+    echo "\$(date) - Changes detected. Pulling..." >> /home/ubuntu/auto_deploy.log
+    git pull origin main
+    echo "\$(date) - Rebuilding docker containers..." >> /home/ubuntu/auto_deploy.log
+    cd /home/ubuntu/liberum-data
+    docker-compose down
+    docker-compose --profile tunnel up -d --build
+    echo "\$(date) - Deployment complete." >> /home/ubuntu/auto_deploy.log
+fi
+SH_EOF
+          chmod +x /home/ubuntu/auto_deploy.sh
+          
+          # Manually start the tunnel RIGHT NOW
+          cd /home/ubuntu/liberum-data
+          docker-compose --profile tunnel up -d
+          INNEREOF
+          sudo docker ps -a
+
