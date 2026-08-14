@@ -25,10 +25,12 @@ jobs:
           ssh-keyscan -H 130.61.234.227 >> ~/.ssh/known_hosts
           
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << 'INNEREOF' > server_logs.txt 2>&1
-          cd /home/ubuntu/Liberum
-          echo "==== TEST DOCKER COMPOSE ===="
-          export OPENAI_API_KEY="dummy"
-          docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build || docker-compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build || echo "Both failed"
+          echo "==== CRONTAB ===="
+          crontab -l || sudo crontab -l || echo "No crontab"
+          echo "==== ALL CONTAINERS ===="
+          sudo docker ps -a
+          echo "==== CLOUDFLARE LOGS ===="
+          sudo docker logs --tail=50 cloudflared || echo "no cloudflare logs"
           echo "==== DOCKER LOGS ===="
           sudo docker logs --tail=200 liberum-app || echo "Failed to get logs"
           echo "==== DOCKER PS ===="
