@@ -26,7 +26,14 @@ jobs:
           
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << 'INNEREOF' > server_logs.txt 2>&1
           echo "==== PLATFORM UPDATES ===="
-          sudo docker exec liberum-app sqlite3 /app/database_tenants/master.db "SELECT * FROM platform_updates;" || echo "No platform_updates"
+          sudo docker exec liberum-app python -c "
+import sqlite3
+conn = sqlite3.connect('/app/database_tenants/master.db')
+cursor = conn.cursor()
+cursor.execute('SELECT * FROM platform_updates')
+print(cursor.fetchall())
+conn.close()
+" || echo "No platform_updates"
           INNEREOF
           
       - name: Commit Logs to Repository
