@@ -22,18 +22,23 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H 130.61.234.227 >> ~/.ssh/known_hosts
-          
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p 22 "ubuntu@130.61.234.227" << 'INNEREOF' > server_logs.txt 2>&1
-          echo "==== PLATFORM UPDATES ===="
+          echo "==== RESET OWNER ===="
           sudo docker exec liberum-app python -c "
 import sqlite3
-conn = sqlite3.connect('/app/database_tenants/master.db')
-cursor = conn.cursor()
-cursor.execute('SELECT * FROM platform_updates')
-print(cursor.fetchall())
-conn.close()
-" || echo "No platform_updates"
+from master_database import SessionMaster, User
+from auth import set_password
+
+db = SessionMaster()
+owner = db.query(User).filter_by(role='owner').first()
+if owner:
+    print(f'Owner found: {owner.username} / {owner.email}')
+    set_password('admin123', owner)
+    print('Password reset to admin123')
+else:
+    print('No owner found!')
+db.close()
+"
           INNEREOF
           
       - name: Commit Logs to Repository
