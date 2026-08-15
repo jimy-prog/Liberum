@@ -28,7 +28,7 @@ _db_env = os.getenv("DATABASE_URL", "").strip()
 if os.getenv("RENDER"):
     DATA_DIR = Path("/data")
 elif os.getenv("IS_DOCKER") == "true":
-    DATA_DIR = Path("/app/database_tenants")
+    DATA_DIR = Path("/app/data")
 else:
     DATA_DIR = BASE_DIR
 
@@ -71,14 +71,9 @@ DEFAULT_ADMIN_PASSWORD = os.getenv("DEFAULT_ADMIN_PASSWORD", "change-me")
 PASSWORD_FILE = DATA_DIR / "liberum_auth_password.txt"
 LEGACY_PASSWORD_FILE = DATA_DIR / "auth_password.txt"
 
-if os.getenv("IS_DOCKER") == "true":
-    BACKUP_DIR = Path("/app/backups")
-    UPLOADS_DIR = Path("/app/uploads")
-else:
-    BACKUP_DIR = DATA_DIR / "backups"
-    UPLOADS_DIR = DATA_DIR / "uploads"
-
+BACKUP_DIR = DATA_DIR / "backups"
 STATIC_DIR = BASE_DIR / "static"
+UPLOADS_DIR = DATA_DIR / "uploads"
 
 LOG_FILENAME = os.getenv("APP_LOG_FILENAME", "liberum.log")
 
