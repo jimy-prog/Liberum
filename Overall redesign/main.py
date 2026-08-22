@@ -286,8 +286,6 @@ async def auth_middleware(request: Request, call_next):
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    if get_current_user(request):
-        return RedirectResponse("/app", status_code=302)
     return templates.TemplateResponse("landing.html", {"request": request})
 
 @app.get("/login", response_class=HTMLResponse)

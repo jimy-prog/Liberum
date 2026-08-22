@@ -236,8 +236,8 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
     <div class="sp"></div>
     <button class="ni" onclick="go('settings')"><i data-lucide="settings"></i><span>Settings</span></button>
     <div class="ucard" style="margin-top:10px">
-      <div class="av" id="uAv" style="background:#7B61FF">AR</div>
-      <div class="uc-t"><div class="nm" id="uName">Aziza Rahimova</div><div class="rl" id="uRole">Teacher · Rahimova Studio</div></div>
+      <div class="av" id="uAv" style="background:#7B61FF">{{ user_initials }}</div>
+      <div class="uc-t"><div class="nm" id="uName">{{ user_name }}</div><div class="rl" id="uRole">{{ user_role_display }}</div></div>
     </div>
   </aside>
 
