@@ -190,3 +190,23 @@ def delete_entry(eid: int, db: Session = Depends(get_db)):
     e = db.query(WaitlistEntry).get(eid)
     if e: db.delete(e); db.commit()
     return RedirectResponse("/waitlist/", status_code=303)
+
+@router.post("/{eid}/update-status")
+def update_waitlist_status(eid: int, request: Request, status: str = Form(...), db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user: return RedirectResponse("/login", status_code=302)
+    entry = db.query(WaitlistEntry).get(eid)
+    if entry:
+        entry.status = status
+        db.commit()
+    return RedirectResponse("/waitlist/", status_code=302)
+
+@router.post("/{eid}/delete")
+def delete_waitlist_entry(eid: int, request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user: return RedirectResponse("/login", status_code=302)
+    entry = db.query(WaitlistEntry).get(eid)
+    if entry:
+        db.delete(entry)
+        db.commit()
+    return RedirectResponse("/waitlist/", status_code=302)
