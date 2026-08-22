@@ -49,7 +49,13 @@ def create_waitlist_from_session(db: Session, session: PlacementSession):
 
 @router.get("/", response_class=HTMLResponse)
 async def placement_dashboard(request: Request, db: Session = Depends(get_db), current_user = Depends(require_teacher_or_owner)):
-    active_sessions = db.query(PlacementSession).filter(PlacementSession.status.in_(["pending", "active"])).order_by(PlacementSession.id.desc()).all()
+
+    from auth import get_current_user
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse("/login?next=/placement/", status_code=302)
+    active_sessions = db.query(PlacementSession).filter(
+PlacementSession.status.in_(["pending", "active"])).order_by(PlacementSession.id.desc()).all()
     completed_sessions = db.query(PlacementSession).filter(PlacementSession.status == "completed").order_by(PlacementSession.completed_at.desc()).all()
     questions = db.query(PlacementQuestion).order_by(PlacementQuestion.level, PlacementQuestion.id).all()
     

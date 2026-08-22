@@ -51,7 +51,12 @@ def waitlist_view(request: Request, db: Session = Depends(get_db)):
     if not user or user.role not in {"owner", "teacher"}:
         return RedirectResponse("/mock", status_code=302)
 
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse("/login?next=/waitlist/", status_code=302)
     entries = db.query(WaitlistEntry).filter(
+
         WaitlistEntry.status != "enrolled"
     ).order_by(WaitlistEntry.enquiry_date.desc()).all()
     groups = db.query(Group).filter(Group.status == "active").all()
@@ -64,7 +69,7 @@ def waitlist_view(request: Request, db: Session = Depends(get_db)):
     ).order_by(PlacementSession.completed_at.desc()).all()
 
     return templates.TemplateResponse("waitlist.html", {
-        "request": request, "entries": entries,
+        "request": request, "user": user, "entries": entries,
         "groups": groups, "status_labels": STATUS_LABELS,
         "how_found_options": HOW_FOUND,
         "active_page": "waitlist", "main_section": "students",

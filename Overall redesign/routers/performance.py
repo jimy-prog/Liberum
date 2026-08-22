@@ -10,7 +10,13 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/")
 def performance_view(request: Request, month: str = None, group_id: int = None, db: Session = Depends(get_db)):
+
+    from auth import get_current_user
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse("/login?next=/performance/", status_code=302)
     today = date.today()
+
     month_str = month or today.strftime("%Y-%m")
     groups = db.query(Group).filter(Group.status.in_(["active","paused"])).all()
     sel_group = db.query(Group).get(group_id) if group_id else (groups[0] if groups else None)
@@ -37,7 +43,7 @@ def performance_view(request: Request, month: str = None, group_id: int = None, 
             data.append({"student": s, "weeks": weeks, "trend": trend})
 
     return templates.TemplateResponse("performance.html", {
-        "request": request, "groups": groups, "sel_group": sel_group,
+        "request": request, "user": user, "groups": groups, "sel_group": sel_group,
         "month_str": month_str, "data": data,
         "weeks": [1,2,3,4], "active_page": "performance", "main_section": "students"
     })
