@@ -27,19 +27,19 @@
 }
 .ai-sidebar-header { margin-bottom: 24px; }
 .new-chat-btn {
-    width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.03); color: var(--text);
+    width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.03); color: var(--txt);
     border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; font-weight: 500;
     cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;
 }
 .new-chat-btn:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-1px); }
 .session-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px; }
 .session-item {
-    padding: 12px 14px; border-radius: 10px; cursor: pointer; color: var(--text2); font-size: 0.9rem;
+    padding: 12px 14px; border-radius: 10px; cursor: pointer; color: var(--txt2); font-size: 0.9rem;
     transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     border: 1px solid transparent;
 }
-.session-item:hover { background: rgba(255, 255, 255, 0.04); color: var(--text); border-color: rgba(255, 255, 255, 0.05); }
-.session-item.active { background: rgba(255, 255, 255, 0.08); color: var(--text); font-weight: 500; }
+.session-item:hover { background: rgba(255, 255, 255, 0.04); color: var(--txt); border-color: rgba(255, 255, 255, 0.05); }
+.session-item.active { background: rgba(255, 255, 255, 0.08); color: var(--txt); font-weight: 500; }
 
 .ai-wrapper {
     flex: 1;
@@ -100,7 +100,7 @@
 }
 
 .input-box {
-    background: var(--bg2);
+    background: var(--card);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 12px 16px;
@@ -127,7 +127,7 @@
     border-radius: 50%;
     border: none;
     background: transparent;
-    color: var(--text2);
+    color: var(--txt2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -135,8 +135,8 @@
     transition: all 0.2s;
 }
 .btn-icon:hover {
-    background: var(--bg3);
-    color: var(--text);
+    background: var(--fill);
+    color: var(--txt);
 }
 
 .btn-icon.recording {
@@ -154,7 +154,7 @@
     flex: 1;
     background: transparent;
     border: none;
-    color: var(--text);
+    color: var(--txt);
     font-size: 1rem;
     resize: none;
     min-height: 24px;
@@ -164,7 +164,7 @@
     padding: 8px 0;
 }
 .chat-textarea::placeholder {
-    color: var(--text3);
+    color: var(--txt3);
 }
 
 .btn-submit {
@@ -173,7 +173,7 @@
     border-radius: 50%;
     border: none;
     background: rgba(255, 255, 255, 0.1);
-    color: var(--text);
+    color: var(--txt);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -181,7 +181,7 @@
     transition: all 0.2s;
 }
 .btn-submit:hover:not(:disabled) {
-    background: var(--text);
+    background: var(--txt);
     color: var(--bg1);
 }
 .btn-submit:disabled {
@@ -202,7 +202,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--text2);
+    color: var(--txt2);
     font-size: 0.85rem;
     cursor: pointer;
     padding: 4px 8px;
@@ -228,7 +228,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 999px;
     padding: 8px 16px;
-    color: var(--text2);
+    color: var(--txt2);
     font-size: 0.85rem;
     cursor: pointer;
     display: flex;
@@ -238,7 +238,7 @@
 }
 .suggestion-chip:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: var(--text);
+    color: var(--txt);
     border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -283,8 +283,8 @@
     flex-shrink: 0;
 }
 .message-row.user .avatar {
-    background: var(--bg3);
-    color: var(--text);
+    background: var(--fill);
+    color: var(--txt);
 }
 .message-row.lexi .avatar {
     background: linear-gradient(135deg, #a855f7, #6366f1);
@@ -293,7 +293,7 @@
 
 .message-content {
     max-width: 85%;
-    color: var(--text);
+    color: var(--txt);
     font-size: 1rem;
     line-height: 1.6;
 }
@@ -315,7 +315,7 @@
     position: absolute;
     bottom: 100%;
     left: 16px;
-    background: var(--bg2);
+    background: var(--card);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 12px;
@@ -335,10 +335,10 @@
     align-items: center;
     gap: 8px;
     font-size: 0.9rem;
-    color: var(--text);
+    color: var(--txt);
     cursor: pointer;
 }
-.context-option input { margin: 0; accent-color: var(--accent); }
+.context-option input { margin: 0; accent-color: var(--acc); }
 
 @media (max-width: 768px) {
     .lexi-logo { font-size: 2.5rem; }

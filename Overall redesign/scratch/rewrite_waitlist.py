@@ -1,14 +1,11 @@
+import re
+
 with open('templates/waitlist.html', 'r', encoding='utf-8') as f:
     text = f.read()
 
-import re
+new_content = """{% block topbar_actions %}{% endblock %}
 
-text = text.replace("{% block page_title %}Waitlist{% endblock %}", "{% block page_title %}Students{% endblock %}\n{% block page_subtitle %}CRM · groups · waitlist · performance · placement{% endblock %}")
-text = re.sub(r'\{% block topbar_actions %\}.*?\{% endblock %\}', '{% block topbar_actions %}{% endblock %}', text, flags=re.DOTALL)
-
-match = re.search(r'\{% block content %\}.*?(<div class="modal-overlay" id="addEntry")', text, re.DOTALL)
-
-new_content = """{% block content %}
+{% block content %}
 <div class="segs">
   <button onclick="window.location='/students/'">Students</button>
   <button onclick="window.location='/groups/'">Groups</button>
@@ -29,7 +26,8 @@ new_content = """{% block content %}
 </div>
 
 <div class="card">
-  <div class="ct">Waitlist <span class="pill p-acc">{{ entries|length }}</span>
+  <div class="ct" style="display:flex;justify-content:space-between">
+    <span>Waitlist <span class="pill p-acc">{{ entries|length }}</span></span>
     <button class="btn sm" onclick="document.getElementById('addEntry').classList.add('open')"><i data-lucide="plus"></i>Add Enquiry</button>
   </div>
   {% for w in entries %}
@@ -47,37 +45,75 @@ new_content = """{% block content %}
           <span class="pill p-grey" style="margin-left:6px;text-transform:capitalize">{{ w.status }}</span>
         {% endif %}
       </div>
-      <div class="rs">{{ w.goal_level }} · via {{ w.source }} {% if w.notes %}· {{ w.notes }}{% endif %}</div>
+      <div class="rs">{{ w.goal_level or 'No specific goal' }} {% if w.source %}· via {{ w.source }}{% endif %} {% if w.notes %}· {{ w.notes }}{% endif %}</div>
     </div>
     {% if w.status != 'enrolled' %}
-      <button class="btn ghost sm" onclick="window.location='/students/?add_from_placement={{w.id}}'">Enroll</button>
+      {% if w.phone %}<button class="btn ghost sm" onclick="window.location.href='tel:{{ (w.phone or '')|replace(\"'\", \"\") }}'">Call</button>{% endif %}
+      <button class="btn ghost sm" onclick="document.getElementById('enrollModal').classList.add('open')">Enroll</button>
     {% endif %}
   </div>
   {% else %}
-  <div class="empty">
-    <i data-lucide="inbox"></i>
-    <b>Waitlist is empty</b>
-  </div>
+  <div class="empty">Waitlist is empty</div>
   {% endfor %}
 </div>
 
+<!-- Add Enquiry Modal -->
+<div class="ovl" id="addEntry">
+  <div class="modal">
+    <div class="mt">Add Enquiry<button type="button" class="x" onclick="document.getElementById('addEntry').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form method="post" action="/waitlist/add" style="margin-top:16px">
+      <div class="fgroup"><label>Full Name *</label><input name="name" required></div>
+      <div class="frow">
+        <div class="fgroup"><label>Phone</label><input name="phone" placeholder="+998..."></div>
+        <div class="fgroup"><label>Parent Phone</label><input name="parent_phone"></div>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label>Mode</label>
+          <select name="mode">
+            <option value="in-person">In-person</option>
+            <option value="online">Online</option>
+          </select>
+        </div>
+        <div class="fgroup"><label>Wants Group (Optional)</label>
+          <select name="desired_group_id">
+            <option value="">-- Not sure --</option>
+            {% for g in groups %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="fgroup"><label>Goal / Notes</label><textarea name="learning_goal" rows="2"></textarea></div>
+      <button type="submit" class="btn block" style="margin-top:16px">Add Enquiry</button>
+    </form>
+  </div>
+</div>
+
+<!-- Enroll Modal -->
+<div class="ovl" id="enrollModal">
+  <div class="modal">
+    <div class="mt">Enroll Student<button type="button" class="x" onclick="document.getElementById('enrollModal').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form id="enrollForm" method="post" style="margin-top:16px">
+      <div class="fgroup">
+        <label>Assign to Group *</label>
+        <select name="group_id" required>
+          {% for g in groups %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Level</label>
+        <select name="level">
+          {% for lv in ['','A1','A2','B1','B2','C1'] %}<option value="{{ lv }}">{{ lv or 'Not assessed' }}</option>{% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn block" style="margin-top:16px">Enroll Now</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
 """
 
-if match:
-    text = text[:match.start()] + new_content + match.group(1) + text[match.end():]
-else:
-    print("Could not find match!")
-
-def fix_modal(text, modal_id, title):
-    text = text.replace(f'<div class="modal-overlay" id="{modal_id}" onclick="if(event.target===this)closeModal(\'{modal_id}\')">', f'<div class="ovl" id="{modal_id}" onclick="if(event.target===this)document.getElementById(\'{modal_id}\').classList.remove(\'open\')">')
-    text = text.replace(f'<div class="modal-overlay" id="{modal_id}">', f'<div class="ovl" id="{modal_id}">')
-    text = re.sub(r'<div class="modal-header">.*?</div>', f'<div class="mt">{title}<button type="button" class="x" onclick="document.getElementById(\'{modal_id}\').classList.remove(\'open\')"><i data-lucide="x"></i></button></div>', text, count=1, flags=re.DOTALL)
-    text = text.replace(f'onclick="closeModal(\'{modal_id}\')"', f'onclick="document.getElementById(\'{modal_id}\').classList.remove(\'open\')"')
-    return text
-
-text = text.replace('<div class="modal-dialog">', '<div class="modal">')
-text = text.replace('<div class="modal-body">', '')
-text = fix_modal(text, 'addEntry', 'Add Enquiry')
+text = re.sub(r'\{% block content %\}.*', new_content, text, flags=re.DOTALL)
+text = text.replace('{% block topbar_actions %}', '{% block topbar_actions %}{% endblock %}')
 
 with open('templates/waitlist.html', 'w', encoding='utf-8') as f:
     f.write(text)
+

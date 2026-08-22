@@ -5,21 +5,21 @@
 {% block extra_styles %}
 <style>
 .filters-bar { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
-.filter-btn { padding: 6px 16px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; text-decoration: none; border: 1px solid var(--border); color: var(--text2); background: var(--bg2); transition: all 0.2s; }
-.filter-btn:hover { background: var(--bg3); color: var(--text); }
-.filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+.filter-btn { padding: 6px 16px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; text-decoration: none; border: 1px solid var(--line); color: var(--txt2); background: var(--card); transition: all 0.2s; }
+.filter-btn:hover { background: var(--fill); color: var(--txt); }
+.filter-btn.active { background: var(--acc); color: white; border-color: var(--acc); }
 
 .grammar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 24px; }
 
-.grammar-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; text-decoration: none; color: inherit; }
-.grammar-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
-.grammar-card h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text); }
-.grammar-card p { font-size: 0.85rem; color: var(--text2); margin-bottom: 16px; flex-grow: 1; }
+.grammar-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+.grammar-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.grammar-card h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--txt); }
+.grammar-card p { font-size: 0.85rem; color: var(--txt2); margin-bottom: 16px; flex-grow: 1; }
 
-.level-badge { padding: 4px 8px; border-radius: 6px; background: var(--bg3); font-size: 0.75rem; font-weight: 600; align-self: flex-start; margin-bottom: 12px; }
+.level-badge { padding: 4px 8px; border-radius: 6px; background: var(--fill); font-size: 0.75rem; font-weight: 600; align-self: flex-start; margin-bottom: 12px; }
 
-.progress-bar-bg { width: 100%; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; margin-top: auto; }
-.progress-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+.progress-bar-bg { width: 100%; height: 6px; background: var(--fill); border-radius: 3px; overflow: hidden; margin-top: auto; }
+.progress-bar-fill { height: 100%; background: var(--acc); border-radius: 3px; }
 </style>
 {% endblock %}
 
@@ -27,11 +27,11 @@
 <!-- Top Action Bar -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
     <div>
-        <a href="/library" class="btn btn-sm" style="background: var(--bg3); margin-right: 12px;">&larr; Back to Library</a>
+        <a href="/library" class="btn sm" style="background: var(--fill); margin-right: 12px;">&larr; Back to Library</a>
         <span style="font-weight: 600; font-size: 1.25rem;">Grammar Topics</span>
     </div>
     {% if _is_staff %}
-    <a href="/library/grammar/manage" class="btn btn-primary">Manage Grammar Engine</a>
+    <a href="/library/grammar/manage" class="btn block">Manage Grammar Engine</a>
     {% endif %}
 </div>
 
@@ -55,7 +55,7 @@
         <h3>{{ topic.title }}</h3>
         
         {% set pct = progress.get(topic.id, 0) %}
-        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text3); margin-bottom: 6px;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--txt3); margin-bottom: 6px;">
             <span>Mastery Score</span>
             <span>{{ pct|int }}%</span>
         </div>
@@ -64,7 +64,7 @@
         </div>
     </a>
     {% else %}
-    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text3); background: var(--bg2); border-radius: 12px; border: 1px dashed var(--border);">
+    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--txt3); background: var(--card); border-radius: 12px; border: 1px dashed var(--line);">
         <div style="font-size: 3rem; margin-bottom: 16px;">🧠</div>
         <p style="font-size: 1.1rem; font-weight: 500;">No grammar topics available for this level yet.</p>
         <p style="font-size: 0.9rem; margin-top: 8px;">Check back later as we are actively updating our library!</p>

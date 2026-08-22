@@ -7,32 +7,32 @@
 .quiz-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; }
 @media (max-width: 900px) { .quiz-layout { grid-template-columns: 1fr; } }
 
-.explanation-area { background: var(--bg2); padding: 32px; border-radius: 12px; border: 1px solid var(--border); font-size: 0.95rem; line-height: 1.6; }
+.explanation-area { background: var(--card); padding: 32px; border-radius: 12px; border: 1px solid var(--line); font-size: 0.95rem; line-height: 1.6; }
 .explanation-area h2 { margin-top: 0; margin-bottom: 16px; font-size: 1.5rem; }
 .explanation-area h3 { margin-top: 24px; margin-bottom: 12px; font-size: 1.1rem; }
 .explanation-area p { margin-bottom: 16px; }
 .explanation-area ul { margin-left: 20px; margin-bottom: 16px; }
 .explanation-area li { margin-bottom: 8px; }
 .explanation-area table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-.explanation-area th, .explanation-area td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
-.explanation-area th { background: var(--bg3); }
+.explanation-area th, .explanation-area td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; }
+.explanation-area th { background: var(--fill); }
 
-.quiz-area { background: var(--bg2); padding: 24px; border-radius: 12px; border: 1px solid var(--border); }
-.question-block { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+.quiz-area { background: var(--card); padding: 24px; border-radius: 12px; border: 1px solid var(--line); }
+.question-block { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
 .question-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 .q-text { font-weight: 600; margin-bottom: 12px; }
 
-.option-label { display: flex; align-items: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s; }
-.option-label:hover { background: var(--bg3); }
+.option-label { display: flex; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s; }
+.option-label:hover { background: var(--fill); }
 .option-label input { margin-right: 12px; }
 
-.result-card { background: var(--bg2); border: 2px solid #10b981; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px; }
+.result-card { background: var(--card); border: 2px solid #10b981; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div style="margin-bottom: 20px;">
-    <a href="/library/grammar" class="btn btn-sm" style="background: var(--bg3);">&larr; Back to Topics</a>
+    <a href="/library/grammar" class="btn sm" style="background: var(--fill);">&larr; Back to Topics</a>
 </div>
 
 {% if request.query_params.get('result') == 'success' %}
@@ -53,7 +53,7 @@
         <h2 style="margin-top: 0; margin-bottom: 20px; font-size: 1.25rem;">Knowledge Check</h2>
         
         {% if best_attempt %}
-        <div style="background: var(--bg3); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem;">
+        <div style="background: var(--fill); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem;">
             <strong>Your Best Score:</strong> {{ best_attempt.score }} / {{ best_attempt.total_questions }}
         </div>
         {% endif %}
@@ -83,10 +83,10 @@
             </div>
             {% endfor %}
             
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Submit Quiz</button>
+            <button type="submit" class="btn block" style="width: 100%; margin-top: 16px;">Submit Quiz</button>
         </form>
         {% else %}
-        <div style="text-align: center; color: var(--text3); padding: 20px 0;">
+        <div style="text-align: center; color: var(--txt3); padding: 20px 0;">
             Questions are currently being generated for this topic. Check back soon!
         </div>
         {% endif %}
