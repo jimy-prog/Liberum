@@ -4,7 +4,8 @@
 {% block page_subtitle %}CRM · groups · waitlist · performance · placement{% endblock %}
 
 {% block extra_styles %}
-<style>
+
+.view { max-width: 1400px !important; }
 .wl-head { display:grid; gap:10px; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--txt3); padding:0 12px 10px; border-bottom:1px solid var(--line); margin-bottom:8px; }
 .wl-row { display:grid; gap:10px; align-items:center; padding:12px; border-radius:10px; transition:.15s; font-size:13px; color:var(--txt2); }
 .wl-row:hover { background:var(--fill); color:var(--txt); }
@@ -13,7 +14,7 @@
 .ft-btn { font-size:12px; padding:6px 12px; border-radius:6px; color:var(--txt2); background:var(--fill); border:none; cursor:pointer; font-weight:500; transition:.15s; }
 .ft-btn:hover { background:var(--bg3); color:var(--txt); }
 .ft-btn.active { background:var(--green); color:#fff; }
-</style>
+
 {% endblock %}
 
 {% block content %}
