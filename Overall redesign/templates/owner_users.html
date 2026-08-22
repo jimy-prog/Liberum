@@ -1,66 +1,53 @@
 {% extends "base.html" %}
 {% block title %}User Management | Owner{% endblock %}
-{% block page_title %}Platform User Directory{% endblock %}
+{% block page_title %}Users & Platform{% endblock %}
+{% block page_subtitle %}Manage all users and system settings{% endblock %}
 
 {% block content %}
-<div class="flex-between mb-4">
-    <div class="flex gap-2">
-        <a href="/owner/users" class="badge {% if not active_role %}btn-primary{% endif %}" style="text-decoration:none;">All</a>
-        <a href="/owner/users?role=teacher" class="badge {% if active_role=='teacher' %}btn-primary{% endif %}" style="text-decoration:none;">Teachers</a>
-        <a href="/owner/users?role=student" class="badge {% if active_role=='student' %}btn-primary{% endif %}" style="text-decoration:none;">Students</a>
-    </div>
+<div class="segs">
+    <button class="{% if not active_role %}on{% endif %}" onclick="window.location='/owner/users'">All</button>
+    <button class="{% if active_role=='teacher' %}on{% endif %}" onclick="window.location='/owner/users?role=teacher'">Teachers</button>
+    <button class="{% if active_role=='student' %}on{% endif %}" onclick="window.location='/owner/users?role=student'">Students</button>
 </div>
 
 <div class="card">
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Username / Email</th>
-                    <th>Full Name</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Joined</th>
-                    <th style="text-align:right">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for u in users %}
-                <tr>
-                    <td>
-                        <div class="td-primary">{{ u.username }}</div>
-                        <div style="font-size:.7rem; color:var(--text3)">{{ u.email }}</div>
-                    </td>
-                    <td>{{ u.full_name }}</td>
-                    <td><span class="pill pill-blue">{{ u.role }}</span></td>
-                    <td>
-                        {% if u.is_banned %}
-                        <span class="pill pill-red">Banned</span>
-                        {% elif not u.is_active %}
-                        <span class="pill pill-yellow">Inactive</span>
-                        {% else %}
-                        <span class="pill pill-green">Active</span>
-                        {% endif %}
-                    </td>
-                    <td class="mono">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
-                    <td style="text-align:right">
-                        <div style="display:flex; gap:8px; justify-content:flex-end;">
-                            <form action="/owner/users/{{ u.id }}/ban" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-xs {% if u.is_banned %}btn-green{% else %}btn-orange{% endif %}">
-                                    {% if u.is_banned %}Unban{% else %}Ban{% endif %}
-                                </button>
-                            </form>
-                            {% if u.id != user.id %}
-                            <form action="/owner/users/{{ u.id }}/delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to PERMANENTLY DELETE this user?');">
-                                <button type="submit" class="btn btn-xs btn-danger"><i class="fa-solid fa-trash"></i></button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="ct">Platform Users</div>
+    {% for u in users %}
+    <div class="row">
+        {% set parts = u.full_name.split() if u.full_name else [u.username] %}
+        {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
+        <div class="av" style="background:var(--fill);color:var(--txt2)">{{ initials }}</div>
+        
+        <div class="rmain">
+            <div class="rt">{{ u.full_name or u.username }} 
+                {% if u.is_banned %}
+                <span class="pill p-red" style="margin-left:6px">Banned</span>
+                {% elif not u.is_active %}
+                <span class="pill p-orange" style="margin-left:6px">Inactive</span>
+                {% else %}
+                <span class="pill p-green" style="margin-left:6px">Active</span>
+                {% endif %}
+            </div>
+            <div class="rs">{{ u.email }} · Joined {{ u.created_at.strftime('%Y-%m-%d') }}</div>
+        </div>
+        
+        <span class="pill {% if u.role == 'teacher' %}p-acc{% elif u.role == 'owner' %}p-red{% else %}p-grey{% endif %}" style="text-transform:capitalize">{{ u.role }}</span>
+        
+        <div style="display:flex; gap:6px;">
+            <form action="/owner/users/{{ u.id }}/ban" method="POST" style="margin:0;">
+                <button type="submit" class="btn sm {% if u.is_banned %}soft{% else %}ghost{% endif %}">
+                    {% if u.is_banned %}Unban{% else %}Ban{% endif %}
+                </button>
+            </form>
+            {% if u.id != user.id %}
+            <form action="/owner/users/{{ u.id }}/delete" method="POST" style="margin:0;" onsubmit="return confirm('Are you sure you want to PERMANENTLY DELETE this user?');">
+                <button type="submit" class="btn sm dang"><i data-lucide="trash-2"></i></button>
+            </form>
+            {% endif %}
+        </div>
     </div>
+    {% else %}
+    <div class="empty">No users found</div>
+    {% endfor %}
 </div>
 {% endblock %}

@@ -50,7 +50,7 @@
         <div class="row" style="padding-left:0;padding-right:0">
             <div class="rmain">
                 <div class="rt" style="font-family:var(--fm);font-size:12px">{{ log.code + ' sent to ' + log.target }}</div>
-                <div class="rs">User {{ channel: ' + log.channel + ' }} · {{ log.created_at }}</div>
+                <div class="rs">User {{ log.channel }} · {{ log.created_at }}</div>
             </div>
         </div>
         {% else %}
