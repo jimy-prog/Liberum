@@ -3,39 +3,39 @@
 {% block page_title %}{{ course.name }}{% endblock %}
 {% block topbar_actions %}
 <div style="display:flex;gap:8px">
-  <span class="pill pill-blue">{{ course.duration }}</span>
-  <span class="pill pill-grey">{{ course.target }}</span>
+  <span class="pill p-acc">{{ course.duration }}</span>
+  <span class="pill p-grey">{{ course.target }}</span>
 </div>
 {% endblock %}
 
 {% block extra_styles %}
 <style>
-.week-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:14px; overflow:hidden }
-.week-header { padding:12px 18px; background:var(--bg3); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; cursor:pointer }
+.week-card { background:var(--card); border:1px solid var(--line); border-radius:16px; margin-bottom:14px; overflow:hidden }
+.week-header { padding:12px 18px; background:var(--fill); border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; cursor:pointer }
 .week-body { padding:0 }
-.day-card { padding:14px 18px; border-bottom:1px solid var(--border) }
+.day-card { padding:14px 18px; border-bottom:1px solid var(--line) }
 .day-card:last-child { border-bottom:none }
 .day-badge { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; flex-shrink:0 }
-.obj-list { font-size:.82rem; color:var(--text2); line-height:1.7 }
+.obj-list { font-size:.82rem; color:var(--txt2); line-height:1.7 }
 .obj-list li { list-style:none; padding-left:14px; position:relative }
 .obj-list li::before { content:'·'; position:absolute; left:0; color:var(--accent) }
-.hw-box { background:var(--bg4); border-radius:6px; padding:10px 14px; font-size:.78rem; color:var(--text3); margin-top:8px }
+.hw-box { background:var(--fill2); border-radius:6px; padding:10px 14px; font-size:.78rem; color:var(--txt3); margin-top:8px }
 .current-badge { background:var(--green-bg); color:var(--green); border:1px solid rgba(74,222,128,.2); border-radius:20px; padding:2px 10px; font-size:.68rem; font-weight:600 }
 </style>
 {% endblock %}
 
 {% block content %}
-<a href="/courses/" class="btn btn-ghost btn-sm mb-4" style="display:inline-flex">← Course Library</a>
+<a href="/courses/" class="btn sm ghost" style="margin-bottom:16px;" style="display:inline-flex">← Course Library</a>
 
-<div style="font-size:.875rem;color:var(--text2);margin-bottom:24px;max-width:700px;line-height:1.6">
+<div style="font-size:.875rem;color:var(--txt2);margin-bottom:24px;max-width:700px;line-height:1.6">
   {{ course.description }}
 </div>
 
 <!-- Assign group + progress -->
-<div class="card mb-6">
-  <div class="card-header">
-    <span class="card-title">Group Progress</span>
-    <button class="btn btn-primary btn-sm" onclick="openModal('assignGroup')">+ Assign Group</button>
+<div class="card" style="margin-bottom:16px">
+  <div class="ct">
+    <span>Group Progress</span>
+    <button class="btn sm block" onclick="openModal('assignGroup')">+ Assign Group</button>
   </div>
   {% if prog_map %}
   <div class="table-wrap">
@@ -49,11 +49,11 @@
         {% set done = ((p.current_week-1)*3 + p.current_day-1) %}
         <tr>
           <td class="td-primary"><span class="dot" style="background:{{ g.color }};margin-right:6px"></span>{{ g.name }}</td>
-          <td><span class="pill pill-blue">Week {{ p.current_week }} · Day {{ p.current_day }}</span></td>
+          <td><span class="pill p-acc">Week {{ p.current_week }} · Day {{ p.current_day }}</span></td>
           <td>
             <div style="display:flex;align-items:center;gap:8px">
               <div class="progress" style="width:80px"><div class="progress-bar pb-green" style="width:{{ (done/total*100)|int if total else 0 }}%"></div></div>
-              <span style="font-size:.75rem;color:var(--text2)">{{ done }}/{{ total }}</span>
+              <span style="font-size:.75rem;color:var(--txt2)">{{ done }}/{{ total }}</span>
             </div>
           </td>
           <td class="mono" style="font-size:.78rem">{{ p.started_date or '—' }}</td>
@@ -75,7 +75,7 @@
     </table>
   </div>
   {% else %}
-  <div class="card-body" style="text-align:center;padding:24px;color:var(--text3)">No groups assigned yet. Click "+ Assign Group" to track progress.</div>
+  <div class="card-body" style="text-align:center;padding:24px;color:var(--txt3)">No groups assigned yet. Click "+ Assign Group" to track progress.</div>
   {% endif %}
 </div>
 
@@ -84,19 +84,19 @@
 <div class="week-card">
   <div class="week-header" onclick="toggleWeek({{ week.id }})">
     <div class="flex-center gap-3">
-      <span style="font-family:var(--font-m);font-size:.75rem;color:var(--text3)">WEEK {{ week.week_num }}</span>
-      <span style="font-weight:600;color:var(--text)">{{ week.title }}</span>
+      <span style="font-family:var(--font-m);font-size:.75rem;color:var(--txt3)">WEEK {{ week.week_num }}</span>
+      <span style="font-weight:600;color:var(--txt)">{{ week.title }}</span>
     </div>
     <div class="flex-center gap-2">
       {% if week.grammar_focus %}
-      <span style="font-size:.72rem;color:var(--text3);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📝 {{ week.grammar_focus[:60] }}…</span>
+      <span style="font-size:.72rem;color:var(--txt3);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📝 {{ week.grammar_focus[:60] }}…</span>
       {% endif %}
-      <span style="color:var(--text3);font-size:.9rem" id="arrow-{{ week.id }}">▼</span>
+      <span style="color:var(--txt3);font-size:.9rem" id="arrow-{{ week.id }}">▼</span>
     </div>
   </div>
   <div class="week-body" id="week-{{ week.id }}" style="display:none">
     {% if week.grammar_focus %}
-    <div style="padding:10px 18px;background:var(--accent-glow);border-bottom:1px solid var(--border);font-size:.8rem;color:var(--accent)">
+    <div style="padding:10px 18px;background:var(--accent-glow);border-bottom:1px solid var(--line);font-size:.8rem;color:var(--accent)">
       <strong>Grammar Focus:</strong> {{ week.grammar_focus }}
     </div>
     {% endif %}
@@ -106,7 +106,7 @@
         <div class="day-badge" style="background:{% if lesson.day_num==1 %}var(--accent-glow);color:var(--accent){% elif lesson.day_num==2 %}var(--green-bg);color:var(--green){% else %}var(--orange-bg);color:var(--orange){% endif %}">
           D{{ lesson.day_num }}
         </div>
-        <span style="font-weight:600;color:var(--text);font-size:.9rem">{{ lesson.title }}</span>
+        <span style="font-weight:600;color:var(--txt);font-size:.9rem">{{ lesson.title }}</span>
       </div>
       <ul class="obj-list mb-3">
         {% for line in lesson.objectives.split('·') %}
@@ -115,12 +115,12 @@
       </ul>
       {% if lesson.homework %}
       <div class="hw-box">
-        <strong style="color:var(--text2)">📚 Homework:</strong> {{ lesson.homework }}
+        <strong style="color:var(--txt2)">📚 Homework:</strong> {{ lesson.homework }}
       </div>
       {% endif %}
       {% if lesson.file_name %}
       <div style="margin-top:8px">
-        <span class="pill pill-blue">📎 {{ lesson.file_name }}</span>
+        <span class="pill p-acc">📎 {{ lesson.file_name }}</span>
       </div>
       {% endif %}
     </div>

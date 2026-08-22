@@ -17,8 +17,8 @@
     <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
         <!-- Upload Form -->
         <div class="card">
-            <div class="card-header">
-                <h2>Upload New Audio</h2>
+            <div class="ct">
+                <h2>Upload New Audio
             </div>
             <div class="card-body">
                 <form id="uploadForm" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 16px;">
@@ -65,7 +65,7 @@
                     <div>
                         <label>Subtitles File (Optional, .vtt format recommended)</label>
                         <input type="file" name="subtitles_file" class="input" accept=".vtt,.srt,.txt">
-                        <small style="color: var(--text3); font-size: 0.75rem;">Upload a WebVTT (.vtt) file for native web player subtitle support.</small>
+                        <small style="color: var(--txt3); font-size: 0.75rem;">Upload a WebVTT (.vtt) file for native web player subtitle support.</small>
                     </div>
                     
                     <div id="progressContainer" style="display: none; margin-top: 8px;">
@@ -73,12 +73,12 @@
                             <span>Uploading...</span>
                             <span id="progressText">0%</span>
                         </div>
-                        <div style="width: 100%; height: 8px; background: var(--bg3); border-radius: 999px; overflow: hidden;">
+                        <div style="width: 100%; height: 8px; background: var(--fill); border-radius: 999px; overflow: hidden;">
                             <div id="progressBar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.2s;"></div>
                         </div>
                     </div>
                     
-                    <button type="submit" id="uploadBtn" class="btn btn-primary" style="margin-top: 8px;">Upload Audio</button>
+                    <button type="submit" id="uploadBtn" class="btn block" style="margin-top: 8px;">Upload Audio</button>
                 </form>
                 
                 <script>
@@ -137,14 +137,14 @@
         
         <!-- Uploaded Items List -->
         <div class="card">
-            <div class="card-header">
-                <h2>Uploaded Audio</h2>
+            <div class="ct">
+                <h2>Uploaded Audio
             </div>
             <div class="card-body" style="padding: 0;">
-                <div style="display: flex; flex-direction: column; gap: 1px; background: var(--border);">
+                <div style="display: flex; flex-direction: column; gap: 1px; background: var(--line);">
                     {% for item in audio_items %}
                     <div style="background: var(--bg); padding: 16px; display: flex; gap: 16px; align-items: center;">
-                        <div style="width: 50px; height: 50px; border-radius: {{ '50%' if item.book_type == 'podcast' else '6px' }}; background: var(--bg3); flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <div style="width: 50px; height: 50px; border-radius: {{ '50%' if item.book_type == 'podcast' else '6px' }}; background: var(--fill); flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                             {% if item.cover_url %}
                             <img src="{{ item.cover_url }}" style="width: 100%; height: 100%; object-fit: cover;">
                             {% else %}
@@ -153,8 +153,8 @@
                         </div>
                         <div style="flex: 1;">
                             <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
-                                <span class="badge" style="background: var(--bg2); color: var(--text2);">{{ item.book_type }}</span>
-                                <span class="badge" style="background: var(--bg2); color: var(--text2);">{{ item.level }}</span>
+                                <span class="badge" style="background: var(--card); color: var(--text2);">{{ item.book_type }}</span>
+                                <span class="badge" style="background: var(--card); color: var(--text2);">{{ item.level }}</span>
                                 {% if item.subtitles_url %}
                                 <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">CC</span>
                                 {% endif %}
@@ -170,7 +170,7 @@
                         </div>
                     </div>
                     {% else %}
-                    <div style="background: var(--bg); padding: 40px 20px; text-align: center; color: var(--text3);">
+                    <div style="background: var(--bg); padding: 40px 20px; text-align: center; color: var(--txt3);">
                         <p>No audio files uploaded yet.</p>
                     </div>
                     {% endfor %}

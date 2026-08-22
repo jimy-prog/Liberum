@@ -42,14 +42,12 @@
     <div style="font-weight:600; font-size:14px;">ALL ENQUIRIES (<span id="wl-count">{{ entries|length }}</span>)</div>
     <div style="display:flex; gap:6px; align-items:center;">
       <div style="display:flex; gap:4px; margin-right:12px;">
+
         <button class="ft-btn active" onclick="filterWl('all', this)">All</button>
         <button class="ft-btn" onclick="filterWl('new', this)">New Enquiry</button>
         <button class="ft-btn" onclick="filterWl('contacted', this)">Contacted</button>
         <button class="ft-btn" onclick="filterWl('trial', this)">Trial</button>
         <button class="ft-btn" onclick="filterWl('enrolled', this)">Enrolled</button>
-        <button class="ft-btn">Contacted</button>
-        <button class="ft-btn">Trial</button>
-        <button class="ft-btn">Enrolled</button>
       </div>
       <button class="btn sm" onclick="document.getElementById('addEntry').classList.add('open')"><i data-lucide="plus"></i>Add Enquiry</button>
     </div>

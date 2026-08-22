@@ -11,7 +11,7 @@
   <button  onclick="window.location='/library/'">Library</button>
 </div>
 
-<div class="card mb-6">
+<div class="card" style="margin-bottom:16px">
   <div class="ct">Active Assignments</div>
   {% for hw in active %}
   <div class="row" onclick="openModal('hw{{ hw.id }}')">

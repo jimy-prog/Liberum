@@ -1,83 +1,48 @@
 {% extends "base.html" %}
+{% block title %}Library{% endblock %}
+{% block page_title %}Learning / Library{% endblock %}
 
 {% block content %}
 <div class="segs">
-  <button  onclick="window.location='/homework/'">Homework</button>
-  <button  onclick="window.location='/courses/'">Courses</button>
+  <button onclick="window.location='/homework/'">Homework</button>
+  <button onclick="window.location='/courses/'">Courses</button>
   <button class="on" onclick="window.location='/library/'">Library</button>
 </div>
 
-<div class="px-6 py-8 w-full max-w-7xl mx-auto space-y-8 animate-fade-in">
+<div class="card" style="margin-bottom:16px;">
+  <div class="ct">Manage Resources</div>
+  <p class="rs mb-4" style="margin-bottom:16px">Upload new e-books or audio files for your students.</p>
+  <div style="display:flex;gap:10px;">
+    <button class="btn block" onclick="window.location='/library/books/manage'"><i data-lucide="book"></i> Manage Library Books</button>
+    <button class="btn block" onclick="window.location='/library/audio/manage'"><i data-lucide="headphones"></i> Manage Audio Lessons</button>
+  </div>
+</div>
 
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Library Dashboard</h1>
-      <p class="text-gray-500 dark:text-gray-400 mt-1">Monitor student grammar performance and manage digital resources.</p>
+<div class="card">
+  <div class="ct">Grammar Test Activity</div>
+  {% if recent_grammar %}
+  {% for r in recent_grammar %}
+  <div class="row">
+    <div class="av" style="background:var(--fill);color:var(--txt2)">
+      {% set parts = r.student.name.split() %}
+      {{ (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper }}
+    </div>
+    <div class="rmain">
+      <div class="rt">{{ r.student.name }}</div>
+      <div class="rs">{{ r.grammar_topic.title }}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="rt">{{ r.score }} / {{ r.total_questions }}</div>
+      <div class="rs">{{ r.created_at.strftime('%d %b %Y, %H:%M') }}</div>
     </div>
   </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    
-    <!-- Upload/Manage Resources (Placeholder for Phase 2/3) -->
-    <div class="lg:col-span-1 space-y-6">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Manage Resources</h2>
-            <p class="text-sm text-gray-500 mb-4">Upload new e-books or audio files for your students.</p>
-            <div class="flex flex-col gap-3">
-                <a href="/library/books/manage" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    Manage Library Books
-                </a>
-                <a href="/library" class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-200 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    View Student Library
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Grammar Performance Activity -->
-    <div class="lg:col-span-2">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-            <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Grammar Quiz Activity</h3>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-3 px-6 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Student</th>
-                            <th class="py-3 px-6 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Grammar Topic</th>
-                            <th class="py-3 px-6 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Score</th>
-                            <th class="py-3 px-6 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        {% for attempt in attempts %}
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-                            <td class="py-4 px-6 text-sm font-medium text-gray-900 dark:text-white">{{ attempt.student_name }}</td>
-                            <td class="py-4 px-6 text-sm text-gray-500 dark:text-gray-300">{{ attempt.topic }}</td>
-                            <td class="py-4 px-6 text-sm">
-                                {% set pct = (attempt.score / attempt.total * 100) if attempt.total > 0 else 0 %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ 'bg-green-100 text-green-800' if pct >= 80 else ('bg-yellow-100 text-yellow-800' if pct >= 50 else 'bg-red-100 text-red-800') }}">
-                                    {{ attempt.score }} / {{ attempt.total }} ({{ pct|int }}%)
-                                </span>
-                            </td>
-                            <td class="py-4 px-6 text-sm text-gray-500 dark:text-gray-400">{{ attempt.date }}</td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="4" class="py-8 text-center text-gray-500">No grammar quizzes taken recently.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
+  {% endfor %}
+  {% else %}
+  <div class="empty">
+    <i data-lucide="clipboard-list"></i>
+    <b>No Recent Activity</b>
+    <p>Students haven't completed any grammar tests recently.</p>
   </div>
+  {% endif %}
 </div>
 {% endblock %}
