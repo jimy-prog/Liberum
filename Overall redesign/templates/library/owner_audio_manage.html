@@ -2,6 +2,10 @@
 
 {% block page_title %}Manage Audio{% endblock %}
 
+{% block extra_styles %}
+
+{% endblock %}
+
 {% block content %}
 <div style="max-width: 1000px; margin: 0 auto;">
     
@@ -17,8 +21,8 @@
     <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
         <!-- Upload Form -->
         <div class="card">
-            <div class="ct">
-                <h2>Upload New Audio
+            <div class="card-header">
+                <h2>Upload New Audio</h2>
             </div>
             <div class="card-body">
                 <form id="uploadForm" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 16px;">
@@ -69,7 +73,7 @@
                     </div>
                     
                     <div id="progressContainer" style="display: none; margin-top: 8px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; color: var(--text2);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; color: var(--txt2);">
                             <span>Uploading...</span>
                             <span id="progressText">0%</span>
                         </div>
@@ -78,7 +82,7 @@
                         </div>
                     </div>
                     
-                    <button type="submit" id="uploadBtn" class="btn block" style="margin-top: 8px;">Upload Audio</button>
+                    <button type="submit" id="uploadBtn" class="btn btn-primary" style="margin-top: 8px;">Upload Audio</button>
                 </form>
                 
                 <script>
@@ -137,8 +141,8 @@
         
         <!-- Uploaded Items List -->
         <div class="card">
-            <div class="ct">
-                <h2>Uploaded Audio
+            <div class="card-header">
+                <h2>Uploaded Audio</h2>
             </div>
             <div class="card-body" style="padding: 0;">
                 <div style="display: flex; flex-direction: column; gap: 1px; background: var(--line);">
@@ -153,14 +157,14 @@
                         </div>
                         <div style="flex: 1;">
                             <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
-                                <span class="badge" style="background: var(--card); color: var(--text2);">{{ item.book_type }}</span>
-                                <span class="badge" style="background: var(--card); color: var(--text2);">{{ item.level }}</span>
+                                <span class="badge" style="background: var(--card); color: var(--txt2);">{{ item.book_type }}</span>
+                                <span class="badge" style="background: var(--card); color: var(--txt2);">{{ item.level }}</span>
                                 {% if item.subtitles_url %}
                                 <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">CC</span>
                                 {% endif %}
                             </div>
                             <h3 style="font-size: 1rem; font-weight: 600;">{{ item.title }}</h3>
-                            <p style="font-size: 0.8rem; color: var(--text2);">{{ item.author or 'Unknown' }}</p>
+                            <p style="font-size: 0.8rem; color: var(--txt2);">{{ item.author or 'Unknown' }}</p>
                         </div>
                         <div style="display: flex; gap: 8px;">
                             <a href="/library/audio/{{ item.id }}/play" class="btn btn-ghost btn-sm" target="_blank">Play</a>

@@ -3,6 +3,7 @@
 {% block page_title %}Manage Library Books{% endblock %}
 
 {% block extra_styles %}
+
 <style>
 .table-img { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; background: var(--fill); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
 .manage-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; align-items: start; }
@@ -18,25 +19,25 @@
     <div class="manage-grid">
         <!-- Upload Form -->
         <div class="card">
-            <div class="ct">
-                Upload New Book
+            <div class="card-header">
+                <h2 class="card-title" style="color: var(--txt);">Upload New Book</h2>
             </div>
             <div class="card-body">
                 <form id="uploadBookForm" enctype="multipart/form-data">
                     <div id="errorBookAlert" style="display: none; background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 12px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.9rem; margin-bottom: 16px;"></div>
                     
-                    <div class="fgroup">
-                        <label>Book Title *</label>
+                    <div class="form-group">
+                        <label class="form-label">Book Title *</label>
                         <input type="text" name="title" class="form-control" required placeholder="e.g. Harry Potter">
                     </div>
                     
-                    <div class="fgroup">
-                        <label>Author</label>
+                    <div class="form-group">
+                        <label class="form-label">Author</label>
                         <input type="text" name="author" class="form-control" placeholder="e.g. J.K. Rowling">
                     </div>
                     
-                    <div class="fgroup">
-                        <label>English Level *</label>
+                    <div class="form-group">
+                        <label class="form-label">English Level *</label>
                         <select name="level" class="form-control" required>
                             <option value="A1">A1 Beginner</option>
                             <option value="A2">A2 Elementary</option>
@@ -47,23 +48,23 @@
                         </select>
                     </div>
                     
-                    <div class="fgroup">
-                        <label>Description / Summary</label>
+                    <div class="form-group">
+                        <label class="form-label">Description / Summary</label>
                         <textarea name="description" class="form-control" rows="3" placeholder="Brief summary..."></textarea>
                     </div>
                     
-                    <div class="fgroup">
-                        <label>Cover Image (Poster)</label>
+                    <div class="form-group">
+                        <label class="form-label">Cover Image (Poster)</label>
                         <input type="file" name="cover_file" class="form-control" accept="image/*" style="padding: 8px;">
                     </div>
                     
                     <div class="form-group mb-4">
-                        <label>Book File (EPUB or PDF) *</label>
+                        <label class="form-label">Book File (EPUB or PDF) *</label>
                         <input type="file" name="book_file" class="form-control" accept=".pdf,.epub" required style="padding: 8px;">
                     </div>
                     
                     <div id="progressBookContainer" style="display: none; margin-bottom: 16px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; color: var(--text2);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; color: var(--txt2);">
                             <span>Uploading...</span>
                             <span id="progressBookText">0%</span>
                         </div>
@@ -72,7 +73,7 @@
                         </div>
                     </div>
                     
-                    <button type="submit" id="uploadBookBtn" class="btn block" style="width: 100%;">Upload Book</button>
+                    <button type="submit" id="uploadBookBtn" class="btn btn-primary" style="width: 100%;">Upload Book</button>
                 </form>
                 
                 <script>
@@ -131,8 +132,8 @@
 
         <!-- Books List -->
         <div class="card">
-            <div class="ct" style="display: flex; justify-content: space-between; align-items: center;">
-                Uploaded Books ({{ books|length }})
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="card-title" style="color: var(--txt);">Uploaded Books ({{ books|length }})</h2>
             </div>
             <div class="card-body">
                 {% if books %}
@@ -150,7 +151,7 @@
                             </div>
                         </div>
                         <h3 style="font-size: 0.95rem; font-weight: 600; color: var(--txt); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ book.title }}</h3>
-                        <p style="font-size: 0.75rem; color: var(--text2); margin-bottom: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ book.author or 'Unknown' }}</p>
+                        <p style="font-size: 0.75rem; color: var(--txt2); margin-bottom: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ book.author or 'Unknown' }}</p>
                         
                         <form action="/library/books/{{ book.id }}/delete" method="post" onsubmit="return confirm('Are you sure you want to delete this book? This cannot be undone.');" style="margin-top: auto;">
                             <button type="submit" class="btn btn-sm" style="width: 100%; background: #fee2e2; color: #dc2626; border: none;">Delete</button>

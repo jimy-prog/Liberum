@@ -25,17 +25,17 @@
 {% endblock %}
 
 {% block content %}
-<a href="/courses/" class="btn sm ghost" style="margin-bottom:16px;" style="display:inline-flex">← Course Library</a>
+<a href="/courses/" class="btn btn-ghost btn-sm mb-4" style="display:inline-flex">← Course Library</a>
 
 <div style="font-size:.875rem;color:var(--txt2);margin-bottom:24px;max-width:700px;line-height:1.6">
   {{ course.description }}
 </div>
 
 <!-- Assign group + progress -->
-<div class="card" style="margin-bottom:16px">
-  <div class="ct">
-    <span>Group Progress</span>
-    <button class="btn sm block" onclick="openModal('assignGroup')">+ Assign Group</button>
+<div class="card mb-6">
+  <div class="card-header">
+    <span class="card-title">Group Progress</span>
+    <button class="btn btn-primary btn-sm" onclick="openModal('assignGroup')">+ Assign Group</button>
   </div>
   {% if prog_map %}
   <div class="table-wrap">
