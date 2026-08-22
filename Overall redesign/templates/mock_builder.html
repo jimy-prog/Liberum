@@ -5,7 +5,7 @@
 <style>
 .builder-card {
     background: #fff;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     border-radius: 16px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     margin-bottom: 24px;
@@ -14,7 +14,7 @@
 .builder-header {
     padding: 16px 24px;
     background: var(--bg3);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -23,8 +23,8 @@
     padding: 24px;
 }
 .question-item {
-    background: var(--bg2);
-    border: 1px solid var(--border);
+    background: var(--card);
+    border: 1px solid var(--line);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 16px;
@@ -39,7 +39,7 @@
 }
 .q-badge {
     background: var(--accent-glow);
-    color: var(--accent);
+    color: var(--acc);
     padding: 4px 8px;
     border-radius: 6px;
     font-size: 0.75rem;
@@ -48,14 +48,14 @@
 .input-clean {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     border-radius: 10px;
     background: #fff;
     font-family: var(--font-b);
     transition: all 0.2s;
 }
 .input-clean:focus {
-    border-color: var(--accent);
+    border-color: var(--acc);
     box-shadow: 0 0 0 3px var(--accent-glow);
     outline: none;
 }
@@ -63,7 +63,7 @@
     display: block;
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--text2);
+    color: var(--txt2);
     margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -72,15 +72,15 @@
 
 <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px;">
     <div>
-        <div style="font-size:0.85rem; color:var(--text2); margin-bottom:8px;">
-            <a href="/mock/manage" style="color:var(--accent); text-decoration:none; font-weight:600;"><i class="fa-solid fa-arrow-left"></i> Back to Manage Mocks</a>
+        <div style="font-size:0.85rem; color:var(--txt2); margin-bottom:8px;">
+            <a href="/mock/manage" style="color:var(--acc); text-decoration:none; font-weight:600;"><i class="fa-solid fa-arrow-left"></i> Back to Manage Mocks</a>
         </div>
-        <h1 style="font-family:var(--font-d); font-size:2.2rem; font-weight:800; color:var(--text); letter-spacing:-0.03em;">{{ exam.title }}</h1>
-        <p style="color:var(--text2); font-size: 1rem; margin-top:4px;">Draft mode. Students cannot see this test until published.</p>
+        <h1 style="font-family:var(--font-d); font-size:2.2rem; font-weight:800; color:var(--txt); letter-spacing:-0.03em;">{{ exam.title }}</h1>
+        <p style="color:var(--txt2); font-size: 1rem; margin-top:4px;">Draft mode. Students cannot see this test until published.</p>
     </div>
     
     <div style="display:flex; gap:12px;">
-        <button onclick="document.getElementById('bulkAnswersModal').style.display='flex'" class="btn btn-ghost" style="border-radius:12px; border:1px solid var(--border);">
+        <button onclick="document.getElementById('bulkAnswersModal').style.display='flex'" class="btn btn-ghost" style="border-radius:12px; border:1px solid var(--line);">
             <i class="fa-solid fa-paste"></i> Bulk Paste Answers
         </button>
         <button onclick="document.getElementById('addSectionModal').style.display='flex'" class="btn btn-ghost border" style="border-radius:12px;">
@@ -102,7 +102,7 @@
         <!-- General Settings Editor -->
         <div class="builder-card">
             <div class="builder-header">
-                <h3 style="font-size:1.1rem; font-weight:700; color:var(--text);"><i class="fa-solid fa-gear"></i> Settings & Assets</h3>
+                <h3 style="font-size:1.1rem; font-weight:700; color:var(--txt);"><i class="fa-solid fa-gear"></i> Settings & Assets</h3>
             </div>
             <div class="builder-body">
                 <form action="/mock/{{ exam.id }}/update-settings" method="POST" style="display:flex; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
@@ -131,7 +131,7 @@
                     </div>
                 </form>
 
-                <hr style="border:none; border-top:1px solid var(--border); margin:24px 0;">
+                <hr style="border:none; border-top:1px solid var(--line); margin:24px 0;">
 
                 <div style="display:flex; gap:24px;">
                     <!-- Image Upload -->
@@ -234,7 +234,7 @@
         <!-- Question Editor (The Meat) -->
         <form action="/mock/{{ exam.id }}/save-answers" method="POST" id="questionsForm">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                <h2 style="font-size:1.4rem; font-weight:800; color:var(--text);"><i class="fa-solid fa-list-check"></i> Examination Content</h2>
+                <h2 style="font-size:1.4rem; font-weight:800; color:var(--txt);"><i class="fa-solid fa-list-check"></i> Examination Content</h2>
                 <button type="submit" class="btn btn-primary" style="padding:10px 24px; border-radius:10px; box-shadow:0 4px 14px rgba(123, 97, 255, 0.4);"><i class="fa-solid fa-floppy-disk"></i> Save All Answers</button>
             </div>
 
@@ -243,8 +243,8 @@
                 <div class="builder-card">
                     <div class="builder-header">
                         <div>
-                            <h3 style="font-size:1.15rem; font-weight:700; color:var(--text);">{{ section.section_type }}</h3>
-                            <span style="font-size:0.8rem; color:var(--text2); font-weight:600;"><i class="fa-regular fa-clock"></i> {{ section.time_limit_minutes }} Min</span>
+                            <h3 style="font-size:1.15rem; font-weight:700; color:var(--txt);">{{ section.section_type }}</h3>
+                            <span style="font-size:0.8rem; color:var(--txt2); font-weight:600;"><i class="fa-regular fa-clock"></i> {{ section.time_limit_minutes }} Min</span>
                         </div>
                         <div style="display:flex; gap:8px;">
                             <button type="button" onclick="openQuestionModal({{ section.id }})" class="btn btn-sm btn-ghost border" style="background:#fff;"><i class="fa-solid fa-plus"></i> Add Question</button>
@@ -256,10 +256,10 @@
                         {% if "writing" in section.section_type | lower %}
                         <div style="margin-bottom: 16px; padding: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
                             <div style="display: flex; align-items: center; gap: 12px;">
-                                <i class="fa-solid fa-chart-line" style="font-size: 1.35rem; color: var(--accent);"></i>
+                                <i class="fa-solid fa-chart-line" style="font-size: 1.35rem; color: var(--acc);"></i>
                                 <div>
-                                    <strong style="font-size: 0.9rem; display: block; color: var(--text);">Writing Graph Image</strong>
-                                    <span style="font-size: 0.75rem; color: var(--text2);">Upload the diagram, chart, or map image for this task</span>
+                                    <strong style="font-size: 0.9rem; display: block; color: var(--txt);">Writing Graph Image</strong>
+                                    <span style="font-size: 0.75rem; color: var(--txt2);">Upload the diagram, chart, or map image for this task</span>
                                 </div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 12px;">
@@ -301,28 +301,28 @@
                                 </div>
                                 {% endif %}
                                 
-                                <div style="font-size:0.95rem; color:var(--text); line-height:1.5; padding:12px; background:#fff; border:1px solid #e2e8f0; border-radius:8px;">
+                                <div style="font-size:0.95rem; color:var(--txt); line-height:1.5; padding:12px; background:#fff; border:1px solid #e2e8f0; border-radius:8px;">
                                     {{ q.prompt | safe }}
                                 </div>
                                 
                                 <div>
-                                    <label class="form-label" style="color:var(--accent);">Exact Answer Key</label>
+                                    <label class="form-label" style="color:var(--acc);">Exact Answer Key</label>
                                     <input type="text" name="answer_{{ q.id }}" value="{{ q.correct_answer_text }}" class="input-clean" placeholder="Enter correct answer (e.g. FALSE, 1994, B)" style="border-color:#cbd5e1; font-weight:600; color:#0f172a;">
                                 </div>
                             </div>
                             {% endfor %}
                         {% endfor %}
                         {% if not section.blocks or not section.blocks[0].questions %}
-                            <div style="text-align:center; padding:32px; color:var(--text2); font-size:0.9rem;">No questions in this section.</div>
+                            <div style="text-align:center; padding:32px; color:var(--txt2); font-size:0.9rem;">No questions in this section.</div>
                         {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-                <div style="text-align:center; padding:60px 20px; background:#fff; border-radius:24px; border:2px dashed var(--border);">
-                    <i class="fa-solid fa-box-open" style="font-size:3rem; color:var(--text2); margin-bottom:16px;"></i>
-                    <h3 style="font-size:1.2rem; font-weight:700; color:var(--text); margin-bottom:8px;">No Sections Found</h3>
-                    <p style="color:var(--text2); font-size:0.95rem; margin-bottom:24px;">Use the AI Extractor or add a section manually to start building.</p>
+                <div style="text-align:center; padding:60px 20px; background:#fff; border-radius:24px; border:2px dashed var(--line);">
+                    <i class="fa-solid fa-box-open" style="font-size:3rem; color:var(--txt2); margin-bottom:16px;"></i>
+                    <h3 style="font-size:1.2rem; font-weight:700; color:var(--txt); margin-bottom:8px;">No Sections Found</h3>
+                    <p style="color:var(--txt2); font-size:0.95rem; margin-bottom:24px;">Use the AI Extractor or add a section manually to start building.</p>
                 </div>
             {% endif %}
         </form>
@@ -330,16 +330,16 @@
 
     <!-- RIGHT SIDE: Dual-Pane Tabs (Simulator & PDF View) -->
     <div style="flex:1; position:sticky; top:32px; height:calc(100vh - 64px); display:flex; flex-direction:column; gap:0;">
-        <div style="display:flex; background:#e2e8f0; border-radius:12px 12px 0 0; padding:4px; gap:4px; border: 1px solid var(--border); border-bottom: none;">
-            <button type="button" onclick="switchRightTab('simulator')" id="tab-btn-simulator" class="btn btn-xs" style="flex:1; border-radius:8px; border:none; padding:8px; font-weight:700; cursor:pointer; background:#fff; color:var(--text);">
+        <div style="display:flex; background:#e2e8f0; border-radius:12px 12px 0 0; padding:4px; gap:4px; border: 1px solid var(--line); border-bottom: none;">
+            <button type="button" onclick="switchRightTab('simulator')" id="tab-btn-simulator" class="btn btn-xs" style="flex:1; border-radius:8px; border:none; padding:8px; font-weight:700; cursor:pointer; background:#fff; color:var(--txt);">
                 <i class="fa-solid fa-desktop"></i> Student Simulator
             </button>
             {% if exam.original_pdf_url %}
-            <button type="button" onclick="switchRightTab('pdf')" id="tab-btn-pdf" class="btn btn-xs" style="flex:1; border-radius:8px; border:none; padding:8px; font-weight:700; cursor:pointer; background:transparent; color:var(--text2);">
+            <button type="button" onclick="switchRightTab('pdf')" id="tab-btn-pdf" class="btn btn-xs" style="flex:1; border-radius:8px; border:none; padding:8px; font-weight:700; cursor:pointer; background:transparent; color:var(--txt2);">
                 <i class="fa-solid fa-file-pdf"></i> Original PDF
             </button>
             {% endif %}
-            <a href="/mock/{{ exam.id }}/start" target="_blank" class="btn btn-xs" style="border-radius:8px; border:1px solid var(--border); padding:8px 12px; font-weight:700; color:var(--text2); text-decoration:none; white-space:nowrap;">
+            <a href="/mock/{{ exam.id }}/start" target="_blank" class="btn btn-xs" style="border-radius:8px; border:1px solid var(--line); padding:8px 12px; font-weight:700; color:var(--txt2); text-decoration:none; white-space:nowrap;">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Fullscreen
             </a>
         </div>
@@ -350,8 +350,8 @@
                 <div style="flex:1; position:relative;">
                     <iframe id="previewIframe" src="/mock/{{ exam.id }}/start" style="width:125%; height:125%; border:none; transform: scale(0.8); transform-origin: top left; position:absolute; top:0; left:0;"></iframe>
                 </div>
-                <div style="padding:12px 24px; background:#fff; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:0.8rem; color:var(--text2); font-weight:600;"><i class="fa-solid fa-rotate"></i> Auto-refreshes on save</span>
+                <div style="padding:12px 24px; background:#fff; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.8rem; color:var(--txt2); font-weight:600;"><i class="fa-solid fa-rotate"></i> Auto-refreshes on save</span>
                     <button type="button" onclick="document.getElementById('previewIframe').src = document.getElementById('previewIframe').src" class="btn btn-xs btn-ghost border">Refresh Preview</button>
                 </div>
             </div>
@@ -385,7 +385,7 @@
             </div>
             <div style="display:flex; gap:12px;">
                 <button type="button" onclick="document.getElementById('addSectionModal').style.display='none'" class="btn btn-ghost input-clean" style="flex:1;">Cancel</button>
-                <button type="submit" class="btn btn-primary input-clean" style="flex:1; background:var(--text); color:#fff; border:none;">Create Section</button>
+                <button type="submit" class="btn btn-primary input-clean" style="flex:1; background:var(--txt); color:#fff; border:none;">Create Section</button>
             </div>
         </form>
     </div>
@@ -415,7 +415,7 @@
             </div>
             <div style="display:flex; gap:12px;">
                 <button type="button" onclick="document.getElementById('addQuestionModal').style.display='none'" class="btn btn-ghost input-clean" style="flex:1;">Cancel</button>
-                <button type="submit" class="btn btn-primary input-clean" style="flex:1; background:var(--accent); color:#fff; border:none;">Save Question</button>
+                <button type="submit" class="btn btn-primary input-clean" style="flex:1; background:var(--acc); color:#fff; border:none;">Save Question</button>
             </div>
         </form>
     </div>
@@ -424,7 +424,7 @@
 <div id="bulkAnswersModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center;">
     <div style="background:#fff; width:600px; border-radius:24px; padding:32px; box-shadow:0 32px 80px rgba(0,0,0,0.2);">
         <h3 style="font-size:1.4rem; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-paste"></i> Bulk Import Answers</h3>
-        <p style="font-size:0.9rem; color:var(--text2); margin-bottom:24px; line-height:1.5;">
+        <p style="font-size:0.9rem; color:var(--txt2); margin-bottom:24px; line-height:1.5;">
             Paste your answers from a PDF/Word file below. Use standard numbering like <strong>1. FALSE</strong> or <strong>2) NOT GIVEN</strong>.
         </p>
         <form action="/mock/{{ exam.id }}/bulk-answers" method="POST">
@@ -433,7 +433,7 @@
             </div>
             <div style="display:flex; gap:12px;">
                 <button type="button" onclick="document.getElementById('bulkAnswersModal').style.display='none'" class="btn btn-ghost input-clean" style="flex:1;">Cancel</button>
-                <button type="submit" class="btn btn-primary input-clean" style="flex:1; background:var(--accent); color:#fff; border:none; box-shadow:0 4px 14px rgba(123,97,255,0.4);">Parse & Save Answers</button>
+                <button type="submit" class="btn btn-primary input-clean" style="flex:1; background:var(--acc); color:#fff; border:none; box-shadow:0 4px 14px rgba(123,97,255,0.4);">Parse & Save Answers</button>
             </div>
         </form>
     </div>
@@ -456,22 +456,22 @@ function switchRightTab(tab) {
         if (pdfTab) pdfTab.style.display = 'none';
         if (simBtn) {
             simBtn.style.background = '#fff';
-            simBtn.style.color = 'var(--text)';
+            simBtn.style.color = 'var(--txt)';
         }
         if (pdfBtn) {
             pdfBtn.style.background = 'transparent';
-            pdfBtn.style.color = 'var(--text2)';
+            pdfBtn.style.color = 'var(--txt2)';
         }
     } else {
         if (simTab) simTab.style.display = 'none';
         if (pdfTab) pdfTab.style.display = 'flex';
         if (simBtn) {
             simBtn.style.background = 'transparent';
-            simBtn.style.color = 'var(--text2)';
+            simBtn.style.color = 'var(--txt2)';
         }
         if (pdfBtn) {
             pdfBtn.style.background = '#fff';
-            pdfBtn.style.color = 'var(--text)';
+            pdfBtn.style.color = 'var(--txt)';
         }
     }
 }

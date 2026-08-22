@@ -7,13 +7,17 @@
 {% block topbar_actions %}{% endblock %}
 
 {% block content %}
+
 <div class="segs">
   <button class="on" onclick="window.location='/students/'">Students</button>
-  <button onclick="window.location='/groups/'">Groups</button>
-  <button onclick="window.location='/waitlist/'">Waitlist</button>
-  <button onclick="window.location='/performance/'">Performance</button>
-  <button onclick="window.location='/placement/'">Placement tests</button>
+  <button class="" onclick="window.location='/groups/'">Groups</button>
+  <button class="" onclick="window.location='/waitlist/'">Waitlist</button>
+  <button class="" onclick="window.location='/performance/'">Performance</button>
+  <button class="" onclick="window.location='/placement/'">Placement tests</button>
+  <button class="" onclick="window.location='/archive/'">Archive</button>
 </div>
+
+
 
 {% if error_code == 'banned_phone' %}
 <div class="card" style="background:var(--red-bg);border:1px solid rgba(248,113,113,.35);color:var(--red);padding:14px;margin-bottom:14px">

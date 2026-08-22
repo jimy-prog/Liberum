@@ -5,13 +5,17 @@
 {% block topbar_actions %}{% endblock %}
 
 {% block content %}
+
 <div class="segs">
-  <button onclick="window.location='/students/'">Students</button>
-  <button onclick="window.location='/groups/'">Groups</button>
-  <button onclick="window.location='/waitlist/'">Waitlist</button>
-  <button onclick="window.location='/performance/'">Performance</button>
+  <button class="" onclick="window.location='/students/'">Students</button>
+  <button class="" onclick="window.location='/groups/'">Groups</button>
+  <button class="" onclick="window.location='/waitlist/'">Waitlist</button>
+  <button class="" onclick="window.location='/performance/'">Performance</button>
   <button class="on" onclick="window.location='/placement/'">Placement tests</button>
+  <button class="" onclick="window.location='/archive/'">Archive</button>
 </div>
+
+
 
 <div class="stats">
   <div class="stat"><div class="v">{{ questions|length }}</div><div class="l">Question bank</div></div>
