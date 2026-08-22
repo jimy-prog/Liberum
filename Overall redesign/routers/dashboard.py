@@ -105,7 +105,7 @@ def dashboard(request: Request, show_marked: int = 0, db: Session = Depends(get_
             "held_count": held_count, "lessons_expected": lessons_expected, "lessons_pct": lessons_pct,
             "perf_list": perf_list, "leaderboard": leaderboard,
             "todays_lessons": todays_lessons, "upcoming_lessons": upcoming_lessons,
-            "active_page": "dashboard", "main_section": "home"
+            "active_page": "dashboard", "main_section": "studio_home"
         })
 
     generate_month_lessons(db, today.year, today.month)
@@ -223,7 +223,7 @@ def dashboard(request: Request, show_marked: int = 0, db: Session = Depends(get_
         "todays_data": todays_data, "notifications": notifications,
         "upcoming": upcoming, "groups_data": groups_data,
         "show_marked": show_marked,
-        "active_page": "dashboard", "main_section": "home"
+        "active_page": "dashboard", "main_section": "studio_home"
     })
 
 @router.post("/mark-all-present/{lesson_id}")
