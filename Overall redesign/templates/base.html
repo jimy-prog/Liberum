@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}Liberum{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
 <script src="https://cdn.lr-ingest.com/LogRocket.min.js" crossorigin="anonymous"></script>
@@ -242,14 +243,16 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
     {% set _is_teacher = _u and _u.role == 'teacher' %}
     {% set _is_student = _u and _u.role == 'student' %}
     
-    <nav id="nav" style="margin-top:20px;">
+        <nav id="nav" style="margin-top:20px;">
         {% if _is_owner %}
             <div class="navlbl">Owner Admin</div>
-            <a href="/owner/" class="ni {% if main_section=='home' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Home</span></a>
-            <a href="/owner/users" class="ni {% if main_section=='users' %}on{% endif %}"><i data-lucide="users"></i><span>Users & Platform</span></a>
-        {% elif _is_teacher %}
+            <a href="/owner/" class="ni {% if main_section=='home' %}on{% endif %}"><i data-lucide="shield"></i><span>Overview</span></a>
+            <a href="/owner/users" class="ni {% if main_section=='users' %}on{% endif %}"><i data-lucide="users"></i><span>Platform Users</span></a>
+        {% endif %}
+
+        {% if _is_teacher or _is_owner %}
             <div class="navlbl">Studio</div>
-            <a href="/dashboard" class="ni {% if main_section=='home' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Home</span></a>
+            <a href="/dashboard" class="ni {% if main_section=='studio_home' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
             <a href="/timetable/" class="ni {% if main_section=='schedule' %}on{% endif %}"><i data-lucide="calendar-days"></i><span>Schedule</span></a>
             <a href="/students/" class="ni {% if main_section=='students' %}on{% endif %}"><i data-lucide="users"></i><span>Students</span></a>
             <a href="/library/" class="ni {% if main_section=='learning' %}on{% endif %}"><i data-lucide="book-open"></i><span>Learning</span></a>
