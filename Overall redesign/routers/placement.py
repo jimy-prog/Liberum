@@ -62,7 +62,7 @@ async def placement_dashboard(request: Request, db: Session = Depends(get_db), c
         "active_sessions": active_sessions,
         "completed_sessions": completed_sessions,
         "questions": questions,
-        "active_page": "placement",
+        "active_page": "placement", "main_section": "placement",
         "show_pin": show_pin,
         "show_name": show_name
     })

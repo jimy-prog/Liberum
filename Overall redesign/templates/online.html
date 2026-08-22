@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Online Teaching{% endblock %}
-{% block page_title %}Online Teaching{% endblock %}
-{% block topbar_actions %}
-<span class="badge">{{ month_str }}</span>
-{% endblock %}
+{% block page_title %}Schedule{% endblock %}
+{% block page_subtitle %}Timetable · attendance · online · class invites{% endblock %}
+{% block topbar_actions %}{% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -23,25 +22,13 @@
 {% endblock %}
 
 {% block content %}
-
-<!-- Summary -->
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
-  <div class="stat-mini">
-    <div class="stat-mini-val" style="color:var(--accent)">{{ group_data|length }}</div>
-    <div class="stat-mini-lbl">Online Groups</div>
-  </div>
-  <div class="stat-mini">
-    <div class="stat-mini-val">{{ group_data|sum(attribute='student_count') }}</div>
-    <div class="stat-mini-lbl">Online Students</div>
-  </div>
-  <div class="stat-mini">
-    <div class="stat-mini-val" style="color:var(--green)">{{ "{:,.0f}".format(total_income) }}</div>
-    <div class="stat-mini-lbl">UZS This Month</div>
-  </div>
+<div class="segs">
+  <button onclick="window.location='/timetable/weekly'">Week</button>
+  <button onclick="window.location='/timetable/'">Day</button>
+  <button onclick="window.location='/timetable/monthly'">Month</button>
+  <button onclick="window.location='/classes/'">Classes</button>
+  <button class="on" onclick="window.location='/online/'">Online</button>
 </div>
-
-<!-- Today's online lessons -->
-{% if todays_online %}
 <div class="card mb-6">
   <div class="card-header"><span class="card-title">📹 Today's Online Lessons</span></div>
   <div class="card-body" style="display:flex;flex-direction:column;gap:10px">

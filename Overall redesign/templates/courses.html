@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Course Library{% endblock %}
-{% block page_title %}Course Library{% endblock %}
+{% block page_title %}Learning{% endblock %}
+{% block page_subtitle %}Homework · courses · library · Lexi AI{% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -14,6 +15,12 @@
 {% endblock %}
 
 {% block content %}
+<div class="segs">
+  <button  onclick="window.location='/homework/'">Homework</button>
+  <button class="on" onclick="window.location='/courses/'">Courses</button>
+  <button  onclick="window.location='/library/'">Library</button>
+</div>
+
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px">
   {% for c in courses %}
   <div class="course-card">

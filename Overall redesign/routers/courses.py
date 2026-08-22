@@ -274,7 +274,7 @@ def courses_list(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("courses.html", {
         "request": request, "courses": courses,
         "groups": groups, "prog_map": prog_map,
-        "active_page": "courses"
+        "active_page": "courses", "main_section": "learning"
     })
 
 @router.get("/{cid}")
@@ -286,7 +286,7 @@ def course_detail(cid: int, request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("course_detail.html", {
         "request": request, "course": course,
         "groups": groups, "prog_map": prog_map,
-        "active_page": "courses"
+        "active_page": "courses", "main_section": "learning"
     })
 
 @router.post("/{cid}/assign-group")

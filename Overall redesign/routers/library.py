@@ -22,7 +22,7 @@ def library_home(request: Request):
     if not user: return RedirectResponse("/login", status_code=303)
     
     return templates.TemplateResponse("library/student_home.html", {
-        "request": request, "user": user, "active_page": "library"
+        "request": request, "user": user, "active_page": "library", "main_section": "learning"
     })
 
 @router.get("/books")
@@ -41,7 +41,7 @@ def list_books(request: Request, level: str = None):
         master_db.close()
 
     return templates.TemplateResponse("library/student_books.html", {
-        "request": request, "user": user, "books": books, "active_page": "library"
+        "request": request, "user": user, "books": books, "active_page": "library", "main_section": "learning"
     })
 
 @router.get("/grammar/manage")
@@ -59,7 +59,7 @@ def manage_grammar(request: Request):
         master_db.close()
         
     return templates.TemplateResponse("library/owner_grammar_manage.html", {
-        "request": request, "user": user, "topics": topics, "active_page": "library"
+        "request": request, "user": user, "topics": topics, "active_page": "library", "main_section": "learning"
     })
 
 @router.get("/grammar/{topic_id}/edit")
@@ -79,7 +79,7 @@ def edit_grammar(request: Request, topic_id: int):
         master_db.close()
         
     return templates.TemplateResponse("library/owner_grammar_edit.html", {
-        "request": request, "user": user, "topic": topic, "questions": questions, "active_page": "library"
+        "request": request, "user": user, "topic": topic, "questions": questions, "active_page": "library", "main_section": "learning"
     })
 
 @router.post("/grammar/{topic_id}/edit")
@@ -175,7 +175,7 @@ def list_grammar(request: Request, level: str = None):
 
     return templates.TemplateResponse("library/student_grammar.html", {
         "request": request, "user": user, "topics": topics, 
-        "progress": progress, "active_page": "library"
+        "progress": progress, "active_page": "library", "main_section": "learning"
     })
 
 @router.get("/grammar/{topic_id}")
@@ -202,7 +202,7 @@ def grammar_detail(request: Request, topic_id: int):
         
     return templates.TemplateResponse("library/grammar_detail.html", {
         "request": request, "user": user, "topic": topic, "has_questions": has_questions, 
-        "best_attempt": best_attempt, "active_page": "library"
+        "best_attempt": best_attempt, "active_page": "library", "main_section": "learning"
     })
 
 @router.get("/grammar/{topic_id}/test")
@@ -223,7 +223,7 @@ def grammar_test(request: Request, topic_id: int):
         
     return templates.TemplateResponse("library/grammar_test.html", {
         "request": request, "user": user, "topic": topic, "questions": questions, 
-        "active_page": "library"
+        "active_page": "library", "main_section": "learning"
     })
 
 @router.post("/grammar/{topic_id}/submit")
@@ -309,7 +309,7 @@ def library_teacher_dashboard(request: Request, db: Session = Depends(get_db)):
         master_db.close()
 
     return templates.TemplateResponse("library/teacher_dashboard.html", {
-        "request": request, "user": user, "attempts": attempt_data, "active_page": "library"
+        "request": request, "user": user, "attempts": attempt_data, "active_page": "library", "main_section": "learning"
     })
 
 # =======================
@@ -329,7 +329,7 @@ def manage_books(request: Request):
         master_db.close()
         
     return templates.TemplateResponse("library/owner_books_manage.html", {
-        "request": request, "user": user, "books": books, "active_page": "library"
+        "request": request, "user": user, "books": books, "active_page": "library", "main_section": "learning"
     })
 
 @router.post("/books/add")
@@ -420,7 +420,7 @@ def read_book(request: Request, book_id: int):
         master_db.close()
         
     return templates.TemplateResponse("library/reader.html", {
-        "request": request, "user": user, "book": book, "active_page": "library"
+        "request": request, "user": user, "book": book, "active_page": "library", "main_section": "learning"
     })
 
 # =======================
@@ -445,7 +445,7 @@ def list_audio(request: Request, filter: str = "all", level: str = "all"):
         master_db.close()
 
     return templates.TemplateResponse("library/student_audio.html", {
-        "request": request, "user": user, "audio_items": audio_items, "active_page": "library", "current_filter": filter, "current_level": level
+        "request": request, "user": user, "audio_items": audio_items, "active_page": "library", "main_section": "learning", "current_filter": filter, "current_level": level
     })
 
 @router.get("/audio/manage")
@@ -461,7 +461,7 @@ def manage_audio(request: Request):
         master_db.close()
         
     return templates.TemplateResponse("library/owner_audio_manage.html", {
-        "request": request, "user": user, "audio_items": audio_items, "active_page": "library"
+        "request": request, "user": user, "audio_items": audio_items, "active_page": "library", "main_section": "learning"
     })
 
 @router.post("/audio/add")
@@ -560,5 +560,5 @@ def play_audio(request: Request, item_id: int):
         master_db.close()
         
     return templates.TemplateResponse("library/audio_player.html", {
-        "request": request, "user": user, "item": item, "active_page": "library"
+        "request": request, "user": user, "item": item, "active_page": "library", "main_section": "learning"
     })

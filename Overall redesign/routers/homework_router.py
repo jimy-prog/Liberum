@@ -62,7 +62,7 @@ def homework_list(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("homework.html", {
         "request": request, "active": active, "completed": completed,
         "groups": groups, "lessons_by_group": lessons_by_group,
-        "active_page": "homework"
+        "active_page": "homework", "main_section": "learning"
     })
 
 @router.post("/add")

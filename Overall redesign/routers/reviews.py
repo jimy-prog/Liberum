@@ -27,7 +27,7 @@ async def review_inbox(request: Request, db: SessionMaster = Depends(get_mdb)):
         "request": request,
         "user": user,
         "review_requests": requests,
-        "active_page": "reviews"
+        "active_page": "reviews", "main_section": "mock"
     })
 
 @router.post("/submit")

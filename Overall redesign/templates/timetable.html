@@ -1,53 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Timetable{% endblock %}
-{% block page_title %}Timetable{% endblock %}
+{% block page_title %}Schedule{% endblock %}
+{% block page_subtitle %}Timetable · attendance · online · class invites{% endblock %}
 
-{% block topbar_actions %}
-<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-  {% if view == 'daily' %}{% set export_url = '/timetable-export/?view=daily&d=' + view_date.isoformat() + '&show=' + show %}
-  {% elif view == 'weekly' %}{% set export_url = '/timetable-export/?view=weekly&week=' + week_start.isoformat() + '&show=' + show %}
-  {% else %}{% set export_url = '/timetable-export/?view=monthly&month=' + month_str + '&show=' + show %}{% endif %}
-  <a href="{{ export_url }}" target="_blank" class="btn btn-primary btn-sm">🖨 Export</a>
-  <!-- View switcher -->
-  <div style="display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden">
-    {% set base_d = '/timetable/?show=' + show + ('&d=' + view_date.isoformat() if view == 'daily' else '') %}
-    {% set base_w = '/timetable/weekly?show=' + show + ('&week=' + week_start.isoformat() if view == 'weekly' else '') %}
-    {% set base_m = '/timetable/monthly?show=' + show + ('&month=' + month_str if view == 'monthly' else '') %}
-    <a href="/timetable/?show={{ show }}" class="btn btn-xs {% if view=='daily' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius:0;border:none">Day</a>
-    <a href="/timetable/weekly?show={{ show }}" class="btn btn-xs {% if view=='weekly' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius:0;border:none;border-left:1px solid var(--border)">Week</a>
-    <a href="/timetable/monthly?show={{ show }}" class="btn btn-xs {% if view=='monthly' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius:0;border:none;border-left:1px solid var(--border)">Month</a>
-  </div>
-
-  <!-- Filter buttons -->
-  <div style="display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden">
-    {% if view == 'daily' %}{% set vp = '?d=' + view_date.isoformat() %}
-    {% elif view == 'weekly' %}{% set vp = '/weekly?week=' + week_start.isoformat() %}
-    {% elif view == 'monthly' %}{% set vp = '/monthly?month=' + month_str %}
-    {% else %}{% set vp = '?' %}{% endif %}
-    <a href="/timetable{{ vp }}&show=all" class="btn btn-xs {% if show=='all' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius:0;border:none">All</a>
-    <a href="/timetable{{ vp }}&show=active" class="btn btn-xs {% if show=='active' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius:0;border:none;border-left:1px solid var(--border)">Active</a>
-    <a href="/timetable{{ vp }}&show=archived" class="btn btn-xs {% if show=='archived' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius:0;border:none;border-left:1px solid var(--border)">Archived</a>
-  </div>
-
-  <!-- Navigation -->
-  {% if view == 'daily' %}
-  <a href="/timetable/?d={{ prev_date }}&show={{ show }}" class="btn btn-ghost btn-xs">←</a>
-  <input type="date" value="{{ view_date.isoformat() }}" onchange="window.location='/timetable/?d='+this.value+'&show={{ show }}'" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:4px 8px;font-size:.78rem;cursor:pointer;font-family:var(--font-b)">
-  <a href="/timetable/?d={{ next_date }}&show={{ show }}" class="btn btn-ghost btn-xs">→</a>
-  <a href="/timetable/?show={{ show }}" class="btn btn-ghost btn-xs">Today</a>
-  {% elif view == 'weekly' %}
-  <a href="/timetable/weekly?week={{ prev_week }}&show={{ show }}" class="btn btn-ghost btn-xs">←</a>
-  <span class="badge">{{ week_start.strftime('%d %b') }} – {{ week_end.strftime('%d %b %Y') }}</span>
-  <a href="/timetable/weekly?week={{ next_week }}&show={{ show }}" class="btn btn-ghost btn-xs">→</a>
-  <a href="/timetable/weekly?show={{ show }}" class="btn btn-ghost btn-xs">This Week</a>
-  {% elif view == 'monthly' %}
-  <a href="/timetable/monthly?month={{ prev_month }}&show={{ show }}" class="btn btn-ghost btn-xs">←</a>
-  <input type="month" value="{{ month_str }}" onchange="window.location='/timetable/monthly?month='+this.value+'&show={{ show }}'" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:4px 8px;font-size:.78rem;cursor:pointer;font-family:var(--font-b)">
-  <a href="/timetable/monthly?month={{ next_month }}&show={{ show }}" class="btn btn-ghost btn-xs">→</a>
-  <a href="/timetable/monthly?show={{ show }}" class="btn btn-ghost btn-xs">This Month</a>
-  {% endif %}
-</div>
-{% endblock %}
+{% block topbar_actions %}{% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -88,6 +44,35 @@
 {% endblock %}
 
 {% block content %}
+<div class="segs">
+  <button class="{% if view == 'weekly' %}on{% endif %}" onclick="window.location='/timetable/weekly'">Week</button>
+  <button class="{% if view == 'daily' %}on{% endif %}" onclick="window.location='/timetable/'">Day</button>
+  <button class="{% if view == 'monthly' %}on{% endif %}" onclick="window.location='/timetable/monthly'">Month</button>
+  <button onclick="window.location='/classes/'">Classes</button>
+  <button onclick="window.location='/online/'">Online</button>
+</div>
+
+<div style="display:flex; justify-content:space-between; margin-bottom:14px; align-items:center;">
+  <div style="display:flex;gap:6px">
+    <a href="{{ export_url }}" target="_blank" class="btn soft sm"><i data-lucide="printer"></i>Export</a>
+  </div>
+  
+  <div style="display:flex;gap:12px;align-items:center">
+    {% if view == 'daily' %}
+    <a href="/timetable/?d={{ prev_date }}&show={{ show }}" class="btn ghost sm"><i data-lucide="chevron-left"></i></a>
+    <span style="font-size:14px; font-weight:600">{{ view_date.strftime('%B %d, %Y') }}</span>
+    <a href="/timetable/?d={{ next_date }}&show={{ show }}" class="btn ghost sm"><i data-lucide="chevron-right"></i></a>
+    {% elif view == 'weekly' %}
+    <a href="/timetable/weekly?week={{ prev_week }}&show={{ show }}" class="btn ghost sm"><i data-lucide="chevron-left"></i></a>
+    <span style="font-size:14px; font-weight:600">{{ week_start.strftime('%d %b') }} – {{ week_end.strftime('%d %b %Y') }}</span>
+    <a href="/timetable/weekly?week={{ next_week }}&show={{ show }}" class="btn ghost sm"><i data-lucide="chevron-right"></i></a>
+    {% elif view == 'monthly' %}
+    <a href="/timetable/monthly?month={{ prev_month }}&show={{ show }}" class="btn ghost sm"><i data-lucide="chevron-left"></i></a>
+    <span style="font-size:14px; font-weight:600">{{ view_date.strftime('%B %Y') }}</span>
+    <a href="/timetable/monthly?month={{ next_month }}&show={{ show }}" class="btn ghost sm"><i data-lucide="chevron-right"></i></a>
+    {% endif %}
+  </div>
+</div>
 
 {# ══ DAILY ══════════════════════════════════════════════════════════════════ #}
 {% if view == 'daily' %}

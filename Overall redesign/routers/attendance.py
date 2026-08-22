@@ -42,7 +42,7 @@ def attendance_view(request: Request, month: str = None, db: Session = Depends(g
         "lessons": lessons, "students": students, "groups": groups,
         "matrix": matrix, "month_start": month_start,
         "month_str": month_start.strftime("%Y-%m"),
-        "active_page": "attendance"
+        "active_page": "attendance", "main_section": "attendance"
     })
 
 @router.post("/update")

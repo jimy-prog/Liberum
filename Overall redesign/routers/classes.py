@@ -34,7 +34,7 @@ async def my_classes(request: Request, db: SessionMaster = Depends(get_mdb)):
             "request": request,
             "user": user,
             "classes": classes,
-            "active_page": "classes"
+            "active_page": "classes", "main_section": "schedule"
         })
     elif user.role == "student":
         memberships = db.query(ClassMember).filter(ClassMember.student_id == user.id).all()
@@ -42,7 +42,7 @@ async def my_classes(request: Request, db: SessionMaster = Depends(get_mdb)):
             "request": request,
             "user": user,
             "memberships": memberships,
-            "active_page": "classes"
+            "active_page": "classes", "main_section": "schedule"
         })
     else:
         return RedirectResponse("/dashboard", status_code=302)
@@ -141,7 +141,7 @@ async def class_details(class_id: int, request: Request, db: SessionMaster = Dep
         "messages": messages,
         "timeline": timeline,
         "all_exams": all_exams,
-        "active_page": "classes"
+        "active_page": "classes", "main_section": "schedule"
     })
 
 

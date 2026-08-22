@@ -57,7 +57,7 @@ def daily(request: Request, d: str = None, show: str = "all", db: Session = Depe
         "day_data": day_data,
         "prev_date": (vd - timedelta(days=1)).isoformat(),
         "next_date": (vd + timedelta(days=1)).isoformat(),
-        "show": show, "active_page": "timetable"
+        "show": show, "active_page": "timetable", "main_section": "schedule"
     })
 
 @router.get("/weekly")
@@ -88,7 +88,7 @@ def weekly(request: Request, week: str = None, show: str = "all", db: Session = 
         "week_start": ws, "week_end": we, "week_days": days, "time_slots": times,
         "prev_week": (ws - timedelta(days=7)).isoformat(),
         "next_week": (ws + timedelta(days=7)).isoformat(),
-        "show": show, "active_page": "timetable"
+        "show": show, "active_page": "timetable", "main_section": "schedule"
     })
 
 @router.get("/monthly")
@@ -144,7 +144,7 @@ def monthly(request: Request, month: str = None, show: str = "all", db: Session 
         "month_start": ms, "month_str": ms.strftime("%Y-%m"),
         "weeks": weeks, "groups": groups,
         "prev_month": prev_m, "next_month": next_m,
-        "show": show, "active_page": "timetable"
+        "show": show, "active_page": "timetable", "main_section": "schedule"
     })
 
 @router.post("/lesson/{lid}/status")

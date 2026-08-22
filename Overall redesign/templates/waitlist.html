@@ -1,11 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Waitlist{% endblock %}
-{% block page_title %}Waitlist{% endblock %}
-{% block topbar_actions %}
-<div style="display:flex;gap:8px;align-items:center">
-  <button class="btn btn-primary btn-sm" onclick="openModal('addEntry')">+ New Enquiry</button>
-</div>
-{% endblock %}
+{% block page_title %}Students{% endblock %}
+{% block page_subtitle %}CRM · groups · waitlist · performance · placement{% endblock %}
+{% block topbar_actions %}{% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -33,207 +30,62 @@
 {% endblock %}
 
 {% block content %}
-<div class="alert alert-info mb-6" style="display:flex; justify-content:space-between; align-items:center; background: var(--blue-bg); border: 1px solid rgba(47, 128, 237, 0.2); color: var(--blue); padding: 16px;">
-  <div>
-    <strong><i class="fa-solid fa-link"></i> Public Waitlist Link</strong><br>
-    <span style="font-size: 0.9em; opacity: 0.9;">Share this link with prospective students to let them register directly.</span>
-  </div>
-  <div style="display:flex; gap:8px; align-items:center;">
-    <input type="text" readonly id="public-link" value="{{ request.url.scheme }}://{{ request.url.netloc }}/join/{{ request.state.current_user.username }}" style="padding: 8px 12px; border: 1px solid rgba(47, 128, 237, 0.3); border-radius: 4px; background: white; color: var(--text); font-size: 0.9em; width: 250px; outline: none;">
-    <button class="btn btn-primary btn-sm" onclick="copyPublicLink()">Copy</button>
-  </div>
+<div class="segs">
+  <button onclick="window.location='/students/'">Students</button>
+  <button onclick="window.location='/groups/'">Groups</button>
+  <button class="on" onclick="window.location='/waitlist/'">Waitlist</button>
+  <button onclick="window.location='/performance/'">Performance</button>
+  <button onclick="window.location='/placement/'">Placement tests</button>
 </div>
-<script>
-function copyPublicLink() {
-    var copyText = document.getElementById("public-link");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999);
-    document.execCommand("copy");
-    alert("Copied to clipboard!");
-}
-</script>
 
-{% if request.query_params.get('err') == 'banned_phone' %}
-<div class="alert mb-4" style="background:var(--red-bg);border:1px solid rgba(248,113,113,.25);color:var(--red)">
-  This phone number belongs to a banned student, so enrollment is blocked.
-</div>
-{% endif %}
-<!-- In-Process Placement Tests -->
-{% if active_sessions or completed_sessions %}
-<div class="card mb-6" style="border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px;">
-    <div class="card-header" style="background:var(--bg2); padding: 14px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border);">
-        <span class="card-title" style="font-size:0.95rem; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-tablet-screen-button" style="color:var(--accent);"></i> In-Process Placement Tests
-        </span>
-        <span class="pill pill-orange" style="font-size:0.75rem; padding: 4px 10px; font-weight:700; background:#fef3c7; color:#b45309; border: 1px solid #fde68a;">
-            {{ active_sessions | length }} Active Test{{ 's' if (active_sessions | length) != 1 else '' }}
-        </span>
+<div class="card" style="background:var(--accbg);box-shadow:none;margin-bottom:14px">
+  <div style="display:flex;gap:14px;align-items:center">
+    <i data-lucide="link" style="color:var(--acc)"></i>
+    <div class="rmain">
+      <div class="rt" style="color:var(--acc2)">Join link is live</div>
+      <div class="rs">{{ request.url.scheme }}://{{ request.url.netloc }}/join/{{ user.username }}</div>
     </div>
-    <div class="card-body" style="padding:0;">
-        <div class="table-wrap" style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; font-size:0.88rem; text-align:left;">
-                <thead>
-                    <tr style="background:var(--bg3); border-bottom:1px solid var(--border);">
-                        <th style="padding:12px 18px; color:var(--text3); font-weight:600;">Student Name</th>
-                        <th style="padding:12px 18px; color:var(--text3); font-weight:600;">Target Level</th>
-                        <th style="padding:12px 18px; color:var(--text3); font-weight:600; text-align:center;">Access PIN</th>
-                        <th style="padding:12px 18px; color:var(--text3); font-weight:600;">Status</th>
-                        <th style="padding:12px 18px; color:var(--text3); font-weight:600;">Score / Result</th>
-                        <th style="padding:12px 18px; color:var(--text3); font-weight:600; text-align:right;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for s in active_sessions %}
-                    <tr style="border-bottom:1px solid var(--border); transition: background 0.2s;">
-                        <td style="padding:12px 18px; font-weight:600; color:var(--text);">{{ s.student_name }}</td>
-                        <td style="padding:12px 18px;"><span class="pill pill-grey" style="text-transform:uppercase; font-size:0.75rem; font-weight:600;">{{ s.target_level }}</span></td>
-                        <td style="padding:12px 18px; text-align:center;"><strong style="font-size:1.1rem; color:var(--accent); font-family:var(--font-mono); letter-spacing:1px; background:var(--orange-bg); padding:4px 8px; border-radius:4px;">{{ s.access_code }}</strong></td>
-                        <td style="padding:12px 18px;">
-                            {% if s.status == 'pending' %}
-                            <span style="color:var(--text3); font-size:0.82rem;"><i class="fa-regular fa-clock"></i> Waiting for tablet...</span>
-                            {% else %}
-                            <span style="color:#d97706; font-weight:600; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
-                                <span style="display:inline-block; width:8px; height:8px; background:#d97706; border-radius:50%; animation: pulse 1.5s infinite;"></span> Testing...
-                            </span>
-                            {% endif %}
-                        </td>
-                        <td style="padding:12px 18px; color:var(--text3);">—</td>
-                        <td style="padding:12px 18px; text-align:right;">
-                            <form action="/placement/session/{{ s.id }}/delete" method="POST" style="margin:0;" onsubmit="return confirm('Cancel this test session?');">
-                                <button type="submit" class="btn btn-xs btn-ghost" style="color:#ef4444; padding:4px 8px; font-weight:600; border:none; background:none; cursor:pointer;">Cancel</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% for s in completed_sessions %}
-                    <tr style="border-bottom:1px solid var(--border); background:rgba(0,0,0,0.01);">
-                        <td style="padding:12px 18px; font-weight:600; color:var(--text);">{{ s.student_name }}</td>
-                        <td style="padding:12px 18px;"><span class="pill pill-grey" style="text-transform:uppercase; font-size:0.75rem; font-weight:600;">{{ s.target_level }}</span></td>
-                        <td style="padding:12px 18px; text-align:center; color:var(--text3);">—</td>
-                        <td style="padding:12px 18px;"><span class="pill pill-green" style="font-size:0.75rem; font-weight:600; background:#dcfce7; color:#166534; border:1px solid #bbf7d0;">Completed</span></td>
-                        <td style="padding:12px 18px;">
-                            <span style="font-weight:700; color:var(--text);">{{ s.score }} / {{ s.total_questions }}</span>
-                            {% if s.passed %}
-                            <span class="pill pill-green" style="margin-left:6px; font-size:0.72rem; padding:2px 6px;">Passed</span>
-                            {% else %}
-                            <span class="pill pill-orange" style="margin-left:6px; font-size:0.72rem; padding:2px 6px;">Failed</span>
-                            {% endif %}
-                        </td>
-                        <td style="padding:12px 18px; text-align:right;">
-                            <div style="display:flex; gap:6px; justify-content:flex-end; align-items:center;">
-                                {% if not s.passed %}
-                                <form action="/placement/session/{{ s.id }}/override" method="POST" style="margin:0;">
-                                    <button type="submit" class="btn btn-xs btn-orange" style="padding:6px 12px; margin:0; width:auto; font-weight:600;" onclick="return confirm('Register this student on the waitlist despite failing the test?');">Accept Anyway</button>
-                                </form>
-                                {% endif %}
-                                <form action="/placement/session/{{ s.id }}/delete" method="POST" style="margin:0;">
-                                    <button type="submit" class="btn btn-xs btn-ghost" style="color:var(--text3); padding:6px 10px; margin:0; width:auto;">Clear</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <button class="btn sm" onclick="navigator.clipboard.writeText('{{ request.url.scheme }}://{{ request.url.netloc }}/join/{{ user.username }}'); toast('Link copied','copy')"><i data-lucide="copy"></i>Copy</button>
+  </div>
 </div>
-{% endif %}
 
-<!-- Filter Buttons & Enquiries Table -->
 <div class="card">
-  <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-    <span class="card-title">All Enquiries ({{ entries|length }})</span>
-    
-    <!-- Client-side Status Filter Toggles -->
-    <div style="display:flex; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden">
-      <button onclick="filterEnquiries('all')" id="btn-filter-all" class="btn btn-xs btn-primary" style="border-radius:0; border:none; padding:6px 12px; margin:0;">All</button>
-      <button onclick="filterEnquiries('new')" id="btn-filter-new" class="btn btn-xs btn-ghost" style="border-radius:0; border:none; border-left:1px solid var(--border); padding:6px 12px; margin:0;">New Enquiry</button>
-      <button onclick="filterEnquiries('contacted')" id="btn-filter-contacted" class="btn btn-xs btn-ghost" style="border-radius:0; border:none; border-left:1px solid var(--border); padding:6px 12px; margin:0;">Contacted</button>
-      <button onclick="filterEnquiries('trial')" id="btn-filter-trial" class="btn btn-xs btn-ghost" style="border-radius:0; border:none; border-left:1px solid var(--border); padding:6px 12px; margin:0;">Trial</button>
-      <button onclick="filterEnquiries('enrolled')" id="btn-filter-enrolled" class="btn btn-xs btn-ghost" style="border-radius:0; border:none; border-left:1px solid var(--border); padding:6px 12px; margin:0;">Enrolled</button>
+  <div class="ct">Waitlist <span class="pill p-acc">{{ entries|length }}</span>
+    <button class="btn sm" onclick="document.getElementById('addEntry').classList.add('open')"><i data-lucide="plus"></i>Add Enquiry</button>
+  </div>
+  {% for w in entries %}
+  <div class="row">
+    {% set parts = w.name.split() %}
+    {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
+    <div class="av" style="background:var(--fill);color:var(--txt2)">{{ initials }}</div>
+    <div class="rmain">
+      <div class="rt">{{ w.name }} 
+        {% if w.status == 'new' %}
+          <span class="pill p-acc" style="margin-left:6px">New</span>
+        {% elif w.status == 'enrolled' %}
+          <span class="pill p-green" style="margin-left:6px">Enrolled</span>
+        {% else %}
+          <span class="pill p-grey" style="margin-left:6px;text-transform:capitalize">{{ w.status }}</span>
+        {% endif %}
+      </div>
+      <div class="rs">{{ w.goal_level }} · via {{ w.source }} {% if w.notes %}· {{ w.notes }}{% endif %}</div>
     </div>
+    {% if w.status != 'enrolled' %}
+      <button class="btn ghost sm" onclick="window.location='/students/?add_from_placement={{w.id}}'">Enroll</button>
+    {% endif %}
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Phone</th>
-          <th>Parent</th>
-          <th>Mode</th>
-          <th>Wants Group</th>
-          <th>Schedule</th>
-          <th>Goal</th>
-          <th>How Found</th>
-          <th>Trial</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="enquiriesTableBody">
-        {% for e in entries %}
-        <tr data-status="{{ e.status }}">
-          <td class="td-primary">{{ e.name }}</td>
-          <td class="mono" style="font-size:.8rem">{{ e.phone or '—' }}</td>
-          <td class="mono" style="font-size:.8rem">{{ e.parent_phone or '—' }}</td>
-          <td>
-            {% if e.mode=='online' %}<span class="pill" style="background:rgba(16,152,173,.15);color:#1098ad;border:1px solid rgba(16,152,173,.2)">🌐 Online</span>
-            {% else %}<span class="pill pill-grey">🏫 In-person</span>{% endif %}
-          </td>
-          <td>{% if e.desired_group %}<span class="dot" style="background:{{ e.desired_group.color }};margin-right:5px"></span>{{ e.desired_group.name }}{% else %}—{% endif %}</td>
-          <td style="font-size:.8rem;color:var(--text2)">{{ e.preferred_schedule or '—' }}</td>
-          <td style="font-size:.8rem;color:var(--text2);max-width:220px">{{ e.learning_goal or '—' }}</td>
-          <td style="font-size:.8rem;color:var(--text3)">{{ e.how_found or '—' }}</td>
-          <td style="font-size:.8rem">
-            {% if e.trial_date %}
-            {{ e.trial_date }}
-            {% if e.trial_done %}<span class="pill pill-green" style="font-size:.6rem">Done ✓</span>
-            {% else %}
-            <form method="post" action="/waitlist/{{ e.id }}/trial-done" style="display:inline">
-              <button class="btn btn-ghost btn-xs">Mark Done</button>
-            </form>
-            {% endif %}
-            {% else %}
-            <form method="post" action="/waitlist/{{ e.id }}/trial" style="display:inline;display:flex;gap:4px;align-items:center">
-              <input type="date" name="trial_date" class="form-control" style="width:130px;padding:3px 6px;font-size:.72rem">
-              <button class="btn btn-ghost btn-xs">Set</button>
-            </form>
-            {% endif %}
-          </td>
-          <td>
-            <form method="post" action="/waitlist/{{ e.id }}/status" style="margin:0; display:inline">
-              <select name="status" onchange="this.form.submit()" class="status-select-pill {{ status_labels[e.status][1] }}">
-                {% for sk,(lbl,pill_cl) in status_labels.items() %}
-                <option value="{{ sk }}" {% if e.status==sk %}selected{% endif %}>{{ lbl }}</option>
-                {% endfor %}
-              </select>
-            </form>
-          </td>
-          <td>
-            <div style="display:flex;gap:5px">
-              {% if e.phone %}
-              <button class="btn btn-ghost btn-xs" type="button" onclick="callWaitlist('{{ e.id }}','{{ (e.phone or '')|replace("'", "") }}')">Call</button>
-              {% endif %}
-              <button class="btn btn-green btn-xs" onclick="openEnroll({{ e.id }},'{{ e.name }}')">Enroll →</button>
-              <form method="post" action="/waitlist/{{ e.id }}/delete" style="display:inline">
-                <button class="btn btn-danger btn-xs" onclick="return confirm('Remove?')">✕</button>
-              </form>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-        {% if not entries %}<tr><td colspan="11" style="text-align:center;padding:28px;color:var(--text3)">No enquiries yet</td></tr>{% endif %}
-      </tbody>
-    </table>
+  {% else %}
+  <div class="empty">
+    <i data-lucide="inbox"></i>
+    <b>Waitlist is empty</b>
   </div>
+  {% endfor %}
 </div>
 
-<!-- Add Modal -->
-<div class="modal-overlay" id="addEntry" onclick="if(event.target===this)closeModal('addEntry')">
+<div class="ovl" id="addEntry" onclick="if(event.target===this)document.getElementById('addEntry').classList.remove('open')">
   <div class="modal">
-    <div class="modal-header"><span class="modal-title">New Enquiry</span><button class="modal-close" onclick="closeModal('addEntry')">✕</button></div>
-    <div class="modal-body">
+    <div class="mt">Add Enquiry<button type="button" class="x" onclick="document.getElementById('addEntry').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    
       <form method="post" action="/waitlist/add">
         <div class="form-group"><label class="form-label">Full Name *</label><input class="form-control" name="name" required></div>
         <div class="grid-2">
@@ -268,7 +120,7 @@ function copyPublicLink() {
         </div>
         <div class="form-group"><label class="form-label">Goal / Notes</label><textarea class="form-control" name="learning_goal" rows="2" placeholder="IELTS target, level, etc."></textarea></div>
         <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button type="button" class="btn btn-ghost" onclick="closeModal('addEntry')">Cancel</button>
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('addEntry').classList.remove('open')">Cancel</button>
           <button type="submit" class="btn btn-primary">Add</button>
         </div>
       </form>
@@ -282,7 +134,7 @@ function copyPublicLink() {
 <div class="modal-overlay" id="enrollModal" onclick="if(event.target===this)closeModal('enrollModal')">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Enroll Student</span><button class="modal-close" onclick="closeModal('enrollModal')">✕</button></div>
-    <div class="modal-body">
+    
       <form id="enrollForm" method="post">
         <div class="form-group"><div id="enrollName" style="font-weight:600;padding:6px 0;color:var(--text)"></div></div>
         <div class="form-group">

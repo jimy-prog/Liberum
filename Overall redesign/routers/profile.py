@@ -83,7 +83,7 @@ def profile_page(request: Request, db: Session = Depends(get_db)):
             
     return templates.TemplateResponse("settings_page.html", {
         "request":request, "profile":profile, "settings":settings,
-        "groups":groups, "users":users, "tab":tab, "active_page":"settings",
+        "groups":groups, "users":users, "tab":tab, "active_page": "settings", "main_section": "settings",
         "current_user": current_user,
     })
 

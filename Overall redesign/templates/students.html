@@ -1,96 +1,75 @@
 {% extends "base.html" %}
 {% block title %}Students{% endblock %}
 {% block page_title %}Students{% endblock %}
+{% block page_subtitle %}CRM · groups · waitlist · performance · placement{% endblock %}
+{% block page_subtitle %}CRM · groups · waitlist · performance · placement{% endblock %}
+{% block page_subtitle %}CRM · groups · waitlist · performance · placement{% endblock %}
 
-{% block topbar_actions %}
-<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-  <a href="/students/" class="btn btn-primary btn-sm" style="background:var(--accent);">Active Students</a>
-  <button type="button" class="btn btn-orange btn-sm" onclick="openBannedPage()">Banned</button>
-  <a href="/placement/" class="btn btn-ghost btn-sm">Placement Tests</a>
-  <div style="position:relative">
-    <input id="searchBox" class="form-control" placeholder="Search student..." style="width:220px;padding:6px 12px" oninput="liveSearch(this.value)">
-    <div id="searchResults" style="display:none;position:absolute;top:110%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-sm);z-index:300;overflow:hidden"></div>
-  </div>
-  <button class="btn btn-primary btn-sm" onclick="openModal('addStudent')">+ Add Student</button>
-</div>
-{% endblock %}
+{% block topbar_actions %}{% endblock %}
 
 {% block content %}
+<div class="segs">
+  <button class="on" onclick="window.location='/students/'">Students</button>
+  <button onclick="window.location='/groups/'">Groups</button>
+  <button onclick="window.location='/waitlist/'">Waitlist</button>
+  <button onclick="window.location='/students/performance'">Performance</button>
+  <button onclick="window.location='/placement/'">Placement tests</button>
+</div>
+
 {% if error_code == 'banned_phone' %}
-<div class="alert" style="background:var(--red-bg);border:1px solid rgba(248,113,113,.35);color:var(--red)">
+<div class="card" style="background:var(--red-bg);border:1px solid rgba(248,113,113,.35);color:var(--red);padding:14px;margin-bottom:14px">
   Cannot add this student. This phone number matches banned student: <strong>{{ message_name or 'Unknown' }}</strong>.
 </div>
 {% endif %}
 {% if warn_code == 'known_phone' %}
-<div class="alert" style="background:var(--yellow-bg);border:1px solid rgba(251,191,36,.35);color:var(--yellow)">
+<div class="card" style="background:var(--yellow-bg);border:1px solid rgba(251,191,36,.35);color:var(--yellow);padding:14px;margin-bottom:14px">
   Warning: this phone number was used before by <strong>{{ message_name or 'another student' }}</strong>. Student was added.
 </div>
 {% endif %}
 
-<div class="card mb-6">
-  <div class="card-header">
-    <span class="card-title">Active Students ({{ students|length }})</span>
-    <a href="/archive/" class="btn btn-ghost btn-xs">Open Archive</a>
+<div style="display:flex;gap:10px;margin-bottom:14px;align-items:center">
+  <div class="search" style="flex:1">
+    <i data-lucide="search"></i>
+    <input id="searchBox" placeholder="Search students..." oninput="liveSearch(this.value)" style="border:none;background:transparent;">
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Name</th><th>Group</th><th>Level</th><th>Phone</th><th>Attendance</th><th>Rate</th><th>Actions</th></tr></thead>
-      <tbody>
-        {% for s in students %}
-        <tr>
-          <td><a href="/students/{{ s.id }}" style="color:var(--accent);text-decoration:none;font-weight:500">{{ s.name }}</a></td>
-          <td>{% if s.group %}<span class="dot" style="background:{{ s.group.color }};margin-right:6px"></span>{{ s.group.name }}{% else %}—{% endif %}</td>
-          <td>{% if s.level %}<span class="level-badge">{{ s.level }}</span>{% else %}<span style="color:var(--text3)">—</span>{% endif %}</td>
-          <td class="mono" style="font-size:.8rem">{{ s.phone or '—' }}</td>
-          <td class="mono">{{ s.att_count }} / {{ s.total }}</td>
-          <td>
-            <div style="display:flex;align-items:center;gap:7px">
-              <div class="progress" style="width:55px"><div class="progress-bar {% if s.rate>=80 %}pb-green{% elif s.rate>=60 %}pb-yellow{% else %}pb-red{% endif %}" style="width:{{ s.rate }}%"></div></div>
-              <span style="font-size:.78rem;color:var(--text2)">{{ s.rate }}%</span>
-            </div>
-          </td>
-          <td>
-            <div style="display:flex;gap:5px;flex-wrap:wrap">
-              <a href="/students/{{ s.id }}" class="btn btn-ghost btn-xs">View</a>
-              <button type="button" class="btn btn-ghost btn-xs" onclick="openHistoryPopup({{ s.id }})">History</button>
-              {% if s.phone %}
-              <button type="button" class="btn btn-ghost btn-xs" onclick="callStudent('{{ s.id }}','{{ (s.phone or '')|replace("'", "") }}')">Call</button>
-              {% endif %}
-              <form method="post" action="/students/{{ s.id }}/exclude" style="display:inline">
-                <button class="btn btn-ghost btn-xs" type="submit" onclick="return confirm('Exclude {{ s.name }} from group?')">Exclude</button>
-              </form>
-              <form method="post" action="/students/{{ s.id }}/ban" style="display:inline" onsubmit="return askBanReason(this)">
-                <input type="hidden" name="reason">
-                <button class="btn btn-danger btn-xs" type="submit">Ban</button>
-              </form>
-              <form method="post" action="/students/{{ s.id }}/archive" style="display:inline">
-                <button class="btn btn-orange btn-xs" type="submit" onclick="return confirm('Move {{ s.name }} to Archive?')">Archive</button>
-              </form>
-              <form method="post" action="/students/{{ s.id }}/transfer" style="display:inline-flex;gap:4px;align-items:center">
-                <select class="form-control" name="group_id" style="padding:2px 6px;font-size:.72rem;width:130px">
-                  {% for g in groups if g.status == 'active' %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
-                </select>
-                <button class="btn btn-ghost btn-xs" type="submit">Transfer</button>
-              </form>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-        {% if not students %}<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--text3)">No active students</td></tr>{% endif %}
-      </tbody>
-    </table>
-  </div>
+  <button class="btn" onclick="document.getElementById('addStudent').classList.add('open')"><i data-lucide="user-plus"></i>Add student</button>
 </div>
 
-<div class="modal-overlay" id="addStudent" onclick="if(event.target===this)closeModal('addStudent')">
+<div id="searchResults" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:14px;z-index:300;overflow:hidden;box-shadow:var(--shadow);width:100%;max-width:400px;margin-top:-10px"></div>
+
+<div class="card" style="padding:4px 20px">
+  {% for s in students %}
+  <div class="row" onclick="window.location='/students/{{ s.id }}'">
+    {% set parts = s.name.split() %}
+    {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
+    <div class="av" style="background:var(--accbg);color:var(--acc2)">{{ initials }}</div>
+    <div class="rmain">
+      <div class="rt">{{ s.name }}</div>
+      <div class="rs">{% if s.level %}{{ s.level }}{% else %}No Level{% endif %} · {{ s.group.name if s.group else 'No Group' }}</div>
+    </div>
+    {% if s.debt and s.debt > 0 %}
+    <span class="pill p-red">OWES {{ s.debt }}</span>
+    {% else %}
+    <span class="pill p-green">PAID</span>
+    {% endif %}
+    <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
+  </div>
+  {% else %}
+  <div class="empty">
+    <i data-lucide="users"></i>
+    <b>No active students</b>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="ovl" id="addStudent" onclick="if(event.target===this)document.getElementById('addStudent').classList.remove('open')">
   <div class="modal">
-    <div class="modal-header">
+    <div class="mt">Add student<button type="button" class="x" onclick="document.getElementById('addStudent').classList.remove('open')"><i data-lucide="x"></i></button></div><div style="display:none">
       <span class="modal-title">Add New Student</span>
-      <button class="modal-close" onclick="closeModal('addStudent')">✕</button>
+      <button class="modal-close" onclick="document.getElementById('addStudent').classList.remove('open')">✕</button>
     </div>
     <div class="modal-body">
-      <div id="phoneCheckBox" class="alert" style="display:none"></div>
-      <form method="post" action="/students/add" id="addStudentForm">
+      <div id="phoneCheckBox" class="alert" style="display:none"></div><form method="post" action="/students/add" id="addStudentForm">
         <div class="form-group">
           <label class="form-label">Full Name *</label>
           <input class="form-control" name="name" required placeholder="Student name">
@@ -134,7 +113,7 @@
           <textarea class="form-control" name="notes" rows="2"></textarea>
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button type="button" class="btn btn-ghost" onclick="closeModal('addStudent')">Cancel</button>
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('addStudent').classList.remove('open')">Cancel</button>
           <button type="submit" class="btn btn-primary" id="addStudentSubmit">Add Student</button>
         </div>
       </form>

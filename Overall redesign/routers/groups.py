@@ -23,7 +23,7 @@ def groups_list(request: Request, db: Session = Depends(get_db)):
         ).count()
         g.epl = get_group_epl(db, g)
     return templates.TemplateResponse("groups.html", {
-        "request": request, "groups": groups, "active_page": "groups"
+        "request": request, "groups": groups, "active_page": "groups", "main_section": "students"
     })
 
 @router.post("/add")
@@ -155,5 +155,5 @@ def group_detail(gid: int, request: Request, month: str = None,
         "history": history,
         "perf_data": perf_data,
         "perf_month": perf_month,
-        "active_page": "groups"
+        "active_page": "groups", "main_section": "students"
     })

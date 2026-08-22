@@ -21,7 +21,7 @@ def list_lessons(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("lessons.html", {
         "request": request, "lessons": lessons, "groups": groups,
         "today": today, "week_start": week_start, "week_end": week_end,
-        "upcoming": upcoming, "active_page": "lessons"
+        "upcoming": upcoming, "active_page": "lessons", "main_section": "lessons"
     })
 
 @router.post("/add")
@@ -69,7 +69,7 @@ def lesson_detail(lid: int, request: Request, db: Session = Depends(get_db)):
     attended = {r.student_id: r for r in records}
     return templates.TemplateResponse("lesson_detail.html", {
         "request": request, "lesson": lesson, "records": records,
-        "students": students, "attended": attended, "active_page": "lessons"
+        "students": students, "attended": attended, "active_page": "lessons", "main_section": "lessons"
     })
 
 @router.post("/{lid}/save")

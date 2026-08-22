@@ -90,5 +90,5 @@ def calendar_view(request: Request, month: str = None, db: Session = Depends(get
         "groups": groups,
         "group_lesson_counts": group_lesson_counts,
         "group_income": group_income,
-        "active_page": "calendar"
+        "active_page": "calendar", "main_section": "calendar"
     })

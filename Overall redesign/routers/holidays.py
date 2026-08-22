@@ -79,7 +79,7 @@ def holidays_page(request: Request, db: Session = Depends(get_db)):
     holidays = db.query(Holiday).order_by(Holiday.date).all()
     return templates.TemplateResponse("holidays.html", {
         "request": request, "holidays": holidays,
-        "active_page": "settings"
+        "active_page": "settings", "main_section": "settings"
     })
 
 @router.post("/{hid}/toggle-lesson")

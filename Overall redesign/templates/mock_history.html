@@ -1,18 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div style="padding: 24px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-        <div>
-            <h1 style="font-size:1.8rem; font-weight:700; color:var(--text); letter-spacing:-0.03em;">My Exam History</h1>
-            <p style="color:var(--text2); font-size:0.9rem; margin-top:4px;">A complete record of your past mock exams and scores.</p>
-        </div>
-    </div>
-
-    {% if attempts %}
-    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:20px;">
-        {% for attempt in attempts %}
-        <div class="card hover-scale" style="padding:24px; position:relative; overflow:hidden; border:1px solid var(--border);">
+<div class="segs">
+  <button  onclick="window.location='/reviews/inbox'">Review inbox</button>
+  <button  onclick="window.location='/mock/test'">Catalog</button>
+  <button class="on" onclick="window.location='/mock/history'">History</button>
+</div>
+<div class="card hover-scale" style="padding:24px; position:relative; overflow:hidden; border:1px solid var(--border);">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
                 <div style="flex:1;">
                     <h3 style="font-size:1.1rem; font-weight:600; color:var(--text); margin-bottom:8px;">{{ attempt.exam.title }}</h3>

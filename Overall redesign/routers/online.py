@@ -73,7 +73,7 @@ def online_view(request: Request, db: Session = Depends(get_db)):
         "todays_online": todays_online,
         "today": today,
         "month_str": ms.strftime("%B %Y"),
-        "active_page": "online"
+        "active_page": "online", "main_section": "schedule"
     })
 
 @router.post("/group/{gid}/settings")

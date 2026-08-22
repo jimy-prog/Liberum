@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Homework{% endblock %}
-{% block page_title %}Homework Tracker{% endblock %}
-{% block topbar_actions %}
-<button class="btn btn-primary btn-sm" onclick="openModal('addHomework')">+ Assign Homework</button>
-{% endblock %}
+{% block page_title %}Learning{% endblock %}
+{% block page_subtitle %}Homework · courses · library · Lexi AI{% endblock %}
+{% block topbar_actions %}{% endblock %}
 
 {% block content %}
-<!-- Active homework -->
+<div class="segs">
+  <button class="on" onclick="window.location='/homework/'">Homework</button>
+  <button  onclick="window.location='/courses/'">Courses</button>
+  <button  onclick="window.location='/library/'">Library</button>
+</div>
 <div class="card mb-6">
   <div class="card-header">
     <span class="card-title">Active Assignments</span>

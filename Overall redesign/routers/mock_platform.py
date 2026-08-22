@@ -39,7 +39,7 @@ async def mock_dashboard(request: Request, db: SessionMaster = Depends(get_mdb))
     
     return templates.TemplateResponse("mock_dashboard.html", {
         "request": request,
-        "active_page": "mock",
+        "active_page": "mock", "main_section": "mock",
         "user": user,
         "exams": exams
     })
@@ -57,7 +57,7 @@ async def manage_mocks(request: Request, db: SessionMaster = Depends(get_mdb)):
     
     return templates.TemplateResponse("manage_mocks.html", {
         "request": request,
-        "active_page": "manage_mocks",
+        "active_page": "manage_mocks", "main_section": "mock",
         "user": user,
         "exams": exams
     })
@@ -164,7 +164,7 @@ async def mock_builder(request: Request, exam_id: int, db: SessionMaster = Depen
         
     return templates.TemplateResponse("mock_builder.html", {
         "request": request,
-        "active_page": "mock",
+        "active_page": "mock", "main_section": "mock",
         "user": user,
         "exam": exam
     })
@@ -247,7 +247,7 @@ async def take_mock_start(request: Request, exam_id: int, db: SessionMaster = De
         "has_graded_sections": has_graded_sections,
         "class_teachers": class_teachers,
         "public_teachers": public_teachers,
-        "active_page": "mock"
+        "active_page": "mock", "main_section": "mock"
     })
 
 @router.post("/{exam_id}/start")
@@ -1150,7 +1150,7 @@ async def mock_results(request: Request, attempt_id: int, db: SessionMaster = De
         "user": user,
         "attempt": attempt,
         "review": review,
-        "active_page": "mock"
+        "active_page": "mock", "main_section": "mock"
     })
 
 @router.get("/history", response_class=HTMLResponse)
@@ -1169,7 +1169,7 @@ async def mock_history(request: Request, db: SessionMaster = Depends(get_mdb)):
         "request": request,
         "user": user,
         "attempts": attempts,
-        "active_page": "history"
+        "active_page": "history", "main_section": "history"
     })
 
 

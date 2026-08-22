@@ -1,15 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Finance{% endblock %}
-{% block page_title %}Finance Summary{% endblock %}
-{% block topbar_actions %}
-<div style="display:flex;gap:8px;align-items:center">
-  <form method="get" style="display:flex;gap:8px">
-    <input class="form-control" name="month" type="month" value="{{ month_str }}" style="width:150px;padding:5px 10px">
-    <button class="btn btn-ghost btn-sm" type="submit">Load</button>
-  </form>
-  <a href="/reports/export/monthly?month={{ month_str }}" class="btn btn-green btn-sm">↓ Export Excel</a>
-</div>
-{% endblock %}
+{% block page_title %}Money{% endblock %}
+{% block page_subtitle %}Payments · finance · payroll · reports{% endblock %}
+{% block topbar_actions %}{% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -28,27 +21,12 @@
 {% endblock %}
 
 {% block content %}
-
-<div class="tab-bar">
-  <button class="tab-btn active" onclick="switchTab('active',this)">Active Groups</button>
-  <button class="tab-btn" onclick="switchTab('archived',this)">Archived Groups</button>
+<div class="segs">
+  <button  onclick="window.location='/payments/'">Payments</button>
+  <button class="on" onclick="window.location='/finance/'">Finance</button>
+  <button  onclick="window.location='/monthly-report/'">Monthly report</button>
 </div>
-
-<!-- ACTIVE TAB -->
-<div id="tab-active" class="tab-panel active">
-  <!-- Hero -->
-  <div class="finance-hero mb-6">
-    <div style="font-size:.72rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#5c7ab8;margin-bottom:10px">
-      {{ month_start.strftime('%B %Y') }} — Teacher Income (Active Groups)
-    </div>
-    <div style="font-family:var(--font-d);font-size:3rem;color:var(--green);line-height:1;margin-bottom:8px">
-      {{ "{:,.0f}".format(active_income) }} <span style="font-size:1.2rem;color:#5c7ab8">UZS</span>
-    </div>
-    <div style="font-size:.85rem;color:#5c7ab8">{{ active_countable }} countable lessons (Present + Held)</div>
-  </div>
-
-  <!-- 6-month history chart -->
-  <div class="card mb-6">
+<div class="card mb-6">
     <div class="card-header"><span class="card-title">6-Month History</span></div>
     <div class="card-body">
       {% set max_inc = history|map(attribute='income')|max %}

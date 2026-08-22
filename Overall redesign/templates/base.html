@@ -240,57 +240,37 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
     {% set _u = request.state.current_user %}
     {% set _is_owner = _u and _u.role == 'owner' %}
     {% set _is_teacher = _u and _u.role == 'teacher' %}
-    {% set _is_staff = _is_owner or _is_teacher %}
-
-    <div class="navlbl" style="margin-top:14px">Overview</div>
-    <a href="/dashboard" class="ni {% if active_page=='dashboard' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+    {% set _is_student = _u and _u.role == 'student' %}
     
-    {% if _is_owner %}
-    <div class="navlbl">Administration</div>
-    <a href="/owner/" class="ni {% if active_page=='owner_dashboard' %}on{% endif %}"><i data-lucide="shield"></i><span>Owner Admin</span></a>
-    <a href="/owner/updates" class="ni {% if active_page=='owner_updates' %}on{% endif %}"><i data-lucide="refresh-cw"></i><span>Platform Updates</span></a>
-    <a href="/owner/users" class="ni {% if active_page=='owner_users' %}on{% endif %}"><i data-lucide="users"></i><span>All Users</span></a>
-    <a href="/mock/manage" class="ni {% if active_page=='manage_mocks' %}on{% endif %}"><i data-lucide="settings"></i><span>Manage Mocks</span></a>
-    {% endif %}
-
-    {% if _is_staff %}
-    <div class="navlbl">Teaching</div>
-    <a href="/timetable/" class="ni {% if active_page=='timetable' %}on{% endif %}"><i data-lucide="calendar"></i><span>Timetable</span></a>
-    <a href="/classes/" class="ni {% if active_page=='classes' %}on{% endif %}"><i data-lucide="school"></i><span>My Classes</span></a>
-    {% if _is_teacher %}
-    <a href="/reviews/inbox" class="ni {% if active_page=='reviews' %}on{% endif %}"><i data-lucide="inbox"></i><span>Review Inbox</span></a>
-    {% endif %}
-    <a href="/groups/" class="ni {% if active_page=='groups' %}on{% endif %}"><i data-lucide="users-2"></i><span>Groups</span></a>
-    <a href="/students/" class="ni {% if active_page=='students' %}on{% endif %}"><i data-lucide="users"></i><span>Students</span></a>
-    <a href="/students/banned" class="ni {% if active_page=='banned' %}on{% endif %}"><i data-lucide="user-x"></i><span>Banned</span></a>
-    <a href="/monthly-report/" class="ni {% if active_page=='monthly_report' %}on{% endif %}"><i data-lucide="file-text"></i><span>Monthly Report</span></a>
-    {% endif %}
-    
-    <div class="navlbl">Tools</div>
-    <a href="/mock/test" class="ni {% if active_page=='mock_dashboard' %}on{% endif %}"><i data-lucide="file-check"></i><span>Mock Test</span></a>
-    <a href="/mock/history" class="ni {% if active_page=='mock_history' %}on{% endif %}"><i data-lucide="history"></i><span>History</span></a>
-    
-    {% if _is_staff %}
-    <div class="navlbl">Finance</div>
-    <a href="/payments/" class="ni {% if active_page=='payments' %}on{% endif %}"><i data-lucide="credit-card"></i><span>Payments</span></a>
-    <a href="/finance/debts" class="ni {% if active_page=='debts' %}on{% endif %}"><i data-lucide="alert-circle"></i><span>Debts</span></a>
-    <a href="/finance/income" class="ni {% if active_page=='income' %}on{% endif %}"><i data-lucide="trending-up"></i><span>Income</span></a>
-    {% endif %}
-
-    <div class="navlbl">Learning</div>
-    <a href="/library/" class="ni {% if active_page=='library' %}on{% endif %}"><i data-lucide="book-open"></i><span>Library</span></a>
-    <a href="/library/books" class="ni {% if active_page=='books' %}on{% endif %}"><i data-lucide="book"></i><span>Books</span></a>
-    <a href="/library/audio" class="ni {% if active_page=='audio' %}on{% endif %}"><i data-lucide="headphones"></i><span>Audio</span></a>
-
+    <nav id="nav" style="margin-top:20px;">
+        {% if _is_owner %}
+            <div class="navlbl">Owner Admin</div>
+            <a href="/owner/" class="ni {% if main_section=='home' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Home</span></a>
+            <a href="/owner/users" class="ni {% if main_section=='users' %}on{% endif %}"><i data-lucide="users"></i><span>Users & Platform</span></a>
+        {% elif _is_teacher %}
+            <div class="navlbl">Studio</div>
+            <a href="/dashboard" class="ni {% if main_section=='home' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Home</span></a>
+            <a href="/timetable/" class="ni {% if main_section=='schedule' %}on{% endif %}"><i data-lucide="calendar-days"></i><span>Schedule</span></a>
+            <a href="/students/" class="ni {% if main_section=='students' %}on{% endif %}"><i data-lucide="users"></i><span>Students</span></a>
+            <a href="/library/" class="ni {% if main_section=='learning' %}on{% endif %}"><i data-lucide="book-open"></i><span>Learning</span></a>
+            <a href="/reviews/inbox" class="ni {% if main_section=='mock' %}on{% endif %}"><i data-lucide="target"></i><span>Mock Tests</span></a>
+            <a href="/payments/" class="ni {% if main_section=='money' %}on{% endif %}"><i data-lucide="wallet"></i><span>Money</span></a>
+        {% elif _is_student %}
+            <div class="navlbl">Learning</div>
+            <a href="/dashboard" class="ni {% if main_section=='home' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Home</span></a>
+            <a href="/library/" class="ni {% if main_section=='learn' %}on{% endif %}"><i data-lucide="book-open"></i><span>Learn</span></a>
+            <a href="/mock/history" class="ni {% if main_section=='mock' %}on{% endif %}"><i data-lucide="target"></i><span>Mock Tests</span></a>
+            <a href="/payments/" class="ni {% if main_section=='money' %}on{% endif %}"><i data-lucide="credit-card"></i><span>Payments</span></a>
+        {% endif %}
+    </nav>
     <div class="sp"></div>
-    <a href="/settings" class="ni {% if active_page=='settings' %}on{% endif %}"><i data-lucide="settings"></i><span>Settings</span></a>
-    <a href="/logout" class="ni"><i data-lucide="log-out"></i><span>Sign Out</span></a>
+    <a href="/settings" class="ni {% if main_section=='settings' %}on{% endif %}"><i data-lucide="settings"></i><span>Settings</span></a>
     
-    <div class="ucard" style="margin-top:10px">
-      {% set parts = _u.full_name.split() if _u.full_name else [_u.username] if _u else ['U'] %}
+    <div class="ucard" style="margin-top:10px; cursor:pointer;" onclick="window.location='/logout'">
+      {% set parts = _u.full_name.split() if _u and _u.full_name else [_u.username] if _u else ['U'] %}
       {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper if parts else 'U' %}
       <div class="av" style="background:var(--accbg);color:var(--acc2)">{{ initials }}</div>
-      <div class="uc-t"><div class="nm">{{ _u.full_name or _u.username if _u else 'Guest' }}</div><div class="rl" style="text-transform:capitalize">{{ _u.role if _u else 'Visitor' }}</div></div>
+      <div class="uc-t"><div class="nm">{{ _u.full_name or _u.username if _u else 'Guest' }}</div><div class="rl" style="text-transform:capitalize">{{ _u.role if _u else 'Visitor' }} • Sign Out</div></div>
     </div>
   </aside>
 

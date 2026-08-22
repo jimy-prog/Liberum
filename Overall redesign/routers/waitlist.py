@@ -67,7 +67,7 @@ def waitlist_view(request: Request, db: Session = Depends(get_db)):
         "request": request, "entries": entries,
         "groups": groups, "status_labels": STATUS_LABELS,
         "how_found_options": HOW_FOUND,
-        "active_page": "waitlist",
+        "active_page": "waitlist", "main_section": "students",
         "active_sessions": active_sessions,
         "completed_sessions": completed_sessions
     })

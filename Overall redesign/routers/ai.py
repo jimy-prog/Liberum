@@ -59,7 +59,7 @@ def ai_chat_page(request: Request):
         tenant_db.close()
         
     return templates.TemplateResponse("library/student_ai_chat.html", {
-        "request": request, "user": user, "active_page": "library", "sessions": sessions
+        "request": request, "user": user, "active_page": "library", "main_section": "learning", "sessions": sessions
     })
 
 @router.post("/chat")

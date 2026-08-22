@@ -1,21 +1,17 @@
 {% extends "base.html" %}
 {% block title %}My Classes | Teacher{% endblock %}
-{% block page_title %}Public Classes & Invites{% endblock %}
+{% block page_title %}Schedule{% endblock %}
+{% block page_subtitle %}Timetable · attendance · online · class invites{% endblock %}
 
 {% block content %}
-<div class="flex-between mb-6">
-    <div>
-        <h2 style="font-size:1.2rem; font-weight:600;">Manage Your Public Classes</h2>
-        <p style="color:var(--text3); font-size:.85rem;">Create classes to generate invite codes for your students.</p>
-    </div>
-    <button class="btn btn-primary" onclick="openModal('createClassModal')">
-        <i class="fa-solid fa-plus"></i> Create New Class
-    </button>
+<div class="segs">
+  <button onclick="window.location='/timetable/weekly'">Week</button>
+  <button onclick="window.location='/timetable/'">Day</button>
+  <button onclick="window.location='/timetable/monthly'">Month</button>
+  <button class="on" onclick="window.location='/classes/'">Classes</button>
+  <button onclick="window.location='/online/'">Online</button>
 </div>
-
-<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:20px;">
-    {% for cls in classes %}
-    <div class="card p-4">
+<div class="card p-4">
         <div class="flex-between">
             <h3 style="font-size:1.1rem; font-weight:600;">{{ cls.name }}</h3>
             <span class="pill pill-blue">{{ cls.members | length }} Members</span>

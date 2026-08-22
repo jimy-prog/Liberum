@@ -45,7 +45,7 @@ async def owner_dashboard(request: Request, db: SessionMaster = Depends(get_mdb)
         "stats": stats,
         "recent_users": recent_users,
         "recent_otps": recent_otps,
-        "active_page": "owner_dashboard"
+        "active_page": "owner_dashboard", "main_section": "home"
     })
 
 @router.get("/users", response_class=HTMLResponse)
@@ -65,7 +65,7 @@ async def manage_users(request: Request, role: str = None, db: SessionMaster = D
         "user": user,
         "users": users,
         "active_role": role,
-        "active_page": "owner_users"
+        "active_page": "owner_users", "main_section": "users"
     })
 
 @router.post("/users/{target_id}/ban")

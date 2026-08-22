@@ -58,7 +58,7 @@ def payments_view(request: Request, month: str = None,
         "outstanding": outstanding,
         "paid_count": paid_count,
         "unpaid_count": unpaid_count,
-        "active_page": "payments"
+        "active_page": "payments", "main_section": "money"
     })
 
 @router.post("/record/{student_id}")

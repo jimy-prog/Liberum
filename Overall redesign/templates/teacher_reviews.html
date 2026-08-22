@@ -1,8 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Review Inbox | Teacher{% endblock %}
-{% block page_title %}Student Review Requests{% endblock %}
+{% block page_title %}Mock Tests{% endblock %}
+{% block page_subtitle %}IELTS & SAT · results · review inbox{% endblock %}
 
 {% block content %}
+<div class="segs">
+  <button class="on" onclick="window.location='/reviews/inbox'">Review inbox</button>
+  <button  onclick="window.location='/mock/test'">Catalog</button>
+  <button  onclick="window.location='/mock/history'">History</button>
+</div>
 <div class="card">
     <div class="card-header">
         <span class="card-title">Pending & Recent Reviews</span>

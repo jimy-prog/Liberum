@@ -1,26 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Payments{% endblock %}
-{% block page_title %}Payments{% endblock %}
-{% block topbar_actions %}
-<div style="display:flex;gap:8px;align-items:center">
-  <input class="form-control" type="month" value="{{ month_str }}"
-         onchange="window.location='/payments/?month='+this.value"
-         style="width:150px;padding:5px 10px">
-  <!-- All Paid button -->
-  <form method="post" action="/payments/all-paid" style="display:inline">
-    <input type="hidden" name="month" value="{{ month_str }}">
-    <button type="submit" class="btn btn-green btn-sm"
-            onclick="return confirm('Mark ALL students as paid for {{ month_str }}?')">
-      ✓ All Paid
-    </button>
-  </form>
-</div>
-{% endblock %}
+{% block page_title %}Money{% endblock %}
+{% block page_subtitle %}Payments · finance · payroll · reports{% endblock %}
+{% block topbar_actions %}{% endblock %}
 
 {% block content %}
-<!-- Summary -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
-  <div class="card" style="padding:16px">
+<div class="segs">
+  <button class="on" onclick="window.location='/payments/'">Payments</button>
+  <button  onclick="window.location='/finance/'">Finance</button>
+  <button  onclick="window.location='/monthly-report/'">Monthly report</button>
+</div>
+<div class="card" style="padding:16px">
     <div class="stat-label">Expected</div>
     <div style="font-family:var(--font-d);font-size:1.5rem;color:var(--green)">{{ "{:,.0f}".format(expected) }}</div>
     <div style="font-size:.72rem;color:var(--text3)">UZS total</div>

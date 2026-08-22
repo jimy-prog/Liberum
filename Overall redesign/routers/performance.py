@@ -39,7 +39,7 @@ def performance_view(request: Request, month: str = None, group_id: int = None, 
     return templates.TemplateResponse("performance.html", {
         "request": request, "groups": groups, "sel_group": sel_group,
         "month_str": month_str, "data": data,
-        "weeks": [1,2,3,4], "active_page": "performance"
+        "weeks": [1,2,3,4], "active_page": "performance", "main_section": "students"
     })
 
 @router.post("/quick-save")

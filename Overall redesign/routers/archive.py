@@ -17,7 +17,7 @@ def archive_view(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "archived_groups": archived_groups,
         "archived_students": archived_students,
-        "active_page": "archive"
+        "active_page": "archive", "main_section": "settings"
     })
 
 @router.post("/group/{gid}/restore")

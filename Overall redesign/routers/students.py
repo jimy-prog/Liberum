@@ -48,7 +48,7 @@ def list_students(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "students": students,
         "groups": groups,
-        "active_page": "students",
+        "active_page": "students", "main_section": "students",
         "error_code": err,
         "warn_code": warn,
         "message_name": msg_name,
@@ -72,7 +72,7 @@ def banned_students_page(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("students_banned.html", {
         "request": request,
         "banned": banned,
-        "active_page": "students",
+        "active_page": "students", "main_section": "students",
     })
 
 
@@ -375,7 +375,7 @@ def student_detail(sid: int, request: Request, db: Session = Depends(get_db)):
         "tests": tests,
         "events": events,
         "month_str": date.today().strftime("%Y-%m"),
-        "active_page": "students",
+        "active_page": "students", "main_section": "students",
     })
 
 
