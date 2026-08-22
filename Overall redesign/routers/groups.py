@@ -7,6 +7,12 @@ from database import get_db, Group, Student, Lesson, Attendance, WeeklyPerforman
 from finance_rules import get_group_epl, get_default_group_values
 from auth import require_teacher_or_owner
 
+
+@router.get("/api/list")
+def api_list_groups(db: Session = Depends(get_db)):
+    groups = db.query(Group).filter(Group.status == "active").all()
+    return [{"id": g.id, "name": g.name} for g in groups]
+
 router = APIRouter(prefix="/groups", dependencies=[Depends(require_teacher_or_owner)])
 templates = Jinja2Templates(directory="templates")
 
