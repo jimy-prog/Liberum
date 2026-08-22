@@ -56,7 +56,7 @@
 </div>
 
 <!-- Add Group Modal -->
-<div class="ovl" id="addGroup">
+<div class="ovl" id="addGroup" onclick="if(event.target===this)document.getElementById('addGroup').classList.remove('open')">
   <div class="modal">
     <div class="mt">New Group<button type="button" class="x" onclick="document.getElementById('addGroup').classList.remove('open')"><i data-lucide="x"></i></button></div>
     <form action="/groups/add" method="POST" style="margin-top:16px">
