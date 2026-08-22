@@ -1,143 +1,61 @@
 {% extends "base.html" %}
 {% block title %}Owner Dashboard | Liberum{% endblock %}
 {% block page_title %}Owner Control Center{% endblock %}
+{% block page_subtitle %}Platform-wide overview{% endblock %}
 
 {% block content %}
-<div class="stats-grid mb-6">
-    <div class="stat-card">
-        <div class="stat-label">Total Teachers</div>
-        <div class="stat-value">{{ stats.total_teachers }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Total Students</div>
-        <div class="stat-value">{{ stats.total_students }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Mock Library</div>
-        <div class="stat-value">{{ stats.total_mocks }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Total Attempts</div>
-        <div class="stat-value">{{ stats.total_attempts }}</div>
-    </div>
+<div class="stats">
+  <div class="stat">
+    <div class="ic" style="background:rgba(30,158,74,.12);color:var(--money)"><i data-lucide="users"></i></div>
+    <div class="v">{{ stats.total_teachers }}</div>
+    <div class="l">Total Teachers</div>
+  </div>
+  <div class="stat">
+    <div class="ic" style="background:var(--accbg);color:var(--acc)"><i data-lucide="users"></i></div>
+    <div class="v">{{ stats.total_students }}</div>
+    <div class="l">Total Students</div>
+  </div>
+  <div class="stat">
+    <div class="ic" style="background:var(--accbg);color:var(--acc)"><i data-lucide="book-open"></i></div>
+    <div class="v">{{ stats.total_mocks }}</div>
+    <div class="l">Mock Library</div>
+  </div>
+  <div class="stat">
+    <div class="ic" style="background:rgba(255,69,58,.1);color:var(--red)"><i data-lucide="check-square"></i></div>
+    <div class="v">{{ stats.total_attempts }}</div>
+    <div class="l">Total Attempts</div>
+  </div>
 </div>
 
-<div class="grid-2">
+<div class="grid2">
     <div class="card">
-        <div class="card-header">
-            <span class="card-title">Recent User Registrations</span>
-            <a href="/owner/users" class="btn btn-xs btn-ghost">View All</a>
+        <div class="ct">Recent User Registrations <a href="/owner/users" class="link">View All</a></div>
+        {% for u in recent_users %}
+        <div class="row">
+            <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="user"></i></div>
+            <div class="rmain">
+                <div class="rt">{{ u.full_name or u.username }}</div>
+                <div class="rs">{{ u.email }} · Joined {{ u.created_at.strftime('%d %b %Y') if u.created_at else 'N/A' }}</div>
+            </div>
+            <span class="pill {{ 'p-acc' if u.role == 'teacher' else 'p-grey' }}">{{ u.role }}</span>
         </div>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Role</th>
-                        <th>Joined</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in recent_users %}
-                    <tr>
-                        <td class="td-primary">{{ u.full_name or u.username }}</td>
-                        <td><span class="pill pill-grey">{{ u.role }}</span></td>
-                        <td class="mono">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        {% else %}
+        <div class="empty">No recent registrations</div>
+        {% endfor %}
     </div>
 
     <div class="card">
-        <div class="card-header">
-            <span class="card-title">Quick Actions</span>
-        </div>
-        <div class="card-body">
-            <div style="display:grid; gap:12px;">
-                <a href="/mock/manage" class="btn btn-primary" style="justify-content:flex-start;">
-                    <i class="fa-solid fa-plus"></i> Create Global Mock Test
-                </a>
-                <a href="/owner/users?role=teacher" class="btn btn-ghost" style="justify-content:flex-start;">
-                    <i class="fa-solid fa-chalkboard-teacher"></i> Review Teacher Accounts
-                </a>
-                <a href="/owner/updates" class="btn btn-ghost" style="justify-content:flex-start;">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Platform Updates Changelog
-                </a>
-                <a href="/settings" class="btn btn-ghost" style="justify-content:flex-start;">
-                    <i class="fa-solid fa-sliders"></i> System Settings
-                </a>
-                <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="alert('Audit logs coming soon')">
-                    <i class="fa-solid fa-list-check"></i> System Audit Logs
-                </button>
+        <div class="ct">System Logs</div>
+        {% for log in recent_logs %}
+        <div class="row" style="padding-left:0;padding-right:0">
+            <div class="rmain">
+                <div class="rt" style="font-family:var(--fm);font-size:12px">{{ log.action }}</div>
+                <div class="rs">User {{ log.user_id }} · {{ log.timestamp.strftime('%H:%M:%S') }}</div>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="card mt-6">
-    <div class="card-header">
-        <span class="card-title"><i class="fa-solid fa-key" style="color:var(--accent);"></i> Live OTP Verification Logs (Owner Presentation Tool)</span>
-    </div>
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Channel</th>
-                    <th>Target Address / Phone</th>
-                    <th>Mock Verification Code (OTP)</th>
-                    <th>Generated At</th>
-                    <th>Expires At</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for o in recent_otps %}
-                <tr>
-                    <td>
-                        <span class="pill {% if o.channel == 'SMS' %}pill-orange{% else %}pill-blue{% endif %}">
-                            {{ o.channel }}
-                        </span>
-                    </td>
-                    <td class="td-primary">{{ o.target }}</td>
-                    <td>
-                        <strong class="mono" style="font-size: 1.1rem; color: #7b61ff; letter-spacing: 1px;">
-                            {{ o.code }}
-                        </strong>
-                    </td>
-                    <td class="mono">{{ o.created_at[:19] if o.created_at else '' }}</td>
-                    <td class="mono">{{ o.expires_at[:19] if o.expires_at else '' }}</td>
-                </tr>
-                {% endfor %}
-                {% if not recent_otps %}
-                <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text3); padding: 24px;">No verification codes generated yet.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="card mt-6">
-    <div class="card-header">
-        <span class="card-title">Database Administration</span>
-    </div>
-    <div class="card-body">
-        {% if request.query_params.get('restored') == 'success' %}
-        <div class="alert alert-success">
-            <strong>Success!</strong> Database file has been restored successfully.
-        </div>
-        {% endif %}
-        <p style="font-size: .85rem; color: var(--text2); margin-bottom: 16px;">
-            Restore your school data database (<code>tenant_1.db</code>) directly to the persistent storage.
-        </p>
-        <form action="/owner/database/restore" method="POST" enctype="multipart/form-data">
-            <div class="form-group" style="display:flex; gap:12px; align-items:center; margin-bottom:0;">
-                <input type="file" name="db_file" accept=".db" class="form-control" style="flex:1;" required>
-                <button type="submit" class="btn btn-primary" style="margin-top:0;">Upload & Restore</button>
-            </div>
-        </form>
+        {% else %}
+        <div class="empty">No recent logs</div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
