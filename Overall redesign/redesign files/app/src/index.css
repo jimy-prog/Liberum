@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  @apply bg-paper text-ink font-sans;
+  font-feature-settings: "cv11", "ss01";
+}
+
+::selection {
+  background: #7b61ff;
+  color: #fff;
+}
+
+/* ---------- reveal on scroll ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(8px);
+  transition:
+    opacity 0.9s var(--ease-premium),
+    transform 0.9s var(--ease-premium),
+    filter 0.9s var(--ease-premium);
+  will-change: opacity, transform, filter;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* ---------- showcase crossfade ---------- */
+.showcase-slide {
+  opacity: 0;
+  transform: translateY(10px) scale(0.995);
+  transition:
+    opacity 0.7s var(--ease-premium),
+    transform 0.7s var(--ease-premium);
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+.showcase-slide.is-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  position: relative;
+}
+
+/* ---------- showcase progress ---------- */
+@keyframes fillbar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.progress-fill {
+  transform-origin: left;
+  animation: fillbar var(--duration, 5s) linear forwards;
+}
+
+/* ---------- soft float for hero chips ---------- */
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.floaty { animation: floaty 7s ease-in-out infinite; }
+.floaty-slow { animation: floaty 9s ease-in-out infinite; animation-delay: 1.2s; }
+
+/* ---------- marquee for problem section ---------- */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 36s linear infinite;
+}
+
+/* ---------- AI analysis shimmer ---------- */
+@keyframes scanline {
+  0% { top: 0%; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.scanline {
+  animation: scanline 3.2s var(--ease-premium) infinite;
+}
+
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(var(--w, 0.6)); }
+}
+.bar-grow {
+  transform-origin: left;
+  transform: scaleX(var(--w, 0.6));
+}
+.is-visible .bar-grow {
+  animation: bar-grow 1.2s var(--ease-premium) 0.25s backwards;
+}
+
+/* ---------- link underline ---------- */
+.u-link {
+  position: relative;
+}
+.u-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s var(--ease-premium);
+}
+.u-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---------- focus ---------- */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #7b61ff;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+  .floaty, .floaty-slow, .marquee-track, .scanline { animation: none; }
+  .showcase-slide { transition: opacity 0.2s linear; transform: none; }
+  .progress-fill { animation: none; transform: scaleX(1); }
+}
