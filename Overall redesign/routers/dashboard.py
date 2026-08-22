@@ -3,6 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
+from finance_rules import get_group_epl
 from database import get_db, Group, Student, Lesson, Attendance, Notification, Payment, WeeklyPerformance
 from scheduler import generate_month_lessons, check_unmarked_lessons, fix_archived_future_lessons
 from auth import get_current_user
@@ -206,6 +207,30 @@ def dashboard(request: Request, show_marked: int = 0, db: Session = Depends(get_
             continue
         todays_data.append({"lesson":lesson,"students":students,"att_map":att_map,"marked":marked})
 
+
+    # 6 Month History
+    history = []
+    def nm(d):
+        if d.month == 12: return date(d.year+1,1,1)
+        return date(d.year, d.month+1, 1)
+
+    for i in range(5,-1,-1):
+        m2 = ms.month - i; y2 = ms.year
+        while m2 <= 0: m2 += 12; y2 -= 1
+        hms = date(y2, m2, 1); hme = nm(hms)
+        h_inc = 0
+        h_groups = db.query(Group).join(Lesson).filter(Lesson.date>=hms, Lesson.date<hme).distinct().all()
+        for g in h_groups:
+            gc = db.query(Attendance).join(Lesson).filter(
+                Lesson.date>=hms, Lesson.date<hme, Lesson.status=="Held",
+                Attendance.status.in_(["Present","Absent"]), Lesson.group_id==g.id
+            ).count()
+            epl = get_group_epl(db, g)
+            h_inc += round(gc * epl)
+        history.append({"month_name": hms.strftime("%b"), "income": h_inc})
+    
+    max_history_income = max(h["income"] for h in history) if history else 0
+
     notifications = db.query(Notification).filter(Notification.read==False).order_by(Notification.created_at.desc()).limit(6).all()
     upcoming      = db.query(Lesson).join(Group).filter(
         Lesson.date>today, Lesson.date<=today+timedelta(days=7),
@@ -221,7 +246,7 @@ def dashboard(request: Request, show_marked: int = 0, db: Session = Depends(get_
         "att_rate": att_rate, "att_trend": att_trend,
         "paid_count": paid_count, "unpaid_count": unpaid_count,
         "todays_data": todays_data, "notifications": notifications,
-        "upcoming": upcoming, "groups_data": groups_data,
+        "upcoming": upcoming, "groups_data": groups_data, "history": history, "max_history_income": max_history_income,
         "show_marked": show_marked,
         "active_page": "dashboard", "main_section": "studio_home"
     })

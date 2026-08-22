@@ -1,0 +1,93 @@
+with open('templates/payments.html', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+import re
+
+# replace everything from <div class="card" style="padding:16px"> to the end with a new structure
+match = re.search(r'<div class="card" style="padding:16px">', text)
+if match:
+    text = text[:match.start()]
+
+new_content = """
+<div class="stats">
+  <div class="stat">
+    <div class="v money">{{ "{:,.0f}".format(collected) }}</div>
+    <div class="l">Collected · UZS</div>
+  </div>
+  <div class="stat">
+    <div class="v" style="color:var(--red)">{{ "{:,.0f}".format(outstanding) }}</div>
+    <div class="l">Outstanding · UZS</div>
+  </div>
+  <div class="stat">
+    <div class="v">{{ paid_count }}<span style="font-size:15px;color:var(--txt3)">/{{ paid_count + unpaid_count }}</span></div>
+    <div class="l">Students paid</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="ct">Payments — {{ month_str }} <button class="btn sm" onclick="document.getElementById('recordPayment').classList.add('open')"><i data-lucide="plus"></i>Record payment</button></div>
+  {% for s in payments_data %}
+  <div class="row">
+    {% set parts = s.student.name.split() %}
+    {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
+    <div class="av" style="background:var(--fill);color:var(--txt2)">{{ initials }}</div>
+    <div class="rmain">
+      <div class="rt">{{ s.student.name }}</div>
+      <div class="rs">{{ s.student.group.name if s.student.group else 'No Group' }} · expected {{ "{:,.0f}".format(s.expected) }} UZS</div>
+    </div>
+    {% if s.is_paid %}
+      <span style="font-family:var(--fm);font-size:12px;color:var(--txt2)">{{ s.payment.method.capitalize() }}</span>
+      <span class="pill p-green">{{ "{:,.0f}".format(s.payment.amount) }} UZS</span>
+    {% else %}
+      <span class="pill p-red">Unpaid</span>
+      <button class="btn soft sm" onclick="document.getElementById('recordPayment').classList.add('open')">Record</button>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Modal -->
+<div class="ovl" id="recordPayment" onclick="if(event.target===this)document.getElementById('recordPayment').classList.remove('open')">
+  <div class="modal">
+    <div class="mt">Record payment<button type="button" class="x" onclick="document.getElementById('recordPayment').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form method="post" action="/payments/record">
+      <div class="fgroup">
+        <label>Student</label>
+        <select name="student_id" required>
+          {% for s in payments_data %}
+          {% if not s.is_paid %}
+          <option value="{{ s.student.id }}">{{ s.student.name }}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fgroup">
+          <label>Amount (UZS)</label>
+          <input type="number" name="amount" value="400000" required>
+        </div>
+        <div class="fgroup">
+          <label>Month</label>
+          <input type="text" name="month" value="{{ month_str }}" readonly style="background:var(--fill)">
+        </div>
+      </div>
+      <div class="fgroup">
+        <label>Method</label>
+        <select name="method">
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="transfer">Bank transfer</option>
+          <option value="online">Online</option>
+        </select>
+      </div>
+      <button type="submit" class="btn block">Save payment</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+"""
+
+text += new_content
+
+with open('templates/payments.html', 'w', encoding='utf-8') as f:
+    f.write(text)

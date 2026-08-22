@@ -288,7 +288,7 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
                 <div class="tacts">
           <button class="aic" onclick="toggleTheme()" title="Dark mode"><i data-lucide="moon" id="themeIc"></i></button>
           <button class="aic" onclick="toast('No new notifications','bell')" title="Notifications"><i data-lucide="bell"></i><span class="bdg"></span></button>
-          <button class="btn" style="background:var(--acc);color:#fff;font-weight:600;padding:8px 14px" onclick="toast('Quick add action', 'plus')">
+          <button class="btn" style="background:var(--acc);color:#fff;font-weight:600;padding:8px 14px" onclick="document.getElementById('quickAddModal').classList.add('open')">
             <i data-lucide="plus"></i>Quick add
           </button>
           {% block topbar_actions %}{% endblock %}
@@ -324,5 +324,27 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeD
 lucide.createIcons();
 </script>
 {% block scripts %}{% endblock %}
+
+<!-- Quick Add Modal -->
+<div class="ovl" id="quickAddModal" onclick="if(event.target===this)document.getElementById('quickAddModal').classList.remove('open')">
+  <div class="modal" style="max-width:320px;padding:24px">
+    <div class="mt">Quick Add<button type="button" class="x" onclick="document.getElementById('quickAddModal').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+      <button class="btn ghost block" style="justify-content:flex-start;padding:12px;font-size:15px;color:var(--txt)" onclick="window.location='/classes/add'">
+        <div class="av" style="background:var(--accbg);color:var(--acc2);margin-right:12px;width:34px;height:34px;border-radius:10px"><i data-lucide="clock"></i></div>
+        New Lesson
+      </button>
+      <button class="btn ghost block" style="justify-content:flex-start;padding:12px;font-size:15px;color:var(--txt)" onclick="window.location='/students/add'">
+        <div class="av" style="background:rgba(48,209,88,.12);color:var(--greenD);margin-right:12px;width:34px;height:34px;border-radius:10px"><i data-lucide="user-plus"></i></div>
+        New Student
+      </button>
+      <button class="btn ghost block" style="justify-content:flex-start;padding:12px;font-size:15px;color:var(--txt)" onclick="window.location='/payments/'">
+        <div class="av" style="background:rgba(30,158,74,.12);color:var(--money);margin-right:12px;width:34px;height:34px;border-radius:10px"><i data-lucide="banknote"></i></div>
+        Record Payment
+      </button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

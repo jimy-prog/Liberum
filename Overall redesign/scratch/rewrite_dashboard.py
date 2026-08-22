@@ -1,11 +1,21 @@
-{% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
-{% block page_title %}Home{% endblock %}
-{% block page_subtitle %}Your studio at a glance{% endblock %}
+with open('templates/dashboard.html', 'r', encoding='utf-8') as f:
+    text = f.read()
 
-{% block topbar_actions %}{% endblock %}
+import re
 
-{% block content %}
+# Update topbar
+new_topbar = """{% block topbar_actions %}
+  <button class="btn" style="background:var(--acc);color:#fff;font-weight:600;padding:8px 14px" onclick="openModal('addLesson')">
+    <i data-lucide="plus"></i>Quick add
+  </button>
+{% endblock %}"""
+
+text = re.sub(r'\{% block topbar_actions %\}.*?\{% endblock %\}', new_topbar, text, flags=re.DOTALL)
+if '{% block topbar_actions %}' not in text:
+    text = text.replace('{% block content %}', new_topbar + '\n\n{% block content %}')
+
+# Extract everything between content block to end of file
+new_content = """{% block content %}
 
 {% if notifications %}
 <div class="card mb-4" style="border:1px solid var(--red)">
@@ -28,7 +38,7 @@
 <div class="stats">
   <div class="stat">
     <div class="ic" style="background:rgba(30,158,74,.12);color:var(--money)"><i data-lucide="banknote"></i></div>
-    <div class="v">{{ '{:,.0f}'.format(income | default(0)) }}</div>
+    <div class="v">{{ income | default('0') }}</div>
     <div class="l">UZS earned · {{ today.strftime('%B') }}</div>
     {% if income_max and income_max > 0 %}
     <div class="d" style="color:var(--greenD)">▲ On track</div>
@@ -114,16 +124,21 @@
 
 <div class="card">
   <div class="ct">{{ today.strftime('%B') }} income <span class="link" onclick="window.location='/finance/'">Money →</span></div>
-    <div class="hbar-wrap">
-    {% for h in history %}
-      {% set pct = (h.income / max_history_income * 100)|int if max_history_income > 0 else 0 %}
-      <div class="hbar2" title="{{ '{:,.0f}'.format(h.income) }} UZS">
-        <i class="{% if not loop.last %}dim{% endif %}" style="height:{{ pct }}%"></i>
-        <span>{{ h.month_name }}</span>
+  <div class="hbar-wrap">
+    {% set months = ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'] %}
+    {% set heights = [38, 45, 41, 52, 58, 78] %}
+    {% for m in months %}
+      <div class="hbar2">
+        <i class="{% if not loop.last %}dim{% endif %}" style="height:{{ heights[loop.index0] }}%"></i>
+        <span>{{ m }}</span>
       </div>
-    {% endfor %}
-  </div>
     {% endfor %}
   </div>
 </div>
 {% endblock %}
+"""
+
+text = re.sub(r'\{% block content %\}.*', new_content, text, flags=re.DOTALL)
+
+with open('templates/dashboard.html', 'w', encoding='utf-8') as f:
+    f.write(text)

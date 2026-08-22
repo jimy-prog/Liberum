@@ -1,0 +1,110 @@
+with open('templates/settings.html', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+new_html = """{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}Profile · appearance · finance · security · archive{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div style="display:flex;gap:14px;align-items:center">
+        {% set parts = user.full_name.split() if user.full_name else [user.username] %}
+        {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
+        <div class="av" style="background:var(--accbg);color:var(--acc2)">{{ initials }}</div>
+        <div class="rmain">
+            <div class="rt" style="font-size:18px">{{ user.full_name or user.username }}</div>
+            <div class="rs" style="text-transform:capitalize">{{ user.role }} · {{ user.email }}</div>
+        </div>
+        <button class="btn soft sm" onclick="window.location='/profile'">Edit</button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="ct">Security & Password</div>
+    {% if request.query_params.get('success') == 'password_changed' %}
+    <div class="row" style="background:rgba(48,209,88,.12);color:var(--greenD);border-radius:12px;margin-bottom:14px">
+        <i data-lucide="check-circle-2"></i> Password changed successfully
+    </div>
+    {% endif %}
+    {% if request.query_params.get('error') == 'wrong_password' %}
+    <div class="row" style="background:rgba(255,69,58,.1);color:var(--red);border-radius:12px;margin-bottom:14px">
+        <i data-lucide="alert-circle"></i> Current password incorrect
+    </div>
+    {% endif %}
+    
+    <form method="post" action="/settings/change-password">
+        <div class="frow">
+            <div class="fgroup">
+                <label>Current Password</label>
+                <input type="password" name="current_pw" required>
+            </div>
+            <div class="fgroup">
+                <label>New Password</label>
+                <input type="password" name="new_pw" required minlength="4">
+            </div>
+        </div>
+        <button type="submit" class="btn"><i data-lucide="lock"></i>Update Password</button>
+    </form>
+</div>
+
+<div class="card">
+    <div class="ct">Finance defaults</div>
+    <form method="post" action="/settings/update">
+        <div class="frow">
+        {% for s in settings.values() if s.category == 'finance' %}
+            <div class="fgroup">
+                <label>{{ s.label }}</label>
+                <input name="{{ s.key }}" value="{{ s.value }}" {% if s.type=='number' %}type="number"{% endif %}>
+            </div>
+        {% endfor %}
+        </div>
+        <button type="submit" class="btn"><i data-lucide="save"></i>Save defaults</button>
+    </form>
+</div>
+
+<div class="card">
+    <div class="ct">General Settings</div>
+    <form method="post" action="/settings/update">
+        <div class="frow">
+        {% for s in settings.values() if s.category == 'general' %}
+            <div class="fgroup">
+                <label>{{ s.label }}</label>
+                <input name="{{ s.key }}" value="{{ s.value }}">
+            </div>
+        {% endfor %}
+        </div>
+        <button type="submit" class="btn"><i data-lucide="save"></i>Save settings</button>
+    </form>
+</div>
+
+<div class="card">
+    <div class="ct">Account Data</div>
+    <div class="row" onclick="window.location='/archive/'">
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="archive"></i></div>
+        <div class="rmain">
+            <div class="rt">Archive</div>
+            <div class="rs">View deleted students and groups</div>
+        </div>
+        <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
+    </div>
+    <div class="row" onclick="window.location='/support/'">
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="life-buoy"></i></div>
+        <div class="rmain">
+            <div class="rt">Support</div>
+            <div class="rs">We reply within an hour</div>
+        </div>
+        <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
+    </div>
+</div>
+
+<form action="/logout" method="get" style="margin-top:20px;">
+    <button type="submit" class="btn ghost block" style="color:var(--red)"><i data-lucide="log-out"></i>Sign out</button>
+</form>
+
+{% endblock %}
+"""
+
+with open('templates/settings.html', 'w', encoding='utf-8') as f:
+    f.write(new_html)

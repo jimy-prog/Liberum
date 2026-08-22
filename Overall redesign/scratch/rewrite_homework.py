@@ -1,0 +1,79 @@
+with open('templates/homework.html', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+import re
+match = re.search(r'<div class="card mb-6">', text)
+if match:
+    text = text[:match.start()]
+
+new_content = """
+<div class="card mb-6">
+  <div class="ct">Active Assignments</div>
+  {% for hw in active %}
+  <div class="row" onclick="openModal('hw{{ hw.id }}')">
+    <div class="av" style="background:var(--accbg);color:var(--acc2)"><i data-lucide="pen-tool"></i></div>
+    <div class="rmain">
+      <div class="rt">{{ hw.title }}</div>
+      <div class="rs">{{ hw.lesson.group.name }} · Assigned {{ hw.lesson.date }} {% if hw.due_date %}· Due {{ hw.due_date }}{% endif %}</div>
+    </div>
+    {% if hw.due_date and hw.is_overdue %}
+    <span class="pill p-red">Overdue</span>
+    {% endif %}
+    <span class="pill p-acc">{{ hw.submitted }}/{{ hw.total }} submitted</span>
+    <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
+  </div>
+  {% else %}
+  <div class="empty">No active assignments</div>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <div class="ct">Recent Submissions</div>
+  {% for sub in recent_subs %}
+  <div class="row">
+    <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="check"></i></div>
+    <div class="rmain">
+      <div class="rt">{{ sub.student.name }}</div>
+      <div class="rs">{{ sub.homework.title }} · Submitted {{ sub.submitted_at.strftime('%b %d') }}</div>
+    </div>
+    {% if sub.is_graded %}
+      <span class="pill p-green">{{ sub.score }}/100</span>
+    {% else %}
+      <span class="pill p-orange">Needs Grading</span>
+      <button class="btn sm soft" onclick="openModal('grade{{ sub.id }}')">Grade</button>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="empty">No recent submissions</div>
+  {% endfor %}
+</div>
+
+{% for hw in active %}
+<div class="ovl" id="hw{{ hw.id }}" onclick="if(event.target===this)document.getElementById('hw{{ hw.id }}').classList.remove('open')">
+  <div class="modal">
+    <div class="mt">{{ hw.title }}<button type="button" class="x" onclick="document.getElementById('hw{{ hw.id }}').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <div style="font-size:13px;color:var(--txt2);margin-bottom:14px">{{ hw.description }}</div>
+    <div class="card" style="padding:0">
+        {% for sub in hw.submissions %}
+        <div class="row">
+            <div class="rmain">
+                <div class="rt">{{ sub.student.name }}</div>
+                <div class="rs">{% if sub.is_graded %}Graded: {{ sub.score }}{% else %}Submitted{% endif %}</div>
+            </div>
+            {% if sub.file_url %}
+            <a href="{{ sub.file_url }}" target="_blank" class="btn sm ghost"><i data-lucide="paperclip"></i>File</a>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="empty">No submissions yet</div>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
+"""
+text += new_content
+
+with open('templates/homework.html', 'w', encoding='utf-8') as f:
+    f.write(text)
