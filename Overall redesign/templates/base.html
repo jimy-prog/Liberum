@@ -252,7 +252,7 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
 
         {% if _is_teacher or _is_owner %}
             <div class="navlbl">Studio</div>
-            <a href="/dashboard" class="ni {% if main_section=='studio_home' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+            <a href="/dashboard" class="ni {% if main_section=='studio_home' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Home</span></a>
             <a href="/timetable/" class="ni {% if main_section=='schedule' %}on{% endif %}"><i data-lucide="calendar-days"></i><span>Schedule</span></a>
             <a href="/students/" class="ni {% if main_section=='students' %}on{% endif %}"><i data-lucide="users"></i><span>Students</span></a>
             <a href="/library/" class="ni {% if main_section=='learning' %}on{% endif %}"><i data-lucide="book-open"></i><span>Learning</span></a>
@@ -285,9 +285,12 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
           <div class="ltitle">{% block page_title %}Home{% endblock %}</div>
           <div class="lsub">{% block page_subtitle %}{% endblock %}</div>
         </div>
-        <div class="tacts">
+                <div class="tacts">
           <button class="aic" onclick="toggleTheme()" title="Dark mode"><i data-lucide="moon" id="themeIc"></i></button>
           <button class="aic" onclick="toast('No new notifications','bell')" title="Notifications"><i data-lucide="bell"></i><span class="bdg"></span></button>
+          <button class="btn" style="background:var(--acc);color:#fff;font-weight:600;padding:8px 14px" onclick="toast('Quick add action', 'plus')">
+            <i data-lucide="plus"></i>Quick add
+          </button>
           {% block topbar_actions %}{% endblock %}
         </div>
       </div>

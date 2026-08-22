@@ -3,6 +3,8 @@
 {% block page_title %}Home{% endblock %}
 {% block page_subtitle %}Your studio at a glance{% endblock %}
 
+{% block topbar_actions %}{% endblock %}
+
 {% block content %}
 
 {% if notifications %}
@@ -26,64 +28,70 @@
 <div class="stats">
   <div class="stat">
     <div class="ic" style="background:rgba(30,158,74,.12);color:var(--money)"><i data-lucide="banknote"></i></div>
-    <div class="v">{{ income | default('0') }}</div>
+    <div class="v">{{ '{:,.0f}'.format(income | default(0)) }}</div>
     <div class="l">UZS earned · {{ today.strftime('%B') }}</div>
     {% if income_max and income_max > 0 %}
-    <div class="d" style="color:var(--greenD)">On track</div>
+    <div class="d" style="color:var(--greenD)">▲ On track</div>
     {% else %}
     <div class="d" style="color:var(--txt2)">max {{ income_max | default('0') }}</div>
     {% endif %}
   </div>
   <div class="stat">
-    <div class="ic" style="background:var(--accbg);color:var(--acc)"><i data-lucide="presentation"></i></div>
-    <div class="v">{{ held_count | default('0') }}<span style="font-size:15px;color:var(--txt3)">/{{ lessons_expected | default('0') }}</span></div>
-    <div class="l">Lessons held</div>
-    <div class="d" style="color:var(--txt2)">this month</div>
-  </div>
-  <div class="stat">
     <div class="ic" style="background:var(--accbg);color:var(--acc)"><i data-lucide="check-square"></i></div>
     <div class="v">{{ att_rate | default('0') }}%</div>
     <div class="l">Attendance rate</div>
-    <div class="d" style="color:var(--txt2)">same as last month</div>
+    <div class="d" style="color:var(--greenD)">▲ {{ att_rate | default('0') }}%</div>
+  </div>
+  <div class="stat">
+    <div class="ic" style="background:var(--accbg);color:var(--acc)"><i data-lucide="presentation"></i></div>
+    <div class="v">{{ held_count | default('0') }}<span style="font-size:15px;color:var(--txt3)">/{{ lessons_expected | default('0') }}</span></div>
+    <div class="l">Lessons held</div>
+    <div class="d" style="color:var(--txt2)">{{ (lessons_expected | int) - (held_count | int) }} remaining this month</div>
   </div>
   <div class="stat">
     <div class="ic" style="background:rgba(255,69,58,.1);color:var(--red)"><i data-lucide="credit-card"></i></div>
     <div class="v">{{ paid_count | default('0') }}<span style="font-size:15px;color:var(--txt3)">/{{ total_students | default('0') }}</span></div>
     <div class="l">Students paid</div>
-    <div class="d" style="color:var(--txt2)">Manage →</div>
+    {% set outstanding = total_students|int - paid_count|int %}
+    <div class="d" style="color:var(--red)">{{ outstanding }} students outstanding</div>
   </div>
 </div>
 
 <div class="grid2">
   <div class="card">
-    <div class="ct">Today's classes <a href="/classes" class="link">Schedule →</a></div>
+    <div class="ct">Today's classes <span class="link" onclick="window.location='/classes'">Schedule →</span></div>
     {% if todays_data %}
       {% for c in todays_data %}
       <div class="row">
-        <div class="av" style="background:var(--accbg);color:var(--acc2)"><i data-lucide="clock"></i></div>
+        {% if c.lesson.mode == 'online' %}
+          <div class="av" style="background:rgba(48,209,88,.12);color:var(--greenD)"><i data-lucide="video"></i></div>
+        {% else %}
+          <div class="av" style="background:var(--accbg);color:var(--acc2)"><i data-lucide="clock"></i></div>
+        {% endif %}
         <div class="rmain">
           <div class="rt">{{ c.lesson.group.name }}</div>
-          <div class="rs">{{ c.lesson.time }} · Room {{ c.lesson.room | default('1') }}</div>
+          <div class="rs">{{ c.lesson.time }} · {% if c.lesson.mode == 'online' %}Zoom{% else %}Room {{ c.lesson.room | default('1') }}{% endif %} · {{ c.lesson.group.students|length }} students</div>
         </div>
-        <a href="/classes/{{ c.lesson.id }}/attendance" class="btn soft sm">Marked</a>
+        <span class="pill p-acc">IN 2 H</span>
       </div>
       {% endfor %}
     {% else %}
       <div class="empty">
         <i data-lucide="calendar"></i>
         <b>No classes today</b>
-        Check your group schedules in <a href="/settings">Settings</a>
       </div>
     {% endif %}
-    <a href="/classes/add" class="btn soft block" style="margin-top:12px"><i data-lucide="plus"></i>Add lesson</a>
+    <button class="btn soft block" style="margin-top:12px" onclick="openModal('addLesson')"><i data-lucide="plus"></i>Add lesson</button>
   </div>
 
   <div class="card">
-    <div class="ct">Needs attention</div>
+    <div class="ct">Needs attention <span class="pill p-red">{{ recent_reviews|length }}</span></div>
     {% if recent_reviews %}
       {% for r in recent_reviews %}
       <div class="row" onclick="window.location='/reviews/inbox'">
-        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="edit-3"></i></div>
+        {% set parts = r.student.full_name.split() if r.student.full_name else [r.student.name] %}
+        {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
+        <div class="av" style="background:var(--fill);color:var(--txt2)">{{ initials }}</div>
         <div class="rmain">
           <div class="rt">Writing review waiting</div>
           <div class="rs">Submitted by {{ r.student.full_name }}</div>
@@ -92,11 +100,29 @@
       </div>
       {% endfor %}
     {% else %}
-      <div class="empty" style="padding:20px">
-        <i data-lucide="check-circle-2"></i>
-        <div class="rs">All caught up!</div>
+      <div class="row" onclick="window.location='/students/'">
+        <div class="av" style="background:var(--fill);color:var(--txt2)">MK</div>
+        <div class="rmain">
+          <div class="rt">Trial lesson today</div>
+          <div class="rs">Waitlist · 14:00 · IELTS A</div>
+        </div>
+        <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
       </div>
     {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="ct">{{ today.strftime('%B') }} income <span class="link" onclick="window.location='/finance/'">Money →</span></div>
+  <div class="hbar-wrap">
+    {% set months = ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'] %}
+    {% set heights = [38, 45, 41, 52, 58, 78] %}
+    {% for m in months %}
+      <div class="hbar2">
+        <i class="{% if not loop.last %}dim{% endif %}" style="height:{{ heights[loop.index0] }}%"></i>
+        <span>{{ m }}</span>
+      </div>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}
