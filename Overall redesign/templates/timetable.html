@@ -58,7 +58,7 @@
 {% if view == 'weekly' %}
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
   <div style="font-family:var(--fd);font-weight:600;font-size:18px">{{ week_start.strftime('%d %B %Y') }} – {{ week_end.strftime('%d %B') }}</div>
-  <div>
+  <div style="display:flex; align-items:center; gap:8px;">
     <button class="btn ghost sm" onclick="window.location='/timetable/weekly?week={{ prev_week }}'"><i data-lucide="chevron-left"></i>Prev</button>
     <button class="btn ghost sm" onclick="window.location='/timetable/weekly?week={{ next_week }}'">Next<i data-lucide="chevron-right"></i></button>
   </div>
@@ -128,7 +128,7 @@
 {% elif view == 'daily' %}
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
   <div style="font-family:var(--fd);font-weight:600;font-size:18px">{{ view_date.strftime('%A, %d %B %Y') }}</div>
-  <div>
+  <div style="display:flex; align-items:center; gap:8px;">
     <button class="btn ghost sm" onclick="window.location='/timetable/?d={{ prev_date }}'"><i data-lucide="chevron-left"></i>Prev</button>
     <button class="btn ghost sm" onclick="window.location='/timetable/?d={{ next_date }}'">Next<i data-lucide="chevron-right"></i></button>
   </div>
@@ -154,7 +154,7 @@
 {% else %}
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
   <div style="font-family:var(--fd);font-weight:600;font-size:18px">{{ month_start.strftime('%B %Y') }}</div>
-  <div>
+  <div style="display:flex; align-items:center; gap:8px;">
     <button class="btn ghost sm" onclick="window.location='/timetable/monthly?month={{ prev_month }}'"><i data-lucide="chevron-left"></i>Prev</button>
     <button class="btn ghost sm" onclick="window.location='/timetable/monthly?month={{ next_month }}'">Next<i data-lucide="chevron-right"></i></button>
   </div>

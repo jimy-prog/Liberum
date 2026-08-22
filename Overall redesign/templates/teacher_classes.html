@@ -3,61 +3,55 @@
 {% block page_title %}Schedule{% endblock %}
 {% block page_subtitle %}Timetable · attendance · online · class invites{% endblock %}
 
+{% block topbar_actions %}
+<button class="btn" style="background:var(--acc);color:#fff;font-weight:600;padding:8px 14px" onclick="window.location='/classes/add'">
+  <i data-lucide="plus"></i>Add lesson
+</button>
+{% endblock %}
+
 {% block content %}
 <div class="segs">
-  <button onclick="window.location='/timetable/weekly'">Week</button>
-  <button onclick="window.location='/timetable/'">Day</button>
-  <button onclick="window.location='/timetable/monthly'">Month</button>
-  <button class="on" onclick="window.location='/classes/'">Classes</button>
-  <button onclick="window.location='/online/'">Online</button>
-</div>
-<div class="card p-4">
-        <div class="flex-between">
-            <h3 style="font-size:1.1rem; font-weight:600;">{{ cls.name }}</h3>
-            <span class="pill pill-blue">{{ cls.members | length }} Members</span>
-        </div>
-        <p style="color:var(--text2); font-size:.85rem; margin-top:8px; height:40px; overflow:hidden;">{{ cls.description }}</p>
-        
-        <div style="margin-top:20px; background:var(--bg3); padding:12px; border-radius:12px; text-align:center; border:1px dashed var(--accent);">
-            <div style="font-size:.65rem; text-transform:uppercase; color:var(--text3); font-weight:600; margin-bottom:4px;">Invite Code</div>
-            <div style="font-family:var(--font-m); font-size:1.4rem; font-weight:700; color:var(--accent); letter-spacing:2px;">{{ cls.invite_code }}</div>
-        </div>
-
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <a href="/classes/{{ cls.id }}" class="btn btn-primary btn-sm" style="flex:1;"><i class="fa-solid fa-eye"></i> View Class Portal</a>
-            <form action="/classes/{{ cls.id }}/delete" method="POST" onsubmit="return confirm('Delete this class? Students will lose access.');" style="display:contents;">
-                <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--red); padding: 0 12px;"><i class="fa-solid fa-trash"></i></button>
-            </form>
-        </div>
-    </div>
-    {% else %}
-    <div style="grid-column: 1/-1; text-align:center; padding:60px;">
-        <p style="color:var(--text3);">No public classes yet. Create one to start inviting students!</p>
-    </div>
-    {% endfor %}
+  <button class="{% if view == 'weekly' %}on{% endif %}" onclick="window.location='/timetable/weekly'">Week</button>
+  <button class="{% if view == 'daily' %}on{% endif %}" onclick="window.location='/timetable/'">Day</button>
+  <button class="{% if view == 'online' %}on{% endif %}" onclick="window.location='/timetable/online'">Online</button>
+  <button class="on" onclick="window.location='/classes/'">Classes & invites</button>
 </div>
 
-<!-- Create Class Modal -->
-<div class="modal-overlay" id="createClassModal">
-    <div class="modal">
-        <div class="modal-header">
-            <div class="modal-title">Create Public Class</div>
-            <button class="modal-close" onclick="closeModal('createClassModal')">&times;</button>
-        </div>
-        <form action="/classes/create" method="POST" class="modal-body">
-            <div class="form-group">
-                <label class="form-label">Class Name</label>
-                <input type="text" name="name" class="form-control" placeholder="e.g. IELTS Evening Group" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Description</label>
-                <textarea name="description" class="form-control" rows="3" placeholder="Briefly describe the class purpose..."></textarea>
-            </div>
-            <div class="mt-6 flex gap-2">
-                <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeModal('createClassModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary" style="flex:1;">Create Class</button>
-            </div>
-        </form>
+<div class="card" style="background:var(--accbg);box-shadow:none">
+  <div style="display:flex;gap:14px;align-items:center">
+    <i data-lucide="link" style="color:var(--acc)"></i>
+    <div class="rmain">
+      <div class="rt" style="color:var(--acc2)">Public waitlist link</div>
+      <div class="rs">liberum.uz/join/{{ user.email.split('@')[0] if user.email else 'teacher' }} — share it anywhere</div>
     </div>
+    <button class="btn sm" onclick="navigator.clipboard.writeText('liberum.uz/join/{{ user.email.split('@')[0] if user.email else 'teacher' }}'); toast('Link copied', 'copy')">
+      <i data-lucide="copy"></i>Copy
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="ct" style="display:flex; justify-content:space-between; align-items:center;">
+    <span>Public classes &amp; invite codes</span>
+    <button class="btn sm" onclick="window.location='/classes/add'"><i data-lucide="plus"></i>New class</button>
+  </div>
+  
+  {% for cls in classes %}
+  <div class="row">
+    <div class="av" style="background:{% if loop.index0 % 2 == 0 %}var(--accbg){% else %}rgba(48,209,88,.12){% endif %};color:{% if loop.index0 % 2 == 0 %}var(--acc2){% else %}var(--greenD){% endif %}">
+      <i data-lucide="key-round"></i>
+    </div>
+    <div class="rmain">
+      <div class="rt">{{ cls.name }}</div>
+      <div class="rs">Students join with this code</div>
+    </div>
+    <span style="font-family:var(--fm);font-weight:600;background:var(--fill);padding:6px 12px;border-radius:9px">{{ cls.invite_code }}</span>
+    <form action="/classes/{{ cls.id }}/delete" method="POST" onsubmit="return confirm('Delete this class?');" style="margin-left:8px;">
+      <button type="submit" class="btn ghost sm" style="color:var(--red); padding:0 8px;"><i data-lucide="trash-2"></i></button>
+    </form>
+  </div>
+  {% else %}
+  <div class="empty">No public classes yet. Create one to start inviting students!</div>
+  {% endfor %}
 </div>
 {% endblock %}

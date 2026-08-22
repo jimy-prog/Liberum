@@ -147,6 +147,13 @@ def monthly(request: Request, month: str = None, show: str = "all", db: Session 
         "show": show, "active_page": "timetable", "main_section": "schedule"
     })
 
+
+@router.get("/online")
+def online_view(request: Request, db: Session = Depends(get_db)):
+    return templates.TemplateResponse("online.html", {
+        "request": request, "view": "online", "active_page": "timetable", "main_section": "schedule"
+    })
+
 @router.post("/lesson/{lid}/status")
 def set_status(lid: int, status: str = Form(...),
                redirect_to: str = Form("/timetable/"),
