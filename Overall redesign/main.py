@@ -218,6 +218,7 @@ PUBLIC_PREFIXES = (
     "/register",
     "/onboarding",
     "/images",
+    "/assets",
     "/healthz",
     "/placement/take",
     "/auth",
