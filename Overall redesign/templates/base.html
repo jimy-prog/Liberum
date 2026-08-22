@@ -349,143 +349,70 @@ body.dark .alert-success{border-color:rgba(74,222,128,.2);color:var(--green)}
 
 {% block extra_styles %}{% endblock %}
 </style>
+<script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-brand">
-    <div class="brand-name">{{ request.state.school_name | default('Liberum') }}</div>
-    <div class="brand-sub">{{ request.state.school_tagline | default('Educational Platform') }}</div>
-  </div>
-
-  <nav style="flex:1;padding:10px 0">
-    <div class="nav-section">Overview</div>
-    <a class="nav-link {% if active_page=='dashboard' %}active{% endif %}" href="/dashboard">
-      <span class="nav-icon">📊</span> Dashboard
-    </a>
-
+<body style="display:flex;">
+<aside class="side">
+    <div class="brand"><div class="dotl">L</div>Liber<span>um</span></div>
+    
     {% set _u = request.state.current_user %}
     {% set _is_owner = _u and _u.role == 'owner' %}
     {% set _is_teacher = _u and _u.role == 'teacher' %}
     {% set _is_staff = _is_owner or _is_teacher %}
+
+    <div class="navlbl">Overview</div>
+    <a href="/dashboard" class="ni {% if active_page=='dashboard' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
     
     {% if _is_owner %}
-    <div class="nav-section" style="color:var(--accent);">Administration</div>
-    <a class="nav-link {% if active_page=='owner_dashboard' %}active{% endif %}" href="/owner/">
-      <span class="nav-icon">👑</span> Owner Admin
-    </a>
-    <a class="nav-link {% if active_page=='owner_updates' %}active{% endif %}" href="/owner/updates">
-      <span class="nav-icon">🔄</span> Platform Updates
-    </a>
-    <a class="nav-link {% if active_page=='owner_users' %}active{% endif %}" href="/owner/users">
-      <span class="nav-icon">👥</span> All Users
-    </a>
-    <a class="nav-link {% if active_page=='manage_mocks' %}active{% endif %}" href="/mock/manage">
-      <span class="nav-icon">⚙️</span> Manage Mocks
-    </a>
-
+    <div class="navlbl">Administration</div>
+    <a href="/owner/" class="ni {% if active_page=='owner_dashboard' %}on{% endif %}"><i data-lucide="shield"></i><span>Owner Admin</span></a>
+    <a href="/owner/updates" class="ni {% if active_page=='owner_updates' %}on{% endif %}"><i data-lucide="refresh-cw"></i><span>Platform Updates</span></a>
+    <a href="/owner/users" class="ni {% if active_page=='owner_users' %}on{% endif %}"><i data-lucide="users"></i><span>All Users</span></a>
+    <a href="/mock/manage" class="ni {% if active_page=='manage_mocks' %}on{% endif %}"><i data-lucide="settings"></i><span>Manage Mocks</span></a>
     {% endif %}
 
     {% if _is_staff %}
-    <div class="nav-section">Teaching</div>
-    <a class="nav-link {% if active_page=='timetable' %}active{% endif %}" href="/timetable/">
-      <span class="nav-icon">🗓</span> Timetable
-    </a>
-    <a class="nav-link {% if active_page=='classes' %}active{% endif %}" href="/classes/">
-      <span class="nav-icon">🏫</span> My Classes
-    </a>
+    <div class="navlbl">Teaching</div>
+    <a href="/timetable/" class="ni {% if active_page=='timetable' %}on{% endif %}"><i data-lucide="calendar"></i><span>Timetable</span></a>
+    <a href="/classes/" class="ni {% if active_page=='classes' %}on{% endif %}"><i data-lucide="school"></i><span>My Classes</span></a>
     {% if _is_teacher %}
-    <a class="nav-link {% if active_page=='reviews' %}active{% endif %}" href="/reviews/inbox">
-      <span class="nav-icon">📬</span> Review Inbox
-    </a>
+    <a href="/reviews/inbox" class="ni {% if active_page=='reviews' %}on{% endif %}"><i data-lucide="inbox"></i><span>Review Inbox</span></a>
     {% endif %}
-    <a class="nav-link {% if active_page=='groups' %}active{% endif %}" href="/groups/">
-      <span class="nav-icon">👥</span> Groups
-    </a>
-    <a class="nav-link {% if active_page=='students' %}active{% endif %}" href="/students/">
-      <span class="nav-icon">👤</span> Students
-    </a>
-    <a class="nav-link {% if active_page=='waitlist' %}active{% endif %}" href="/waitlist/">
-      <span class="nav-icon">🎯</span> Waitlist
-    </a>
-    <a class="nav-link {% if active_page=='homework' %}active{% endif %}" href="/homework/">
-      <span class="nav-icon">📝</span> Homework
-    </a>
-    <a class="nav-link {% if active_page=='performance' %}active{% endif %}" href="/performance/">
-      <span class="nav-icon">📈</span> Performance
-    </a>
+    <a href="/groups/" class="ni {% if active_page=='groups' %}on{% endif %}"><i data-lucide="users-2"></i><span>Groups</span></a>
+    <a href="/students/" class="ni {% if active_page=='students' %}on{% endif %}"><i data-lucide="users"></i><span>Students</span></a>
+    <a href="/students/banned" class="ni {% if active_page=='banned' %}on{% endif %}"><i data-lucide="user-x"></i><span>Banned</span></a>
+    <a href="/monthly-report/" class="ni {% if active_page=='monthly_report' %}on{% endif %}"><i data-lucide="file-text"></i><span>Monthly Report</span></a>
     {% endif %}
-
-    <div class="nav-section">Content</div>
-    <a class="nav-link {% if active_page=='library' %}active{% endif %}" href="/library">
-      <span class="nav-icon">📖</span> Digital Library
-    </a>
-    <a class="nav-link {% if active_page=='courses' %}active{% endif %}" href="/courses/">
-      <span class="nav-icon">📚</span> Courses
-    </a>
-    <a class="nav-link {% if active_page=='mock' %}active{% endif %}" href="/mock/">
-      <span class="nav-icon">💻</span> Mock Tests
-    </a>
-    <a class="nav-link {% if active_page=='history' %}active{% endif %}" href="/mock/history">
-      <span class="nav-icon">📜</span> History
-    </a>
-    <a class="nav-link {% if active_page=='support' %}active{% endif %}" href="/support">
-      <span class="nav-icon">🎧</span> Support
-    </a>
-
+    
+    <div class="navlbl">Tools</div>
+    <a href="/mock/test" class="ni {% if active_page=='mock_dashboard' %}on{% endif %}"><i data-lucide="file-check"></i><span>Mock Test</span></a>
+    <a href="/mock/history" class="ni {% if active_page=='mock_history' %}on{% endif %}"><i data-lucide="history"></i><span>History</span></a>
+    
     {% if _is_staff %}
-    <div class="nav-section">Finance</div>
-    <a class="nav-link {% if active_page=='finance' %}active{% endif %}" href="/finance/">
-      <span class="nav-icon">💰</span> Finance
-    </a>
-    <a class="nav-link {% if active_page=='payments' %}active{% endif %}" href="/payments/">
-      <span class="nav-icon">💳</span> Payments
-    </a>
-    <a class="nav-link {% if active_page=='online' %}active{% endif %}" href="/online/">
-      <span class="nav-icon">🌐</span> Online
-    </a>
-
-    <div class="nav-section">Reports</div>
-    <a class="nav-link" href="/monthly-report/" target="_blank">
-      <span class="nav-icon">🖨</span> Monthly Report
-    </a>
-
-    <div class="nav-section">System</div>
-    <a class="nav-link {% if active_page=='archive' %}active{% endif %}" href="/archive/">
-      <span class="nav-icon">🗄</span> Archive
-    </a>
+    <div class="navlbl">Finance</div>
+    <a href="/payments/" class="ni {% if active_page=='payments' %}on{% endif %}"><i data-lucide="credit-card"></i><span>Payments</span></a>
+    <a href="/finance/debts" class="ni {% if active_page=='debts' %}on{% endif %}"><i data-lucide="alert-circle"></i><span>Debts</span></a>
+    <a href="/finance/income" class="ni {% if active_page=='income' %}on{% endif %}"><i data-lucide="trending-up"></i><span>Income</span></a>
     {% endif %}
 
-    <a class="nav-link {% if active_page=='settings' %}active{% endif %}" href="/profile/">
-      <span class="nav-icon">⚙</span> Settings
-    </a>
-  </nav>
+    <div class="navlbl">Learning</div>
+    <a href="/library/" class="ni {% if active_page=='library' %}on{% endif %}"><i data-lucide="book-open"></i><span>Library</span></a>
+    <a href="/library/books" class="ni {% if active_page=='books' %}on{% endif %}"><i data-lucide="book"></i><span>Books</span></a>
+    <a href="/library/audio" class="ni {% if active_page=='audio' %}on{% endif %}"><i data-lucide="headphones"></i><span>Audio</span></a>
 
-  <div class="sidebar-footer">
-    {% if request.state.current_user %}
-    <div style="text-align:center;padding:2px 6px 4px">
-      <div style="font-size:.78rem;color:var(--text2);font-weight:600">{{ request.state.current_user.full_name or request.state.current_user.username }}</div>
-      <div style="font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">{{ request.state.current_user.role }}</div>
+    <div class="sp"></div>
+    <a href="/settings" class="ni {% if active_page=='settings' %}on{% endif %}"><i data-lucide="settings"></i><span>Settings</span></a>
+    <a href="/logout" class="ni"><i data-lucide="log-out"></i><span>Sign Out</span></a>
+    
+    <div class="ucard">
+      {% set parts = _u.full_name.split() if _u.full_name else [_u.username] %}
+      {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper if parts else 'U' %}
+      <div class="av" style="background:#7B61FF">{{ initials }}</div>
+      <div class="uc-t"><div class="nm">{{ _u.full_name or _u.username }}</div><div class="rl" style="text-transform:capitalize">{{ _u.role }} &middot; Liberum</div></div>
     </div>
-    {% endif %}
-    <select class="form-control" id="paletteSelect" onchange="setPalette(this.value)" style="font-size:.72rem;padding:8px 10px;border-radius:999px">
-      <option value="liberum">Theme: Liberum</option>
-      <option value="indigo">Theme: Indigo</option>
-      <option value="teal">Theme: Teal</option>
-      <option value="forest">Theme: Forest</option>
-      <option value="violet">Theme: Violet</option>
-      <option value="rose">Theme: Rose</option>
-      <option value="navy">Theme: Navy</option>
-      <option value="slate">Theme: Slate</option>
-    </select>
-    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
-    <a href="/static/landing/index.html" style="font-size:.72rem;color:var(--accent);text-decoration:none;text-align:center;padding:2px;font-weight:500">⌂ Marketing site</a>
-    <a href="/logout" style="font-size:.72rem;color:var(--text3);text-decoration:none;text-align:center;padding:2px">⎋ Sign Out</a>
-  </div>
-</div>
+  </aside>
+<div class="main" style="flex:1; min-width:0; background:var(--bg); height:100vh; overflow-y:auto">
 
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<div class="main">
   <div class="topbar">
     <div class="topbar-left">
       <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
@@ -729,5 +656,6 @@ function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 </script>
 {% endif %}
 {% block scripts %}{% endblock %}
+<script>lucide.createIcons();</script>
 </body>
 </html>

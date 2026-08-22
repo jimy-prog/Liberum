@@ -289,7 +289,7 @@ async def root(request: Request):
     return templates.TemplateResponse("landing.html", {"request": request})
 
 @app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request, next: str = "/app"):
+async def login_page(request: Request, next: str = "/dashboard"):
     csrf_token = generate_csrf_token()
     response = templates.TemplateResponse("login.html", {
         "request": request, "next": next, "error": None, "csrf_token": csrf_token
@@ -309,7 +309,7 @@ async def login_post(request: Request):
     
     identifier = None
     password = None
-    next_url = "/app"
+    next_url = "/dashboard"
     csrf_token = None
     
     if "application/json" in content_type:
@@ -317,7 +317,7 @@ async def login_post(request: Request):
             data = await request.json()
             identifier = data.get("identifier")
             password = data.get("password")
-            next_url = data.get("next", "/app")
+            next_url = data.get("next", "/dashboard")
             csrf_token = data.get("csrf_token")
         except Exception:
             pass
@@ -326,7 +326,7 @@ async def login_post(request: Request):
             form = await request.form()
             identifier = form.get("identifier")
             password = form.get("password")
-            next_url = form.get("next", "/app")
+            next_url = form.get("next", "/dashboard")
             csrf_token = form.get("csrf_token")
         except Exception:
             pass
@@ -354,9 +354,9 @@ async def login_post(request: Request):
     user = authenticate_user(identifier, password)
     if user:
         token = create_session(user.id)
-        dest = next_url if next_url.startswith("/") else "/app"
+        dest = next_url if next_url.startswith("/") else "/dashboard"
         if dest == "/":
-            dest = "/app"
+            dest = "/dashboard"
             
         if "application/json" in content_type:
             response = JSONResponse(content={"success": True, "redirect": dest})
@@ -592,7 +592,7 @@ async def register_verify(request: Request, email: str = Form(""), phone: str = 
         
         # 4. Log them in automatically
         token = create_session(new_user.id)
-        response = RedirectResponse("/app" if role == "teacher" else "/mock", status_code=302)
+        response = RedirectResponse("/dashboard" if role == "teacher" else "/mock", status_code=302)
         response.set_cookie(SESSION_KEY, token, httponly=True, max_age=60*60*24*30, samesite="lax")
         return response
     finally:
