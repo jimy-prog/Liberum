@@ -39,11 +39,14 @@
 
 <div class="card" style="padding:16px 0;">
   <div style="display:flex; justify-content:space-between; align-items:center; padding:0 16px 16px;">
-    <div style="font-weight:600; font-size:14px;">ALL ENQUIRIES ({{ entries|length }})</div>
+    <div style="font-weight:600; font-size:14px;">ALL ENQUIRIES (<span id="wl-count">{{ entries|length }}</span>)</div>
     <div style="display:flex; gap:6px; align-items:center;">
       <div style="display:flex; gap:4px; margin-right:12px;">
-        <button class="ft-btn active">All</button>
-        <button class="ft-btn">New Enquiry</button>
+        <button class="ft-btn active" onclick="filterWl('all', this)">All</button>
+        <button class="ft-btn" onclick="filterWl('new', this)">New Enquiry</button>
+        <button class="ft-btn" onclick="filterWl('contacted', this)">Contacted</button>
+        <button class="ft-btn" onclick="filterWl('trial', this)">Trial</button>
+        <button class="ft-btn" onclick="filterWl('enrolled', this)">Enrolled</button>
         <button class="ft-btn">Contacted</button>
         <button class="ft-btn">Trial</button>
         <button class="ft-btn">Enrolled</button>
@@ -59,7 +62,7 @@
       </div>
       
       {% for w in entries %}
-      <div class="wl-row wl-grid">
+      <div class="wl-row wl-grid" data-status="{{ w.status }}">
         <div style="font-weight:600; color:var(--txt);">{{ w.name }}</div>
         <div>{{ w.phone or '—' }}</div>
         <div>{{ w.parent_phone or '—' }}</div>
@@ -154,5 +157,22 @@ function openEnroll(eid, name) {
   }
   document.getElementById('enrollModal').classList.add('open');
 }
+
+function filterWl(status, btn) {
+  document.querySelectorAll('.ft-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const rows = document.querySelectorAll('.wl-row');
+  let count = 0;
+  rows.forEach(r => {
+    if (status === 'all' || r.dataset.status === status) {
+      r.style.display = 'grid'; // match css grid
+      count++;
+    } else {
+      r.style.display = 'none';
+    }
+  });
+  document.getElementById('wl-count').innerText = count;
+}
+
 </script>
 {% endblock %}
