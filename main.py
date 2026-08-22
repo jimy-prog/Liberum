@@ -26,8 +26,10 @@ from auth import (
 )
 from scheduler import fix_archived_future_lessons
 
+from routers import spa_api
 from routers import (dashboard, students, groups, lessons, attendance,
                      finance, reports, payments, backup, settings_router)
+from routers import spa_api
 from routers import (calendar_router, timetable_router, homework_router,
                      performance, reportcard)
 from routers import courses, waitlist, profile as profile_router
@@ -201,6 +203,7 @@ LANDING_IMAGES_DIR = STATIC_DIR / "landing_images"
 os.makedirs(LANDING_IMAGES_DIR, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")
+app.mount("/assets", StaticFiles(directory="static/landing/assets"), name="assets")
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 app.mount("/images", StaticFiles(directory=str(LANDING_IMAGES_DIR)), name="landing_images")
 
@@ -281,14 +284,14 @@ async def auth_middleware(request: Request, call_next):
     return await call_next(request)
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     if get_current_user(request):
-        return RedirectResponse("/dashboard", status_code=302)
-    return RedirectResponse("/static/landing/index.html", status_code=302)
+        return RedirectResponse("/app", status_code=302)
+    return templates.TemplateResponse("landing.html", {"request": request})
 
 @app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request, next: str = "/dashboard"):
+async def login_page(request: Request, next: str = "/app"):
     csrf_token = generate_csrf_token()
     response = templates.TemplateResponse("login.html", {
         "request": request, "next": next, "error": None, "csrf_token": csrf_token
@@ -308,7 +311,7 @@ async def login_post(request: Request):
     
     identifier = None
     password = None
-    next_url = "/dashboard"
+    next_url = "/app"
     csrf_token = None
     
     if "application/json" in content_type:
@@ -316,7 +319,7 @@ async def login_post(request: Request):
             data = await request.json()
             identifier = data.get("identifier")
             password = data.get("password")
-            next_url = data.get("next", "/dashboard")
+            next_url = data.get("next", "/app")
             csrf_token = data.get("csrf_token")
         except Exception:
             pass
@@ -325,7 +328,7 @@ async def login_post(request: Request):
             form = await request.form()
             identifier = form.get("identifier")
             password = form.get("password")
-            next_url = form.get("next", "/dashboard")
+            next_url = form.get("next", "/app")
             csrf_token = form.get("csrf_token")
         except Exception:
             pass
@@ -353,9 +356,9 @@ async def login_post(request: Request):
     user = authenticate_user(identifier, password)
     if user:
         token = create_session(user.id)
-        dest = next_url if next_url.startswith("/") else "/dashboard"
+        dest = next_url if next_url.startswith("/") else "/app"
         if dest == "/":
-            dest = "/dashboard"
+            dest = "/app"
             
         if "application/json" in content_type:
             response = JSONResponse(content={"success": True, "redirect": dest})
@@ -591,7 +594,7 @@ async def register_verify(request: Request, email: str = Form(""), phone: str = 
         
         # 4. Log them in automatically
         token = create_session(new_user.id)
-        response = RedirectResponse("/dashboard" if role == "teacher" else "/mock", status_code=302)
+        response = RedirectResponse("/app" if role == "teacher" else "/mock", status_code=302)
         response.set_cookie(SESSION_KEY, token, httponly=True, max_age=60*60*24*30, samesite="lax")
         return response
     finally:
@@ -608,6 +611,7 @@ async def support_page(request: Request):
         "active_page": "support"
     })
 
+app.include_router(spa_api.router)
 for r in [dashboard.router, students.router, groups.router, lessons.router,
           attendance.router, finance.router, reports.router, payments.router,
           backup.router, settings_router.router, calendar_router.router,
