@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Add Lesson{% endblock %}
+{% block page_title %}Schedule{% endblock %}
+{% block page_subtitle %}Add a new lesson to the schedule{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:500px; margin: 0 auto;">
+  <div class="ct">New Lesson</div>
+  <form action="/lessons/add" method="POST">
+    <div class="fgroup">
+      <label>Group</label>
+      <select name="group_id" required>
+        {% for g in groups %}
+        <option value="{{ g.id }}">{{ g.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="frow">
+      <div class="fgroup">
+        <label>Date</label>
+        <input type="date" name="date_str" required>
+      </div>
+      <div class="fgroup">
+        <label>Time</label>
+        <input type="time" name="time" value="14:00" required>
+      </div>
+    </div>
+    
+    <div class="fgroup">
+      <label>Status</label>
+      <select name="status">
+        <option value="Held">Held / Scheduled</option>
+        <option value="Cancelled">Cancelled</option>
+        <option value="Holiday">Holiday</option>
+      </select>
+    </div>
+    
+    <div class="fgroup">
+      <label>Topic (Optional)</label>
+      <input type="text" name="topic" placeholder="e.g. Grammar Review">
+    </div>
+    
+    <div style="margin-top:24px">
+      <button type="submit" class="btn block">Add Lesson</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -24,6 +24,14 @@ def list_lessons(request: Request, db: Session = Depends(get_db)):
         "upcoming": upcoming, "active_page": "lessons", "main_section": "lessons"
     })
 
+
+@router.get("/add")
+def add_lesson_page(request: Request, db: Session = Depends(get_db)):
+    groups = db.query(Group).filter(Group.status == "active").all()
+    return templates.TemplateResponse("add_lesson.html", {
+        "request": request, "groups": groups, "active_page": "timetable", "main_section": "schedule"
+    })
+
 @router.post("/add")
 def add_lesson(
     group_id: int = Form(...),
