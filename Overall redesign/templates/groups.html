@@ -23,108 +23,75 @@
   <button onclick="window.location='/students/'">Students</button>
   <button class="on" onclick="window.location='/groups/'">Groups</button>
   <button onclick="window.location='/waitlist/'">Waitlist</button>
-  <button onclick="window.location='/performance/'">Performance</button>
+  <button onclick="window.location='/students/performance'">Performance</button>
   <button onclick="window.location='/placement/'">Placement tests</button>
 </div>
 
 <div class="stats">
-  <div class="stat">
-    <div class="v">{{ groups|length }}</div>
-    <div class="l">Active groups</div>
-  </div>
-  <div class="stat">
-    <div class="v">...</div>
-    <div class="l">Students total</div>
-  </div>
+  <div class="stat"><div class="v">{{ groups|length }}</div><div class="l">Active groups</div></div>
+  {% set ns = namespace(sc=0) %}
+  {% for g in groups %}{% set ns.sc = ns.sc + g.students|length %}{% endfor %}
+  <div class="stat"><div class="v">{{ ns.sc }}</div><div class="l">Students</div></div>
+  <div class="stat"><div class="v money">...</div><div class="l">UZS / month potential</div></div>
 </div>
 
 <div class="card">
-  <div class="ct">Groups <button class="btn sm" onclick="document.getElementById('addGroup').classList.add('open')"><i data-lucide="plus"></i>New group</button></div>
+  <div class="ct" style="display:flex;justify-content:space-between">
+    <span>Groups</span>
+    <button class="btn sm" onclick="openModal('addGroup')"><i data-lucide="plus"></i>New group</button>
+  </div>
   {% for g in groups %}
-  {% set mode = g.mode if g.mode is defined else 'in-person' %}
   <div class="row" onclick="window.location='/groups/{{ g.id }}'">
     <div class="av" style="background:var(--accbg);color:var(--acc2)"><i data-lucide="users"></i></div>
     <div class="rmain">
-      <div class="rt">{{ g.name }} 
-        {% if mode == 'online' %}<span class="pill p-green" style="margin-left:6px">Online</span>{% else %}<span class="pill p-acc" style="margin-left:6px">In-person</span>{% endif %}
-      </div>
-      <div class="rs">{{ g.schedule or 'No schedule' }} · Room {{ g.room_id or '—' }}</div>
+      <div class="rt">{{ g.name }} <span class="pill {% if g.mode == 'Online' %}p-green{% else %}p-acc{% endif %}" style="margin-left:6px">{{ g.mode or 'Offline' }}</span></div>
+      <div class="rs">{{ g.schedule or 'No Schedule' }} · {% if g.mode == 'Online' %}Zoom{% else %}Room {{ g.room or '1' }}{% endif %}</div>
     </div>
     <span style="font-family:var(--fm);font-size:13px;color:var(--txt2)">{{ g.students|length }} students</span>
     <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
   </div>
   {% else %}
-  <div class="empty">
-    <i data-lucide="users-2"></i>
-    <b>No active groups.</b>
-  </div>
+  <div class="empty">No groups created yet</div>
   {% endfor %}
 </div>
-<div class="ovl" id="addGroup" onclick="if(event.target===this)document.getElementById('addGroup').classList.remove('open')">
+
+<!-- Add Group Modal -->
+<div class="ovl" id="addGroup">
   <div class="modal">
-    <div class="mt">Create Group<button type="button" class="x" onclick="document.getElementById('addGroup').classList.remove('open')"><i data-lucide="x"></i></button></div><div style="display:none"><span class="modal-title">New Group</span><button class="modal-close" onclick="document.getElementById('addGroup').classList.remove('open')">✕</button></div>
-    <div class="modal-body">
-      <form method="post" action="/groups/add">
-        <div class="form-group"><label class="form-label">Name *</label><input class="form-control" name="name" required></div>
-        <div class="grid-2">
-          <div class="form-group">
-            <label class="form-label">Type</label>
-            <select class="form-control" name="group_type">
-              <option value="group">Group</option>
-              <option value="individual">Individual</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Mode</label>
-            <select class="form-control" name="mode" onchange="toggleOnlineFields(this,'new-online')">
-              <option value="in-person">🏫 In-person</option>
-              <option value="online">🌐 Online</option>
-            </select>
-          </div>
+    <div class="mt">New Group<button type="button" class="x" onclick="document.getElementById('addGroup').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form action="/groups/add" method="POST" style="margin-top:16px">
+      <div class="fgroup"><label>Name</label><input name="name" required></div>
+      <div class="frow">
+        <div class="fgroup"><label>Level</label>
+          <select name="level">
+            <option value="Elementary">Elementary</option>
+            <option value="Pre-Intermediate">Pre-Intermediate</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Upper-Intermediate">Upper-Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
         </div>
-        <div class="grid-2">
-          <div class="form-group"><label class="form-label">Price/month</label><input class="form-control" name="price_monthly" type="number" value="750000"></div>
-          <div class="form-group"><label class="form-label">Teacher %</label><input class="form-control" name="teacher_pct" type="number" value="40"></div>
+        <div class="fgroup"><label>Mode</label>
+          <select name="mode">
+            <option value="Offline">Offline</option>
+            <option value="Online">Online</option>
+          </select>
         </div>
-        <div class="grid-2">
-          <div class="form-group">
-            <label class="form-label">Finance Mode</label>
-            <select class="form-control" name="finance_mode">
-              <option value="standard">Use standard settings</option>
-              <option value="custom">Use this group's own price</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Per-lesson override (UZS)</label>
-            <input class="form-control" name="epl_override" type="number" value="0" placeholder="0 = auto by mode">
-          </div>
-        </div>
-        <div class="form-group"><label class="form-label">Schedule</label><input class="form-control" name="schedule" placeholder="Mon 18:00, Wed 18:00, Fri 18:00"></div>
-        <div class="form-group"><label class="form-label">Color</label><input class="form-control" type="color" name="color" value="#7b61ff"></div>
-
-        <!-- Online fields for new group -->
-        <div id="new-online" class="online-fields">
-          <div class="form-group" style="margin:0"><label class="form-label">Company</label><input class="form-control" name="company_name" placeholder="e.g. BrightEnglish"></div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Rate Type</label>
-            <select class="form-control" name="rate_type">
-              <option value="per_lesson">Per Lesson</option>
-              <option value="per_hour">Per Hour</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin:0"><label class="form-label">Rate (UZS)</label><input class="form-control" name="rate_amount" type="number" placeholder="80000"></div>
-          <div class="form-group" style="margin:0"><label class="form-label">Duration (min)</label><input class="form-control" name="lesson_duration" type="number" value="60"></div>
-        </div>
-
-        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
-          <button type="button" class="btn btn-ghost" onclick="document.getElementById('addGroup').classList.remove('open')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Create Group</button>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label>Schedule</label><input name="schedule" placeholder="e.g. Mon/Wed/Fri"></div>
+        <div class="fgroup"><label>Room</label><input name="room" value="1"></div>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label>Price (UZS)</label><input type="number" name="price" value="0"></div>
+        <div class="fgroup"><label>Type</label><select name="price_type"><option value="monthly">Monthly</option><option value="per_lesson">Per Lesson</option></select></div>
+      </div>
+      <button class="btn block" style="margin-top:16px">Create Group</button>
+    </form>
   </div>
 </div>
 {% endblock %}
+
 
 {% block scripts %}
 <script>

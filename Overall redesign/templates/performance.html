@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Performance{% endblock %}
-{% block page_title %}Student Performance{% endblock %}
+{% block page_title %}Students{% endblock %}
 {% block topbar_actions %}
 <div style="display:flex;gap:8px;align-items:center">
   <select class="form-control" style="width:160px;padding:5px 10px" onchange="switchGroup(this.value)">
@@ -45,6 +45,14 @@
 {% endblock %}
 
 {% block content %}
+<div class="segs">
+  <button onclick="window.location='/students/'">Students</button>
+  <button onclick="window.location='/groups/'">Groups</button>
+  <button onclick="window.location='/waitlist/'">Waitlist</button>
+  <button class="on" onclick="window.location='/performance/'">Performance</button>
+  <button onclick="window.location='/placement/'">Placement tests</button>
+</div>
+
 {% if sel_group and data %}
 
 <!-- ── Charts ──────────────────────────────────────────────────────────── -->
