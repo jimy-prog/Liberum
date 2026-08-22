@@ -128,6 +128,14 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
 .empty .lucide{width:30px;height:30px;color:var(--txt3);margin-bottom:12px}
 .empty b{display:block;font-family:var(--fd);font-size:16px;color:var(--txt);margin-bottom:6px}
 
+
+/* Legacy modal support */
+.modal-overlay { display: none; position:fixed; inset:0; background:rgba(0,0,0,.32); backdrop-filter:blur(6px); z-index:100; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open, .modal-overlay.active { display:flex; animation: fadein .2s ease; }
+.modal-overlay .modal { width:100%; max-width:460px; max-height:88vh; background:var(--card); border-radius:22px; padding:26px; overflow-y:auto; box-shadow:0 24px 80px -20px rgba(0,0,0,.35); animation: pop .28s cubic-bezier(.2,.9,.3,1.1); }
+.modal-overlay .modal-header { font-family:var(--fd); font-size:19px; font-weight:600; display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+.modal-overlay .modal-close { width:30px; height:30px; border-radius:50%; background:var(--fill); display:flex; align-items:center; justify-content:center; color:var(--txt2); cursor:pointer; border:none; }
+
 /* modal */
 .ovl{position:fixed;inset:0;background:rgba(0,0,0,.32);backdrop-filter:blur(6px);z-index:90;display:none;align-items:center;justify-content:center;padding:20px}
 .ovl.open{display:flex;animation:fadein .2s ease}
@@ -256,13 +264,13 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
             <a href="/timetable/weekly" class="ni {% if main_section=='schedule' %}on{% endif %}"><i data-lucide="calendar-days"></i><span>Schedule</span></a>
             <a href="/students/" class="ni {% if main_section=='students' %}on{% endif %}"><i data-lucide="users"></i><span>Students</span></a>
             <a href="/library/" class="ni {% if main_section=='learning' %}on{% endif %}"><i data-lucide="book-open"></i><span>Learning</span></a>
-            <a href="/reviews/inbox" class="ni {% if main_section=='mock' %}on{% endif %}"><i data-lucide="target"></i><span>Mock Tests</span></a>
+            <a href="#" onclick="return false;" class="ni" style="opacity:0.6; cursor:not-allowed;"><i data-lucide="target"></i><span>Mock Tests</span><span class="pill p-acc" style="font-size:8px;padding:2px 6px;margin-left:auto;">SOON</span></a>
             <a href="/payments/" class="ni {% if main_section=='money' %}on{% endif %}"><i data-lucide="wallet"></i><span>Money</span></a>
         {% elif _is_student %}
             <div class="navlbl">Learning</div>
             <a href="/dashboard" class="ni {% if main_section=='home' %}on{% endif %}"><i data-lucide="layout-dashboard"></i><span>Home</span></a>
             <a href="/library/" class="ni {% if main_section=='learn' %}on{% endif %}"><i data-lucide="book-open"></i><span>Learn</span></a>
-            <a href="/mock/history" class="ni {% if main_section=='mock' %}on{% endif %}"><i data-lucide="target"></i><span>Mock Tests</span></a>
+            <a href="#" onclick="return false;" class="ni" style="opacity:0.6; cursor:not-allowed;"><i data-lucide="target"></i><span>Mock Tests</span><span class="pill p-acc" style="font-size:8px;padding:2px 6px;margin-left:auto;">SOON</span></a>
             <a href="/payments/" class="ni {% if main_section=='money' %}on{% endif %}"><i data-lucide="credit-card"></i><span>Payments</span></a>
         {% endif %}
     </nav>
@@ -311,8 +319,25 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
 const $=q=>document.querySelector(q);
 const esc=s=>s.replace(/'/g,"\'");
 function toast(msg,ic='check-circle-2'){const t=document.createElement('div');t.className='toast';t.innerHTML=`<i data-lucide="${ic}"></i>${msg}`;$('#toasts').appendChild(t);lucide.createIcons();setTimeout(()=>{t.style.opacity=0;t.style.transition='.3s';setTimeout(()=>t.remove(),300)},2400)}
-function openModal(html){$('#modal').innerHTML=html;$('#ovl').classList.add('open');lucide.createIcons()}
-function closeModal(){$('#ovl').classList.remove('open')}
+function openModal(htmlOrId){
+  const el = document.getElementById(htmlOrId);
+  if(el && (el.classList.contains('modal-overlay') || el.classList.contains('ovl'))) {
+    el.classList.add('open');
+    el.classList.add('active');
+  } else {
+    $('#modal').innerHTML=htmlOrId;
+    $('#ovl').classList.add('open');
+    lucide.createIcons();
+  }
+}
+function closeModal(id){
+  if(id) {
+    const el = document.getElementById(id);
+    if(el) { el.classList.remove('open'); el.classList.remove('active'); }
+  } else {
+    $('#ovl').classList.remove('open');
+  }
+}
 function openDrawer(html){$('#drawer').innerHTML=html;$('#drawer').classList.add('open');lucide.createIcons()}
 function closeDrawer(){$('#drawer').classList.remove('open')}
 function toggleTheme(){const h=document.documentElement;const d=h.dataset.theme==='dark';h.dataset.theme=d?'':'dark';$('#themeIc').setAttribute('data-lucide',d?'moon':'sun');lucide.createIcons();toast(d?'Light mode':'Dark mode',d?'sun':'moon')}

@@ -92,9 +92,9 @@
           </td>
           <td>
             {% if r.status == 'paid' %}
-            <span class="pill pill-green">✓ Paid</span>
+            <span class="pill p-green">✓ Paid</span>
             {% else %}
-            <span class="pill pill-red">Unpaid</span>
+            <span class="pill p-red">Unpaid</span>
             {% endif %}
           </td>
           <td>
@@ -103,10 +103,10 @@
               <!-- Quick mark paid -->
               <form method="post" action="/payments/mark-paid/{{ r.student.id }}" style="display:inline">
                 <input type="hidden" name="month" value="{{ month_str }}">
-                <button class="btn btn-green btn-xs">✓ Paid</button>
+                <button class="btn sm" style="background:var(--money);color:#fff;"">✓ Paid</button>
               </form>
               <!-- Record with details -->
-              <button class="btn btn-ghost btn-xs"
+              <button class="btn ghost sm"
                       onclick="openRecord({{ r.student.id }},'{{ r.student.name }}',{{ r.expected|int }},'{{ month_str }}')">
                 + Details
               </button>
@@ -114,13 +114,13 @@
               <!-- Mark as unpaid -->
               <form method="post" action="/payments/mark-unpaid/{{ r.student.id }}" style="display:inline">
                 <input type="hidden" name="month" value="{{ month_str }}">
-                <button class="btn btn-ghost btn-xs"
+                <button class="btn ghost sm"
                         onclick="return confirm('Remove payment for {{ r.student.name }}?')">
                   ✕ Undo
                 </button>
               </form>
               {% if r.payment %}
-              <button class="btn btn-ghost btn-xs"
+              <button class="btn ghost sm"
                       onclick="openRecord({{ r.student.id }},'{{ r.student.name }}',{{ r.payment.amount|int }},'{{ month_str }}')">
                 Edit
               </button>
@@ -139,12 +139,12 @@
 </div>
 
 <!-- Record Payment Modal -->
-<div class="modal-overlay" id="recordModal"
-     onclick="if(event.target===this)closeModal('recordModal')">
+<div class="ovl" id="recordModal"
+     onclick="if(event.target===this)this.classList.remove('open')">
   <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title" id="recordTitle">Record Payment</span>
-      <button class="modal-close" onclick="closeModal('recordModal')">✕</button>
+    <div class="mt">
+      <span id="recordTitle">Record Payment</span>
+      <button class="x" onclick="document.getElementById('recordModal').classList.remove('open')"><i data-lucide="x"></i></button>
     </div>
     <div class="modal-body">
       <form method="post" id="recordForm">
@@ -168,7 +168,7 @@
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button type="button" class="btn btn-ghost"
-                  onclick="closeModal('recordModal')">Cancel</button>
+                  onclick="document.getElementById('recordModal').classList.remove('open')">Cancel</button>
           <button type="submit" class="btn btn-primary">Save</button>
         </div>
       </form>
@@ -184,7 +184,7 @@ function openRecord(sid, name, amount, month) {
   document.getElementById('recordForm').action = `/payments/record/${sid}`;
   document.getElementById('recordMonth').value = month;
   document.getElementById('recordAmount').value = amount;
-  openModal('recordModal');
+  document.getElementById('recordModal').classList.add('open');
 }
 </script>
 {% endblock %}
