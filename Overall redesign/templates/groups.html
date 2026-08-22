@@ -38,7 +38,7 @@
 <div class="card">
   <div class="ct" style="display:flex;justify-content:space-between">
     <span>Groups</span>
-    <button class="btn sm" onclick="openModal('addGroup')"><i data-lucide="plus"></i>New group</button>
+    <button class="btn sm" onclick="document.getElementById('addGroup').classList.add('open')"><i data-lucide="plus"></i>New group</button>
   </div>
   {% for g in groups %}
   <div class="row" onclick="window.location='/groups/{{ g.id }}'">

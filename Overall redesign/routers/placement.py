@@ -442,3 +442,11 @@ async def _do_submit(request: Request, session_id: int, db):
                 "is_beginner": True,
                 "was_registered": True
             })
+
+@router.post("/question/{qid}/delete")
+def delete_question(qid: int, request: Request, db: Session = Depends(get_db)):
+    q = db.query(PlacementQuestion).get(qid)
+    if q:
+        db.delete(q)
+        db.commit()
+    return RedirectResponse("/placement/", status_code=302)

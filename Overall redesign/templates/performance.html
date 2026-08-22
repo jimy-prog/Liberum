@@ -1,41 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Performance{% endblock %}
-{% block page_title %}Students{% endblock %}
-{% block topbar_actions %}
-<div style="display:flex;gap:8px;align-items:center">
-  <select class="form-control" style="width:160px;padding:5px 10px" onchange="switchGroup(this.value)">
-    {% for g in groups %}<option value="{{ g.id }}" {% if sel_group and g.id==sel_group.id %}selected{% endif %}>{{ g.name }}</option>{% endfor %}
-  </select>
-  <input class="form-control" type="month" value="{{ month_str }}" style="width:150px;padding:5px 10px" onchange="switchMonth(this.value)">
-</div>
-{% endblock %}
+{% block page_title %}Students / Performance{% endblock %}
+{% block topbar_actions %}{% endblock %}
 
 {% block extra_styles %}
 <style>
-.perf-wrap{overflow-x:auto}
-.pt{border-collapse:collapse;width:100%;font-size:.85rem;min-width:600px}
-.pt th,.pt td{border:1px solid var(--border);padding:0}
-.pth{background:var(--bg3);padding:9px 12px;font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);text-align:left}
-.pwh{background:var(--accent-glow);padding:7px 4px;text-align:center;color:var(--accent);font-size:.68rem;font-weight:600;text-transform:uppercase}
-.psh{background:var(--bg4);padding:5px 3px;text-align:center;font-size:.62rem;color:var(--text3);text-transform:uppercase;font-weight:500}
-.pn{padding:9px 12px;font-weight:500;color:var(--text);white-space:nowrap;background:var(--bg2)}
-.ps{padding:4px 2px;text-align:center;background:var(--bg2)}
-.pa{padding:7px;text-align:center;font-family:var(--font-m);font-size:.78rem;font-weight:700;background:var(--bg3)}
-.sd{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;margin:0 auto;transition:all .15s;background:var(--bg3)}
-.sd:hover{transform:scale(1.18)}
-.sd.s1{background:var(--red-bg);border-color:var(--red)}
-.sd.s2{background:var(--yellow-bg);border-color:var(--yellow)}
-.sd.s3{background:var(--green-bg);border-color:var(--green)}
-/* Charts */
 .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
 .chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
 .chart-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
-/* Heatmap */
 .heatmap{display:grid;gap:3px}
 .hm-row{display:flex;align-items:center;gap:3px}
 .hm-label{font-size:.7rem;color:var(--text3);width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
 .hm-cell{flex:1;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:600}
-/* Leaderboard */
 .lb-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
 .lb-row:last-child{border-bottom:none}
 .lb-rank{font-family:var(--font-d);font-size:1.2rem;width:30px;text-align:center;flex-shrink:0}
@@ -45,6 +21,20 @@
 {% endblock %}
 
 {% block content %}
+
+
+<div class="card" style="background:var(--fill);box-shadow:none;margin-bottom:16px">
+  <div style="display:flex;gap:12px;align-items:center">
+    <div style="font-weight:600;font-size:14px;color:var(--text2)">Filters:</div>
+    <select class="form-control" style="width:200px;padding:6px 12px;background:var(--bg2)" onchange="window.location.href='/performance/?group_id='+this.value+'&month={{ month_str }}'">
+      {% for g in groups %}
+      <option value="{{ g.id }}" {% if sel_group and g.id==sel_group.id %}selected{% endif %}>{{ g.name }}</option>
+      {% endfor %}
+    </select>
+    <input type="month" class="form-control" style="width:160px;padding:6px 12px;background:var(--bg2)" value="{{ month_str }}" onchange="window.location.href='/performance/?group_id={{ sel_group.id if sel_group else '' }}&month='+this.value">
+  </div>
+</div>
+
 <div class="segs">
   <button onclick="window.location='/students/'">Students</button>
   <button onclick="window.location='/groups/'">Groups</button>
@@ -85,68 +75,5 @@
   <div class="empty">No performance data yet</div>
   {% endfor %}
 </div>
-{% endblock %}
 
-
-{% block scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<script>
-const emojis={0:'<span style="color:var(--text3);font-size:.62rem">—</span>',1:'🔴',2:'🟡',3:'🟢'};
-const cls={0:'',1:'s1',2:'s2',3:'s3'};
-function cycleScore(dot,month){
-  const cur=parseInt(dot.dataset.val)||0,next=(cur+1)%4;
-  dot.dataset.val=next; dot.innerHTML=emojis[next];
-  dot.className='sd '+cls[next];
-  fetch('/performance/quick-save',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({student_id:parseInt(dot.dataset.sid),month,week:parseInt(dot.dataset.week),field:dot.dataset.field,value:next||null})});
-  updateAvg(dot);
-}
-function updateAvg(dot){
-  const row=dot.closest('tr');
-  let s=0,c=0;
-  row.querySelectorAll('.sd').forEach(d=>{const v=parseInt(d.dataset.val)||0;if(v>0){s+=v;c++;}});
-  const cell=row.querySelector('.pa');
-  if(!cell)return;
-  if(!c){cell.innerHTML='—';return;}
-  const avg=s/c,col=avg>=2.5?'var(--green)':avg>=1.8?'var(--yellow)':'var(--red)';
-  cell.innerHTML=`<span style="color:${col}">${avg.toFixed(1)}</span>`;
-}
-function switchGroup(gid){const m=document.querySelector('input[type=month]').value;window.location.href=`/performance/?group_id=${gid}&month=${m}`;}
-function switchMonth(m){const url=new URL(window.location.href);url.searchParams.set('month',m);window.location.href=url.toString();}
-
-// Trend line chart
-{% if data %}
-const trendData = {{ data | map(attribute='trend') | list | tojson }};
-const trendNames = {{ data | map(attribute='student') | map(attribute='name') | list | tojson }};
-const colors = ['#7b61ff','#40c057','#f03e3e','#e67700','#ae3ec9','#7048e8','#1098ad','#f59f00'];
-
-if(trendData && document.getElementById('trendChart')) {
-  const allLabels = [...new Set(trendData.flat().map(p => `${p.month} W${p.week}`))].sort();
-  const datasets = trendData.map((trend, i) => ({
-    label: trendNames[i],
-    data: allLabels.map(lbl => {
-      const pt = trend.find(p => `${p.month} W${p.week}` === lbl);
-      return pt ? pt.avg : null;
-    }),
-    borderColor: colors[i % colors.length],
-    backgroundColor: colors[i % colors.length] + '22',
-    tension: 0.3, spanGaps: true, pointRadius: 4,
-    borderWidth: 2, fill: false
-  }));
-
-  new Chart(document.getElementById('trendChart'), {
-    type: 'line',
-    data: { labels: allLabels, datasets },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: '#9aa0b8', font: { size: 11 } } } },
-      scales: {
-        y: { min: 0, max: 3, ticks: { color: '#9aa0b8', stepSize: 1, callback: v => ['','🔴','🟡','🟢'][v]||v }, grid: { color: '#252a38' } },
-        x: { ticks: { color: '#9aa0b8', font: { size: 10 }, maxRotation: 45 }, grid: { color: '#252a38' } }
-      }
-    }
-  });
-}
-{% endif %}
-</script>
 {% endblock %}
