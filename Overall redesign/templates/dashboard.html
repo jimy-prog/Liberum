@@ -26,29 +26,29 @@
 <div class="stats">
   <div class="stat">
     <div class="ic" style="background:rgba(30,158,74,.12);color:var(--money)"><i data-lucide="banknote"></i></div>
-    <div class="v">{{ stats.income_earned | default('0') }}</div>
+    <div class="v">{{ income | default('0') }}</div>
     <div class="l">UZS earned · {{ today.strftime('%B') }}</div>
-    {% if stats.max_income and stats.max_income > 0 %}
+    {% if income_max and income_max > 0 %}
     <div class="d" style="color:var(--greenD)">On track</div>
     {% else %}
-    <div class="d" style="color:var(--txt2)">max {{ stats.max_income | default('0') }}</div>
+    <div class="d" style="color:var(--txt2)">max {{ income_max | default('0') }}</div>
     {% endif %}
   </div>
   <div class="stat">
     <div class="ic" style="background:var(--accbg);color:var(--acc)"><i data-lucide="presentation"></i></div>
-    <div class="v">{{ stats.lessons_done | default('0') }}<span style="font-size:15px;color:var(--txt3)">/{{ stats.lessons_total | default('0') }}</span></div>
+    <div class="v">{{ held_count | default('0') }}<span style="font-size:15px;color:var(--txt3)">/{{ lessons_expected | default('0') }}</span></div>
     <div class="l">Lessons held</div>
     <div class="d" style="color:var(--txt2)">this month</div>
   </div>
   <div class="stat">
     <div class="ic" style="background:var(--accbg);color:var(--acc)"><i data-lucide="check-square"></i></div>
-    <div class="v">{{ stats.attendance_rate | default('0') }}%</div>
+    <div class="v">{{ att_rate | default('0') }}%</div>
     <div class="l">Attendance rate</div>
     <div class="d" style="color:var(--txt2)">same as last month</div>
   </div>
   <div class="stat">
     <div class="ic" style="background:rgba(255,69,58,.1);color:var(--red)"><i data-lucide="credit-card"></i></div>
-    <div class="v">{{ stats.payments_done | default('0') }}<span style="font-size:15px;color:var(--txt3)">/{{ stats.payments_total | default('0') }}</span></div>
+    <div class="v">{{ paid_count | default('0') }}<span style="font-size:15px;color:var(--txt3)">/{{ total_students | default('0') }}</span></div>
     <div class="l">Students paid</div>
     <div class="d" style="color:var(--txt2)">Manage →</div>
   </div>
@@ -57,15 +57,15 @@
 <div class="grid2">
   <div class="card">
     <div class="ct">Today's classes <a href="/classes" class="link">Schedule →</a></div>
-    {% if today_classes %}
-      {% for c in today_classes %}
+    {% if todays_data %}
+      {% for c in todays_data %}
       <div class="row">
         <div class="av" style="background:var(--accbg);color:var(--acc2)"><i data-lucide="clock"></i></div>
         <div class="rmain">
-          <div class="rt">{{ c.group.name }}</div>
-          <div class="rs">{{ c.start_time.strftime('%H:%M') }} · Room {{ c.room_id | default('1') }}</div>
+          <div class="rt">{{ c.lesson.group.name }}</div>
+          <div class="rs">{{ c.lesson.time }} · Room {{ c.lesson.room | default('1') }}</div>
         </div>
-        <a href="/classes/{{ c.id }}/attendance" class="btn soft sm">Marked</a>
+        <a href="/classes/{{ c.lesson.id }}/attendance" class="btn soft sm">Marked</a>
       </div>
       {% endfor %}
     {% else %}

@@ -45,12 +45,12 @@
     </div>
 
     <div class="card">
-        <div class="ct">System Logs</div>
-        {% for log in recent_logs %}
+        <div class="ct">Recent OTPs</div>
+        {% for log in recent_otps %}
         <div class="row" style="padding-left:0;padding-right:0">
             <div class="rmain">
-                <div class="rt" style="font-family:var(--fm);font-size:12px">{{ log.action }}</div>
-                <div class="rs">User {{ log.user_id }} · {{ log.timestamp.strftime('%H:%M:%S') }}</div>
+                <div class="rt" style="font-family:var(--fm);font-size:12px">{{ log.code + ' sent to ' + log.target }}</div>
+                <div class="rs">User {{ channel: ' + log.channel + ' }} · {{ log.created_at }}</div>
             </div>
         </div>
         {% else %}
