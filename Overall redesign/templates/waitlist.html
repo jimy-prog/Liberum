@@ -29,6 +29,8 @@
 </style>
 {% endblock %}
 
+{% block topbar_actions %}{% endblock %}
+
 {% block content %}
 <div class="segs">
   <button onclick="window.location='/students/'">Students</button>
@@ -50,7 +52,8 @@
 </div>
 
 <div class="card">
-  <div class="ct">Waitlist <span class="pill p-acc">{{ entries|length }}</span>
+  <div class="ct" style="display:flex;justify-content:space-between">
+    <span>Waitlist <span class="pill p-acc">{{ entries|length }}</span></span>
     <button class="btn sm" onclick="document.getElementById('addEntry').classList.add('open')"><i data-lucide="plus"></i>Add Enquiry</button>
   </div>
   {% for w in entries %}
@@ -68,135 +71,79 @@
           <span class="pill p-grey" style="margin-left:6px;text-transform:capitalize">{{ w.status }}</span>
         {% endif %}
       </div>
-      <div class="rs">{{ w.goal_level }} · via {{ w.source }} {% if w.notes %}· {{ w.notes }}{% endif %}</div>
+      <div class="rs">{{ w.goal_level or 'No specific goal' }} {% if w.source %}· via {{ w.source }}{% endif %} {% if w.notes %}· {{ w.notes }}{% endif %}</div>
     </div>
     {% if w.status != 'enrolled' %}
-      <button class="btn ghost sm" onclick="window.location='/students/?add_from_placement={{w.id}}'">Enroll</button>
+      {% if w.phone %}<button class="btn ghost sm" onclick="window.location.href='tel:{{ (w.phone or '')|replace("'", "") }}'">Call</button>{% endif %}
+      <button class="btn ghost sm" onclick="openEnroll({{ w.id }}, '{{ w.name }}')">Enroll</button>
     {% endif %}
   </div>
   {% else %}
-  <div class="empty">
-    <i data-lucide="inbox"></i>
-    <b>Waitlist is empty</b>
-  </div>
+  <div class="empty">Waitlist is empty</div>
   {% endfor %}
 </div>
 
-<div class="ovl" id="addEntry" onclick="if(event.target===this)document.getElementById('addEntry').classList.remove('open')">
+<!-- Add Enquiry Modal -->
+<div class="ovl" id="addEntry">
   <div class="modal">
     <div class="mt">Add Enquiry<button type="button" class="x" onclick="document.getElementById('addEntry').classList.remove('open')"><i data-lucide="x"></i></button></div>
-    
-      <form method="post" action="/waitlist/add">
-        <div class="form-group"><label class="form-label">Full Name *</label><input class="form-control" name="name" required></div>
-        <div class="grid-2">
-          <div class="form-group"><label class="form-label">Phone</label><input class="form-control" name="phone" placeholder="+998..."></div>
-          <div class="form-group"><label class="form-label">Parent Phone</label><input class="form-control" name="parent_phone"></div>
+    <form method="post" action="/waitlist/add" style="margin-top:16px">
+      <div class="fgroup"><label>Full Name *</label><input name="name" required></div>
+      <div class="frow">
+        <div class="fgroup"><label>Phone</label><input name="phone" placeholder="+998..."></div>
+        <div class="fgroup"><label>Parent Phone</label><input name="parent_phone"></div>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label>Mode</label>
+          <select name="mode">
+            <option value="in-person">In-person</option>
+            <option value="online">Online</option>
+          </select>
         </div>
-        <div class="grid-2">
-          <div class="form-group">
-            <label class="form-label">Mode</label>
-            <select class="form-control" name="mode">
-              <option value="in-person">🏫 In-person</option>
-              <option value="online">🌐 Online</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Wants Group</label>
-            <select class="form-control" name="desired_group_id">
-              <option value="">— Not sure —</option>
-              {% for g in groups %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
-            </select>
-          </div>
-        </div>
-        <div class="grid-2">
-          <div class="form-group"><label class="form-label">Preferred Schedule</label><input class="form-control" name="preferred_schedule" placeholder="Mon/Wed/Fri 18:00"></div>
-          <div class="form-group">
-            <label class="form-label">How Found</label>
-            <select class="form-control" name="how_found">
-              <option value="">—</option>
-              {% for h in how_found_options %}<option>{{ h }}</option>{% endfor %}
-            </select>
-          </div>
-        </div>
-        <div class="form-group"><label class="form-label">Goal / Notes</label><textarea class="form-control" name="learning_goal" rows="2" placeholder="IELTS target, level, etc."></textarea></div>
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button type="button" class="btn btn-ghost" onclick="document.getElementById('addEntry').classList.remove('open')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Add</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- Enroll Modal -->
-<div class="modal-overlay" id="enrollModal" onclick="if(event.target===this)closeModal('enrollModal')">
-  <div class="modal">
-    <div class="modal-header"><span class="modal-title">Enroll Student</span><button class="modal-close" onclick="closeModal('enrollModal')">✕</button></div>
-    
-      <form id="enrollForm" method="post">
-        <div class="form-group"><div id="enrollName" style="font-weight:600;padding:6px 0;color:var(--text)"></div></div>
-        <div class="form-group">
-          <label class="form-label">Assign to Group *</label>
-          <select class="form-control" name="group_id" required>
+        <div class="fgroup"><label>Wants Group (Optional)</label>
+          <select name="desired_group_id">
+            <option value="">-- Not sure --</option>
             {% for g in groups %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Level</label>
-          <select class="form-control" name="level">
-            {% for lv in ['','A1','A2','B1','B2','C1'] %}<option value="{{ lv }}">{{ lv or 'Not assessed' }}</option>{% endfor %}
-          </select>
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button type="button" class="btn btn-ghost" onclick="closeModal('enrollModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">✓ Enroll</button>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div class="fgroup"><label>Goal / Notes</label><textarea name="learning_goal" rows="2"></textarea></div>
+      <button type="submit" class="btn block" style="margin-top:16px">Add Enquiry</button>
+    </form>
   </div>
 </div>
+
+<!-- Enroll Modal -->
+<div class="ovl" id="enrollModal">
+  <div class="modal">
+    <div class="mt">Enroll Student<button type="button" class="x" onclick="document.getElementById('enrollModal').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form id="enrollForm" method="post" style="margin-top:16px">
+      <div class="fgroup">
+        <label>Assign to Group *</label>
+        <select name="group_id" required>
+          {% for g in groups %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Level</label>
+        <select name="level">
+          {% for lv in ['','A1','A2','B1','B2','C1'] %}<option value="{{ lv }}">{{ lv or 'Not assessed' }}</option>{% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn block" style="margin-top:16px">Enroll Now</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
 {% block scripts %}
 <script>
 function openEnroll(eid, name) {
-  document.getElementById('enrollName').textContent = name;
-  document.getElementById('enrollForm').action = `/waitlist/${eid}/enroll`;
-  openModal('enrollModal');
-}
-function callWaitlist(eid, phone) {
-  fetch(`/waitlist/${eid}/log-call`, { method: 'POST' }).catch(() => {});
-  window.location.href = `tel:${phone}`;
-}
-function filterEnquiries(status) {
-  const statuses = ['all', 'new', 'contacted', 'trial', 'enrolled'];
-  statuses.forEach(s => {
-    const btn = document.getElementById('btn-filter-' + s);
-    if (btn) {
-      if (s === status) {
-        btn.classList.remove('btn-ghost');
-        btn.classList.add('btn-primary');
-      } else {
-        btn.classList.remove('btn-primary');
-        btn.classList.add('btn-ghost');
-      }
-    }
-  });
-  
-  const rows = document.querySelectorAll('#enquiriesTableBody tr');
-  rows.forEach(row => {
-    if (status === 'all') {
-      row.style.display = '';
-    } else {
-      const rowStatus = row.getAttribute('data-status');
-      if (rowStatus === status) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
-    }
-  });
+  const form = document.getElementById('enrollForm');
+  if (form) {
+      form.action = `/waitlist/${eid}/enroll`;
+  }
+  openEnroll({{ w.id }}, '{{ w.name }}');
 }
 </script>
-{% endblock %}
 {% endblock %}

@@ -17,18 +17,7 @@
   <button class="on" onclick="window.location='/classes/'">Classes & invites</button>
 </div>
 
-<div class="card" style="background:var(--accbg);box-shadow:none">
-  <div style="display:flex;gap:14px;align-items:center">
-    <i data-lucide="link" style="color:var(--acc)"></i>
-    <div class="rmain">
-      <div class="rt" style="color:var(--acc2)">Public waitlist link</div>
-      <div class="rs">liberum.uz/join/{{ user.email.split('@')[0] if user.email else 'teacher' }} — share it anywhere</div>
-    </div>
-    <button class="btn sm" onclick="navigator.clipboard.writeText('liberum.uz/join/{{ user.email.split('@')[0] if user.email else 'teacher' }}'); toast('Link copied', 'copy')">
-      <i data-lucide="copy"></i>Copy
-    </button>
-  </div>
-</div>
+
 
 <div class="card">
   <div class="ct" style="display:flex; justify-content:space-between; align-items:center;">
