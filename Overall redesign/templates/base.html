@@ -11,40 +11,44 @@
 <script>window.LogRocket && window.LogRocket.init('jgqnaa/liberum');</script>
 <style>
 /* ── Liberum UI (aligned with marketing site / app 2) ── */
-:root {
-  --bg:        #f6f7fb;
-  --bg2:       #ffffff;
-  --bg3:       #f0f1f6;
-  --bg4:       #e8eaf0;
-  --border:    #e5e7eb;
-  --border2:   #d1d5db;
-  --text:      #101114;
-  --text2:     #6b6f7a;
-  --text3:     #9ca3af;
-  --accent:    #7b61ff;
-  --accent2:   #6b51ef;
-  --accent-glow: rgba(123, 97, 255, 0.14);
-  --green:     #16a34a;
-  --green-bg:  rgba(22, 163, 74, 0.1);
-  --red:       #dc2626;
-  --red-bg:    rgba(220, 38, 38, 0.08);
-  --yellow:    #ca8a04;
-  --yellow-bg: rgba(202, 138, 4, 0.1);
-  --orange:    #ea580c;
-  --orange-bg: rgba(234, 88, 12, 0.1);
-  --grey:      #6b7280;
-  --grey-bg:   rgba(107, 114, 128, 0.12);
-  --money:     #15803d;
-  --sidebar-w: 232px;
-  --topbar-h:  56px;
-  --radius:    14px;
-  --radius-sm: 10px;
-  --font-d:    'Space Grotesk', sans-serif;
-  --font-b:    'Inter', sans-serif;
-  --font-m:    'JetBrains Mono', monospace;
-  --shadow-card: 0 18px 50px rgba(17, 24, 39, 0.08);
-  --shadow-bar: 0 1px 3px rgba(17, 24, 39, 0.06);
+
+/* ================= TOKENS ================= */
+:root{
+  --bg:#F5F5F7; --card:#FFFFFF; --card2:#FBFBFD; --fill:rgba(120,120,128,.12); --fill2:rgba(120,120,128,.18);
+  --line:rgba(0,0,0,.07); --txt:#1D1D1F; --txt2:#6E6E73; --txt3:#AEAEB2;
+  --acc:#7B61FF; --acc2:#6B51EF; --accbg:rgba(123,97,255,.1);
+  --green:#30D158; --greenD:#1E9E4A; --red:#FF453A; --yellow:#FFD60A; --orange:#FF9F0A; --money:#1E9E4A;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 28px -12px rgba(0,0,0,.08);
+  --r:18px; --rs:13px;
+  --fd:'Space Grotesk',sans-serif; --fb:'Inter',-apple-system,sans-serif; --fm:'JetBrains Mono',monospace;
+  --border: var(--line);
+  --border2: rgba(0,0,0,.15);
+  --text: var(--txt);
+  --text2: var(--txt2);
+  --text3: var(--txt3);
+  --accent: var(--acc);
+  --accent2: var(--acc2);
 }
+
+.side{width:250px;flex:none;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:22px 14px 14px;border-right:1px solid var(--line);background:var(--bg);z-index:40}
+.side a{text-decoration:none !important; color:inherit}
+.brand{font-family:var(--fd);font-weight:700;font-size:23px;letter-spacing:-.03em;padding:0 12px;display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.brand span{color:var(--acc)}
+.brand .dotl{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px}
+.navlbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt3);padding:14px 12px 6px;margin-top:8px}
+.ni{display:flex;align-items:center;gap:11px;padding:9.5px 12px;border-radius:12px;font-size:14px;font-weight:500;color:var(--txt2);margin-bottom:2px;transition:.18s;width:100%;text-align:left;position:relative; text-decoration:none}
+.ni:hover{background:var(--fill);color:var(--txt)}
+.ni.on{background:var(--card);color:var(--txt);font-weight:600;box-shadow:var(--shadow)}
+
+.lucide{width:18px;height:18px;stroke-width:2;flex:none}
+.ni.on::before{content:'';position:absolute;left:-14px;top:20%;bottom:20%;width:3.5px;border-radius:2px;background:var(--acc)}
+.sp{flex:1}
+.ucard{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);margin-top:10px}
+.ucard .nm{font-size:13px;font-weight:600; color:var(--txt)}
+.ucard .rl{font-size:11px;color:var(--txt2)}
+.ucard .av{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;font-family:var(--fd)}
+
+
 
 body.dark {
   --bg:        #0d0f14;
@@ -348,6 +352,7 @@ body.dark .alert-success{border-color:rgba(74,222,128,.2);color:var(--green)}
 ::-webkit-scrollbar-thumb:hover{background:rgba(123,97,255,.55)}
 
 {% block extra_styles %}{% endblock %}
+
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 </head>
