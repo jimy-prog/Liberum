@@ -85,9 +85,9 @@
   </div>
 
   <div class="card">
-    <div class="ct">Needs attention <span class="pill p-red">{{ (recent_reviews|length) + (recent_waitlist|length) }}</span></div>
+    <div class="ct">Needs attention <span class="pill p-red">{{ ((recent_reviews|default([]))|length) + ((recent_waitlist|default([]))|length) }}</span></div>
     
-    {% for r in recent_reviews %}
+    {% for r in recent_reviews|default([]) %}
       <div class="row" onclick="window.location='/reviews/inbox'">
         {% set parts = r.student.full_name.split() if r.student.full_name else [r.student.name] %}
         {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
@@ -100,7 +100,7 @@
       </div>
     {% endfor %}
 
-    {% for w in recent_waitlist %}
+    {% for w in recent_waitlist|default([]) %}
       <div class="row" onclick="window.location='/waitlist/'">
         {% set parts = w.name.split() %}
         {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
