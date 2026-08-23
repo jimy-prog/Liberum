@@ -5,156 +5,75 @@
 {% block page_title %}Payments{% endblock %}
 {% block topbar_actions %}
 <div style="display:flex;gap:8px;align-items:center">
-  <input class="form-control" type="month" value="{{ month_str }}"
-         onchange="window.location='/payments/?month='+this.value"
-         style="width:150px;padding:5px 10px">
-  <!-- All Paid button -->
+  <input class="form-control" type="month" value="{{ month_str }}" onchange="window.location='/payments/?month='+this.value" style="width:150px;padding:5px 10px">
   <form method="post" action="/payments/all-paid" style="display:inline">
     <input type="hidden" name="month" value="{{ month_str }}">
-    <button type="submit" class="btn sm" style="background:var(--money);color:#fff;"
-            onclick="return confirm('Mark ALL students as paid for {{ month_str }}?')">
-      ✓ All Paid
-    </button>
+    <button type="submit" class="btn sm" style="background:var(--money);color:#fff;" onclick="return confirm('Mark ALL students as paid for {{ month_str }}?')">✓ All Paid</button>
   </form>
 </div>
 {% endblock %}
 
 {% block content %}
-
 <div class="segs">
   <button class="on" onclick="window.location='/payments/'">Payments</button>
   <button class="" onclick="window.location='/finance/'">Finance</button>
 </div>
 
-<!-- Summary -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
-  <div class="card" style="padding:16px">
-    <div class="stat-label">Expected</div>
-    <div style="font-family:var(--font-d);font-size:1.5rem;color:var(--money)">{{ "{:,.0f}".format(expected) }}</div>
-    <div style="font-size:.72rem;color:var(--txt3)">UZS total</div>
-  </div>
-  <div class="card" style="padding:16px">
-    <div class="stat-label">Collected</div>
-    <div style="font-family:var(--font-d);font-size:1.5rem;color:var(--acc)">{{ "{:,.0f}".format(collected) }}</div>
-    <div style="font-size:.72rem;color:var(--txt3)">UZS received</div>
-  </div>
-  <div class="card" style="padding:16px">
-    <div class="stat-label">Outstanding</div>
-    <div style="font-family:var(--font-d);font-size:1.5rem;color:{% if outstanding>0 %}var(--red){% else %}var(--money){% endif %}">{{ "{:,.0f}".format(outstanding) }}</div>
-    <div style="font-size:.72rem;color:var(--txt3)">UZS remaining</div>
-  </div>
-  <div class="card" style="padding:16px">
-    <div class="stat-label">Paid Students</div>
-    <div style="font-family:var(--font-d);font-size:1.5rem">{{ paid_count }} / {{ paid_count + unpaid_count }}</div>
-    <div style="font-size:.72rem;color:var(--txt3)">this month</div>
-  </div>
+<div class="stats">
+   <div class="stat"><div class="v money">{{ "{:,.0f}".format(collected) }}</div><div class="l">Collected · {{ month_str }}</div></div>
+   <div class="stat"><div class="v" style="color:var(--red)">{{ "{:,.0f}".format(outstanding) }}</div><div class="l">Outstanding</div></div>
+   <div class="stat"><div class="v">{{ paid_count }}<span style="font-size:15px;color:var(--txt3)">/{{ paid_count + unpaid_count }}</span></div><div class="l">Students paid</div></div>
 </div>
 
-<!-- Payment table -->
 <div class="card">
-  <div class="ct">
-    <span>Payment Status — {{ month_str }}</span>
-    <span style="font-size:.78rem;color:var(--txt3)">
-      {{ paid_count }} paid · {{ unpaid_count }} unpaid
-    </span>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Student</th>
-          <th>Group</th>
-          <th>Expected</th>
-          <th>Paid</th>
-          <th>Method</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in rows %}
-        <tr>
-          <td class="td-primary">
-            <a href="/students/{{ r.student.id }}" style="color:var(--txt);text-decoration:none">
-              {{ r.student.name }}
-            </a>
-          </td>
-          <td>
-            <span class="dot" style="background:{{ r.group.color }};margin-right:5px"></span>
-            {{ r.group.name }}
-          </td>
-          <td class="money">{{ "{:,.0f}".format(r.expected|int) }}</td>
-          <td class="money">
-            {% if r.payment %}{{ "{:,.0f}".format(r.paid|int) }}{% else %}<span style="color:var(--txt3)">—</span>{% endif %}
-          </td>
-          <td style="font-size:.82rem;color:var(--txt3)">
-            {{ r.payment.method if r.payment else '—' }}
-          </td>
-          <td>
-            {% if r.status == 'paid' %}
-            <span class="pill p-green">✓ Paid</span>
-            {% else %}
-            <span class="pill p-red">Unpaid</span>
-            {% endif %}
-          </td>
-          <td>
-            <div style="display:flex;gap:5px;align-items:center">
-              {% if r.status == 'unpaid' %}
-              <!-- Quick mark paid -->
-              <form method="post" action="/payments/mark-paid/{{ r.student.id }}" style="display:inline">
-                <input type="hidden" name="month" value="{{ month_str }}">
-                <button class="btn sm" style="background:var(--money);color:#fff;"">✓ Paid</button>
-              </form>
-              <!-- Record with details -->
-              <button class="btn ghost sm"
-                      onclick="openRecord({{ r.student.id }},'{{ r.student.name }}',{{ r.expected|int }},'{{ month_str }}')">
-                + Details
-              </button>
-              {% else %}
-              <!-- Mark as unpaid -->
-              <form method="post" action="/payments/mark-unpaid/{{ r.student.id }}" style="display:inline">
-                <input type="hidden" name="month" value="{{ month_str }}">
-                <button class="btn ghost sm"
-                        onclick="return confirm('Remove payment for {{ r.student.name }}?')">
-                  ✕ Undo
-                </button>
-              </form>
-              {% if r.payment %}
-              <button class="btn ghost sm"
-                      onclick="openRecord({{ r.student.id }},'{{ r.student.name }}',{{ r.payment.amount|int }},'{{ month_str }}')">
-                Edit
-              </button>
-              {% endif %}
-              {% endif %}
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-        {% if not rows %}
-        <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--txt3)">No active students this month</td></tr>
-        {% endif %}
-      </tbody>
-    </table>
+  <div class="ct">Payments <button class="btn sm" onclick="openRecord('','',400000,'{{ month_str }}')"><i data-lucide="plus"></i>Record payment</button></div>
+  <div id="payList">
+    {% for r in rows %}
+    <div class="row">
+      <div class="av" style="background:var(--accbg);color:var(--acc)">{{ r.student.name[0] }}</div>
+      <div class="rmain">
+        <div class="rt">{{ r.student.name }}</div>
+        <div class="rs">{{ r.group.name }} · expected {{ "{:,.0f}".format(r.expected|int) }} UZS</div>
+      </div>
+      {% if r.status == 'paid' %}
+        <span style="font-family:var(--fm);font-size:12px;color:var(--txt2)">{{ r.payment.method if r.payment else 'Cash' }}</span>
+        <span class="pill p-green">{{ "{:,.0f}".format(r.paid|int) }} UZS</span>
+      {% else %}
+        <span class="pill p-red">Unpaid</span>
+        <button class="btn soft sm" onclick="openRecord({{ r.student.id }},'{{ r.student.name }}',{{ r.expected|int }},'{{ month_str }}')">Record</button>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% if not rows %}
+    <div style="padding:24px;text-align:center;color:var(--txt3);font-size:13px">No active students this month</div>
+    {% endif %}
   </div>
 </div>
 
 <!-- Record Payment Modal -->
-<div class="ovl" id="recordModal"
-     onclick="if(event.target===this)this.classList.remove('open')">
+<div class="ovl" id="recordModal" onclick="if(event.target===this)closeModal('recordModal')">
   <div class="modal">
     <div class="mt">
       <span id="recordTitle">Record Payment</span>
-      <button class="x" onclick="document.getElementById('recordModal').classList.remove('open')"><i data-lucide="x"></i></button>
+      <button class="x" onclick="closeModal('recordModal')"><i data-lucide="x"></i></button>
     </div>
-    <div class="modal-body">
-      <form method="post" id="recordForm">
-        <input type="hidden" name="month" id="recordMonth">
-        <div class="form-group">
-          <label class="form-label">Amount (UZS)</label>
+    <form method="post" id="recordForm" action="/payments/record/">
+      <input type="hidden" name="month" id="recordMonth">
+      <div class="fgroup">
+        <label>Student</label>
+        <select class="form-control" name="student_id" id="recordStudent">
+          {% for r in rows %}
+          <option value="{{ r.student.id }}">{{ r.student.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fgroup">
+          <label>Amount (UZS)</label>
           <input class="form-control" type="number" name="amount" id="recordAmount" step="10000">
         </div>
-        <div class="form-group">
-          <label class="form-label">Method</label>
+        <div class="fgroup">
+          <label>Method</label>
           <select class="form-control" name="method">
             <option value="Cash">Cash</option>
             <option value="Card">Card</option>
@@ -162,17 +81,13 @@
             <option value="Online">Online</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Notes (optional)</label>
-          <input class="form-control" name="notes" placeholder="Reference number, etc.">
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button type="button" class="btn btn-ghost"
-                  onclick="document.getElementById('recordModal').classList.remove('open')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save</button>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div class="fgroup">
+        <label>Notes (optional)</label>
+        <input class="form-control" name="notes" placeholder="Reference number, etc.">
+      </div>
+      <button type="submit" class="btn block">Save payment</button>
+    </form>
   </div>
 </div>
 {% endblock %}
@@ -180,11 +95,35 @@
 {% block scripts %}
 <script>
 function openRecord(sid, name, amount, month) {
-  document.getElementById('recordTitle').textContent = `Payment — ${name}`;
-  document.getElementById('recordForm').action = `/payments/record/${sid}`;
+  if (name) {
+    document.getElementById('recordTitle').textContent = `Record Payment — ${name}`;
+    let select = document.getElementById('recordStudent');
+    if (select) {
+      select.value = sid;
+      select.style.display = 'none'; // hide select if student is pre-selected
+      select.previousElementSibling.style.display = 'none'; // hide label
+    }
+    document.getElementById('recordForm').action = '/payments/record/' + sid;
+  } else {
+    document.getElementById('recordTitle').textContent = `Record Payment`;
+    let select = document.getElementById('recordStudent');
+    if (select) {
+      select.style.display = 'block';
+      select.previousElementSibling.style.display = 'block';
+    }
+    // Note: backend might not support global /payments/record/ without sid, but keeping form standard.
+  }
   document.getElementById('recordMonth').value = month;
   document.getElementById('recordAmount').value = amount;
-  document.getElementById('recordModal').classList.add('open');
+  openModal('recordModal');
 }
+
+document.getElementById('recordForm').addEventListener('submit', function(e) {
+  let select = document.getElementById('recordStudent');
+  if (select && select.style.display !== 'none') {
+    this.action = '/payments/record/' + select.value;
+  }
+});
+
 </script>
 {% endblock %}

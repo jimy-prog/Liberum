@@ -99,16 +99,7 @@
         <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
       </div>
       {% endfor %}
-    {% else %}
-      <div class="row" onclick="window.location='/students/'">
-        <div class="av" style="background:var(--fill);color:var(--txt2)">MK</div>
-        <div class="rmain">
-          <div class="rt">Trial lesson today</div>
-          <div class="rs">Waitlist · 14:00 · IELTS A</div>
-        </div>
-        <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
-      </div>
-    {% endif %}
+    {% else %}<div class="row" style="text-align:center;padding:24px;color:var(--txt3);justify-content:center;font-size:13px;">Nothing needs attention</div>{% endif %}
   </div>
 </div>
 
