@@ -4,9 +4,10 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
 from finance_rules import get_group_epl
-from database import get_db, Group, Waitlist, Student, Lesson, Attendance, Notification, Payment, WeeklyPerformance
+from database import get_db, Group, Student, Lesson, Attendance, Notification, Payment, WeeklyPerformance
 from scheduler import generate_month_lessons, check_unmarked_lessons, fix_archived_future_lessons
 from auth import get_current_user
+from routers.waitlist import WaitlistEntry as Waitlist
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
