@@ -233,9 +233,7 @@ def dashboard(request: Request, show_marked: int = 0, db: Session = Depends(get_
     max_history_income = max(h["income"] for h in history) if history else 0
 
     notifications = db.query(Notification).filter(Notification.read==False).order_by(Notification.created_at.desc()).limit(6).all()
-    recent_waitlist = []
-    if user.role == "owner":
-        recent_waitlist = db.query(Waitlist).filter(Waitlist.status.in_(["trial", "new"])).limit(3).all()
+    recent_waitlist = db.query(Waitlist).filter(Waitlist.status.in_(["trial", "new"])).limit(3).all()
 
     upcoming      = db.query(Lesson).join(Group).filter(
         Lesson.date>today, Lesson.date<=today+timedelta(days=7),

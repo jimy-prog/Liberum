@@ -1,3 +1,4 @@
+from config import SESSION_COOKIE_NAME
 from fastapi import Request, HTTPException
 from sqlalchemy import create_engine, Column, Integer, String, Float, Date, Boolean, Text, DateTime, ForeignKey, text
 from sqlalchemy.ext.declarative import declarative_base
@@ -229,7 +230,7 @@ class AIChatMessage(Base):
 def get_db(request: Request = None):
     token = None
     if request:
-        token = request.cookies.get("liberum_session")
+        token = request.cookies.get(SESSION_COOKIE_NAME)
         if not token and "Authorization" in request.headers:
             auth_header = request.headers["Authorization"]
             if auth_header.startswith("Bearer "):
