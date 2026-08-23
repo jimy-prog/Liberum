@@ -150,8 +150,13 @@ def monthly(request: Request, month: str = None, show: str = "all", db: Session 
 
 @router.get("/online")
 def online_view(request: Request, db: Session = Depends(get_db)):
+    online_groups = db.query(Group).filter(Group.status == 'active', Group.mode == 'Online').all()
+    students_count = sum(len(g.students) for g in online_groups)
+    income = sum((g.price_monthly or g.price_per_lesson or 0) * len(g.students) for g in online_groups)
+    
     return templates.TemplateResponse("online.html", {
-        "request": request, "view": "online", "active_page": "timetable", "main_section": "schedule"
+        "request": request, "view": "online", "active_page": "timetable", "main_section": "schedule",
+        "online_groups": online_groups, "students_count": students_count, "income": income
     })
 
 @router.post("/lesson/{lid}/status")

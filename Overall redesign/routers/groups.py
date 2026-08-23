@@ -181,3 +181,21 @@ def group_journal(group_id: int, request: Request, db: Session = Depends(get_db)
         "request": request, "group": group, "lessons": past_lessons,
         "active_page": "groups", "main_section": "academy"
     })
+
+@router.get("/{gid}/latest-lesson-modal")
+def latest_lesson_modal(gid: int, request: Request, db: Session = Depends(get_db)):
+    group = db.query(Group).get(gid)
+    # Find latest lesson
+    lesson = db.query(Lesson).filter(Lesson.group_id == gid).order_by(Lesson.date.desc(), Lesson.time.desc()).first()
+    if not lesson:
+        return "<div class='ovl open' id='lessonAttendanceModal' onclick=\"if(event.target===this)this.classList.remove('open')\"><div class='modal'><div class='mt'>Error<button class='x' onclick=\"document.getElementById('lessonAttendanceModal').classList.remove('open')\"><i data-lucide='x'></i></button></div><div>No lessons found for this group.</div></div></div>"
+    
+    records = db.query(Attendance).filter(Attendance.lesson_id == lesson.id).all()
+    students = db.query(Student).filter(
+        Student.group_id == group.id, Student.active == True
+    ).all()
+    attended = {r.student_id: r for r in records}
+    return templates.TemplateResponse("lesson_modal.html", {
+        "request": request, "lesson": lesson, "records": records,
+        "students": students, "attended": attended
+    })

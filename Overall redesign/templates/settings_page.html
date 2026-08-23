@@ -1,6 +1,66 @@
 {% extends "base.html" %}
-{% block title %}Settings{% endblock %}
-{% block page_title %}Settings{% endblock %}
+{% block title %}Settings
+<div class="ovl" id="otherSettingsModal" onclick="if(event.target===this)closeModal('otherSettingsModal')">
+  <div class="modal">
+    <div class="mt">Other Settings<button class="x" onclick="closeModal('otherSettingsModal')"><i data-lucide="x"></i></button></div>
+    <div style="font-size:13px;color:var(--txt3);margin-bottom:16px">Set groups as online or offline.</div>
+    <form method="post" action="/settings/set_online">
+      <div class="fgroup">
+        <label>Select Group</label>
+        <select class="form-control" name="group_id" required>
+            {% for g in all_groups %}
+            <option value="{{ g.id }}">{{ g.name }} (Currently: {{ g.mode or 'in-person' }})</option>
+            {% endfor %}
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Mode</label>
+        <select class="form-control" name="mode">
+            <option value="Online">Online</option>
+            <option value="in-person">Offline / In-person</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Zoom Link</label>
+        <input type="url" class="form-control" name="zoom_link" placeholder="https://zoom.us/j/123456789">
+      </div>
+      <button class="btn block" type="submit">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+{% block page_title %}Settings
+<div class="ovl" id="otherSettingsModal" onclick="if(event.target===this)closeModal('otherSettingsModal')">
+  <div class="modal">
+    <div class="mt">Other Settings<button class="x" onclick="closeModal('otherSettingsModal')"><i data-lucide="x"></i></button></div>
+    <div style="font-size:13px;color:var(--txt3);margin-bottom:16px">Set groups as online or offline.</div>
+    <form method="post" action="/settings/set_online">
+      <div class="fgroup">
+        <label>Select Group</label>
+        <select class="form-control" name="group_id" required>
+            {% for g in all_groups %}
+            <option value="{{ g.id }}">{{ g.name }} (Currently: {{ g.mode or 'in-person' }})</option>
+            {% endfor %}
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Mode</label>
+        <select class="form-control" name="mode">
+            <option value="Online">Online</option>
+            <option value="in-person">Offline / In-person</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Zoom Link</label>
+        <input type="url" class="form-control" name="zoom_link" placeholder="https://zoom.us/j/123456789">
+      </div>
+      <button class="btn block" type="submit">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
 
 {% block content %}
  <div class="card"><div style="display:flex;gap:14px;align-items:center">
@@ -14,6 +74,7 @@
   <div class="row" onclick="openModal('contactModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div><div class="rmain"><div class="rt">Contact</div><div class="rs">Phone, Telegram, email</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="toast('Link copied','link')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="link"></i></div><div class="rmain"><div class="rt">Public join link</div><div class="rs">liberum.uz/join/{{ _u.username }}</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="openModal('teamModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="users"></i></div><div class="rmain"><div class="rt">Roles & Permissions</div><div class="rs">Teachers, admins, access</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
+   <div class="row" onclick="openModal('otherSettingsModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="settings"></i></div><div class="rmain"><div class="rt">Other</div><div class="rs">Advanced systematic settings, online groups</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
  </div>
  
  <div class="card"><div class="ct">Finance defaults</div>
@@ -100,6 +161,36 @@
     <div class="row"><div class="rmain"><div class="rt">Admin Access</div><div class="rs">Invite receptionists or managers</div></div><button class="btn sm" disabled>Upgrade</button></div>
   </div>
  </div>
+</div>
+
+
+<div class="ovl" id="otherSettingsModal" onclick="if(event.target===this)closeModal('otherSettingsModal')">
+  <div class="modal">
+    <div class="mt">Other Settings<button class="x" onclick="closeModal('otherSettingsModal')"><i data-lucide="x"></i></button></div>
+    <div style="font-size:13px;color:var(--txt3);margin-bottom:16px">Set groups as online or offline.</div>
+    <form method="post" action="/settings/set_online">
+      <div class="fgroup">
+        <label>Select Group</label>
+        <select class="form-control" name="group_id" required>
+            {% for g in all_groups %}
+            <option value="{{ g.id }}">{{ g.name }} (Currently: {{ g.mode or 'in-person' }})</option>
+            {% endfor %}
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Mode</label>
+        <select class="form-control" name="mode">
+            <option value="Online">Online</option>
+            <option value="in-person">Offline / In-person</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Zoom Link</label>
+        <input type="url" class="form-control" name="zoom_link" placeholder="https://zoom.us/j/123456789">
+      </div>
+      <button class="btn block" type="submit">Save Changes</button>
+    </form>
+  </div>
 </div>
 
 {% endblock %}

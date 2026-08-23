@@ -74,7 +74,7 @@
     {% for time, lessons in day.lessons_by_time.items() %}
       {% for l in lessons %}
       {% set ns.has_events = true %}
-      <div class="evt" style="background:{{ l.group.color }}18;color:{{ l.group.color }}" onclick="window.location='/lessons/{{ l.id }}'">
+      <div class="evt" style="background:{{ l.group.color }}18;color:{{ l.group.color }}" onclick="openLessonModal({{l.id}})">
         {{ l.group.name }}
         <small>{{ l.time }} · {% if l.mode == 'online' %}Online{% else %}Room {{ l.room or '1' }}{% endif %}</small>
       </div>
@@ -116,7 +116,7 @@
       {% if l.mode == 'online' %}
         <button class="btn ghost sm" onclick="window.open('{{ l.group.zoom_link }}', '_blank')"><i data-lucide="link"></i>Zoom link</button>
       {% endif %}
-      <button class="btn {% if l.mode != 'online' %}btn-primary{% endif %} sm" style="background:var(--acc);color:#fff" onclick="window.location='/lessons/{{ l.id }}'"><i data-lucide="check-square"></i>Attendance</button>
+      <button class="btn {% if l.mode != 'online' %}btn-primary{% endif %} sm" style="background:var(--acc);color:#fff" onclick="openLessonModal({{l.id}})"><i data-lucide="check-square"></i><i data-lucide="check-square"></i>Attendance</button>
     </div>
     {% endfor %}
   {% endfor %}
@@ -144,7 +144,7 @@
       <div class="rt" style="cursor:pointer" onclick="window.location=\'/groups/{{ c.lesson.group.id }}\'">{{ c.lesson.group.name }}</div>
       <div class="rs">{% if c.lesson.mode == 'online' %}Online · Zoom{% else %}Room {{ c.lesson.room or '1' }}{% endif %} · {{ c.students|length }} students</div>
     </div>
-    <button class="btn soft sm" onclick="window.location='/lessons/{{ c.lesson.id }}'">Attendance</button>
+    <button class="btn soft sm" onclick="openLessonModal({{c.lesson.id}})"><i data-lucide="check-square"></i>Attendance</button>
   </div>
   {% else %}
   <div class="empty">No classes on this day</div>

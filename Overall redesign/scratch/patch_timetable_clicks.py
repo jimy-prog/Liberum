@@ -1,13 +1,14 @@
-with open("templates/online.html", "r") as f:
+with open("templates/timetable.html", "r") as f:
     text = f.read()
 
 import re
 
-# Update lesson click
-text = re.sub(r'window\.location=\'/lessons/\{\{\s*l\.id\s*\}\}\'', r'openLessonModal({{l.id}})', text)
-text = re.sub(r'href="/lessons/\{\{\s*l\.id\s*\}\}"', r'href="#" onclick="openLessonModal({{l.id}}); return false"', text)
+# We want to replace all occurrences of: window.location='/lessons/{{ l.id }}' (or c.lesson.id)
+text = re.sub(r'window\.location=\'/lessons/\{\{\s*(l|c\.lesson)\.id\s*\}\}\'', r'openLessonModal({{\1.id}})', text)
+# For Month view, I think I used <a href="/lessons/{{ l.id }}" ...
+text = re.sub(r'href="/lessons/\{\{\s*(l|c\.lesson)\.id\s*\}\}"', r'href="#" onclick="openLessonModal({{\1.id}}); return false"', text)
 
-# Insert the js modal block if needed
+# I should also add the openLessonModal function in the scripts block
 modal_js = '''
 <script>
 async function openLessonModal(lid) {
@@ -32,10 +33,7 @@ async function openLessonModal(lid) {
 '''
 
 if 'async function openLessonModal' not in text:
-    if '{% block scripts %}' in text:
-        text = text.replace('{% block scripts %}', '{% block scripts %}\n' + modal_js)
-    else:
-        text += '\n{% block scripts %}\n' + modal_js + '\n{% endblock %}\n'
+    text = text.replace('{% block scripts %}', '{% block scripts %}\n' + modal_js)
 
-with open("templates/online.html", "w") as f:
+with open("templates/timetable.html", "w") as f:
     f.write(text)

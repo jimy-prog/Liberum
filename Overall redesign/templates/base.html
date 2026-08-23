@@ -416,6 +416,27 @@ async function openAddLessonModal() {
   mod.classList.add('open');
 }
 </script>
+
+<script>
+async function openStudentModal(id) {
+    try {
+        const res = await fetch(`/students/${id}?modal=1`);
+        if (!res.ok) throw new Error("Failed to load");
+        const html = await res.text();
+        let container = document.getElementById('student-modal-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'student-modal-container';
+            document.body.appendChild(container);
+        }
+        container.innerHTML = html;
+        if(window.lucide) lucide.createIcons();
+    } catch (err) {
+        window.location = `/students/${id}`;
+    }
+}
+</script>
+
 </body>
 
 </html>

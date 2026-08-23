@@ -155,3 +155,14 @@ async def toggle_user(request: Request, uid: int, db: Session = Depends(get_db))
         user.is_active = not user.is_active
         db.commit()
     return RedirectResponse("/profile/?tab=security&success=user_updated", status_code=302)
+
+@router.post("/set_online")
+async def set_group_online(request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    g = db.query(Group).get(int(form.get("group_id")))
+    if g:
+        g.mode = form.get("mode", "in-person")
+        if form.get("zoom_link"):
+            g.zoom_link = form.get("zoom_link")
+        db.commit()
+    return RedirectResponse("/settings/", status_code=303)

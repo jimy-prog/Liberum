@@ -1,7 +1,5 @@
-with open('templates/group_detail.html', 'r', encoding='utf-8') as f:
-    text = f.read()
-
-new_content = """{% extends "base.html" %}
+with open("templates/group_detail.html", "w") as f:
+    f.write('''{% extends "base.html" %}
 {% block title %}{{ group.name }}{% endblock %}
 {% block page_title %}{{ group.name }}{% endblock %}
 {% block page_subtitle %}{{ group.level or 'No level' }} · {{ group.schedule or 'No Schedule' }} · {% if group.mode == 'Online' %}Zoom{% else %}Room {{ group.room or '1' }}{% endif %}{% endblock %}
@@ -11,13 +9,13 @@ new_content = """{% extends "base.html" %}
   {% if group.status == 'archived' %}<span class="pill p-grey">Archived</span>
   {% else %}<span class="pill p-green">Active</span>{% endif %}
   <span class="pill {% if group.mode == 'Online' %}p-green{% else %}p-acc{% endif %}">{{ group.mode or 'Offline' }}</span>
-  <button class="btn ghost sm" onclick="openModal('editGroup')"><i data-lucide="edit"></i>Edit</button>
+  <button class="btn ghost sm" onclick="openModal('editGroup')"><i data-lucide="edit"></i>Edit group</button>
   <button class="btn ghost sm" onclick="window.location='/groups/{{ group.id }}/journal'"><i data-lucide="book-open"></i>Journal</button>
 </div>
 {% endblock %}
 
 {% block content %}
-<button class="btn ghost block" style="margin-bottom:16px;justify-content:flex-start" onclick="window.location='/groups/'"><i data-lucide="arrow-left"></i>Back to groups</button>
+<button class="btn ghost block" style="margin-bottom:16px;justify-content:flex-start" onclick="window.history.back()"><i data-lucide="arrow-left"></i>Go back</button>
 
 <div class="grid2">
   <div>
@@ -25,11 +23,11 @@ new_content = """{% extends "base.html" %}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <div class="card" style="padding:14px;box-shadow:none;background:var(--fill)">
         <div style="font-size:11px;color:var(--txt3)">Students</div>
-        <div style="font-size:18px;font-weight:700">{{ group.students|length }}</div>
+        <div style="font-size:24px;font-weight:700;font-family:var(--fm)">{{ group.students|length }}</div>
       </div>
       <div class="card" style="padding:14px;box-shadow:none;background:var(--fill)">
         <div style="font-size:11px;color:var(--txt3)">Total Lessons</div>
-        <div style="font-size:18px;font-weight:700">{{ group.lessons|length }}</div>
+        <div style="font-size:24px;font-weight:700;font-family:var(--fm)">{{ group.lessons|length }}</div>
       </div>
     </div>
     
@@ -39,37 +37,28 @@ new_content = """{% extends "base.html" %}
       <div class="row" style="padding:0">
         <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="coins"></i></div>
         <div class="rmain">
-          <div class="rt">{{ group.price }} UZS</div>
+          <div class="rt" style="font-family:var(--fm);font-weight:600">{{ "{:,.0f}".format(group.price_monthly|int if group.price_type == 'monthly' else (group.price_per_lesson|int if group.price_per_lesson else 0)) }} UZS</div>
           <div class="rs">{% if group.price_type == 'monthly' %}Monthly{% else %}Per Lesson{% endif %}</div>
         </div>
       </div>
       {% if group.color %}
       <div class="row" style="padding:0;margin-top:10px">
-        <div class="av" style="background:{{ group.color }}18;color:{{ group.color }}"><i data-lucide="palette"></i></div>
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="palette"></i></div>
         <div class="rmain">
-          <div class="rt">{{ group.color }}</div>
-          <div class="rs">Schedule Color</div>
+          <div class="rt">Color label</div>
+          <div style="display:flex;gap:4px;margin-top:4px">
+            <span class="dot" style="background:{{ group.color }}"></span>
+          </div>
         </div>
       </div>
       {% endif %}
-    </div>
-    
-    <!-- Status Management -->
-    <div class="card">
-      <div class="ct">Status Management</div>
-      <div style="display:flex;gap:10px">
-        {% if group.status == 'archived' %}
-        <form action="/groups/{{ group.id }}/unarchive" method="POST" style="flex:1">
-          <button type="submit" class="btn block ghost" style="color:var(--green)"><i data-lucide="archive-restore"></i> Unarchive Group</button>
-        </form>
-        {% else %}
-        <form action="/groups/{{ group.id }}/archive" method="POST" style="flex:1">
-          <button type="submit" class="btn block ghost" style="color:var(--txt3)"><i data-lucide="archive"></i> Archive Group</button>
-        </form>
-        {% endif %}
-        <form action="/groups/{{ group.id }}/delete" method="POST" style="flex:1" onsubmit="return confirm('Are you sure you want to permanently delete this group?');">
-          <button type="submit" class="btn block ghost" style="color:var(--red)"><i data-lucide="trash-2"></i> Delete Group</button>
-        </form>
+      
+      <div style="display:flex;gap:8px;margin-top:16px;border-top:1px dashed var(--line);padding-top:16px">
+        <button class="btn soft sm block" onclick="window.location='/groups/{{ group.id }}/journal'"><i data-lucide="book-open"></i>View Journal</button>
+        <button class="btn soft sm block" onclick="openModal('editGroup')"><i data-lucide="edit"></i>Edit Config</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn ghost sm block" style="color:var(--red)" onclick="if(confirm('Archive this group?')) alert('To archive, please use the main Groups list edit function.')"><i data-lucide="archive"></i>Archive Group</button>
       </div>
     </div>
   </div>
@@ -82,7 +71,7 @@ new_content = """{% extends "base.html" %}
         <button class="btn sm" onclick="window.location='/students/'"><i data-lucide="plus"></i>Add</button>
       </div>
       {% for s in group.students %}
-      <div class="row" onclick="window.location='/students/{{ s.id }}'">
+      <div class="row" onclick="openStudentModal({{ s.id }})" style="cursor:pointer">
         {% set parts = s.name.split() %}
         {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
         <div class="av" style="background:var(--accbg);color:var(--acc2)">{{ initials }}</div>
@@ -98,45 +87,5 @@ new_content = """{% extends "base.html" %}
     </div>
   </div>
 </div>
-
-<!-- Edit Group Modal -->
-<div class="ovl" id="editGroup">
-  <div class="modal">
-    <div class="mt">Edit Group<button type="button" class="x" onclick="document.getElementById('editGroup').classList.remove('open')"><i data-lucide="x"></i></button></div>
-    <form action="/groups/{{ group.id }}/edit" method="POST" style="margin-top:16px">
-      <div class="fgroup"><label>Name</label><input name="name" value="{{ group.name }}" required></div>
-      <div class="frow">
-        <div class="fgroup"><label>Level</label><input name="level" value="{{ group.level or '' }}"></div>
-        <div class="fgroup"><label>Mode</label>
-          <select name="mode">
-            <option value="Offline" {% if group.mode != 'Online' %}selected{% endif %}>Offline</option>
-            <option value="Online" {% if group.mode == 'Online' %}selected{% endif %}>Online</option>
-          </select>
-        </div>
-      </div>
-      <div class="frow">
-        <div class="fgroup"><label>Schedule</label><input name="schedule" value="{{ group.schedule or '' }}"></div>
-        <div class="fgroup"><label>Room</label><input name="room" value="{{ group.room or '' }}"></div>
-      </div>
-      <div class="frow">
-        <div class="fgroup"><label>Price</label><input type="number" name="price" value="{{ group.price or 0 }}"></div>
-        <div class="fgroup"><label>Type</label>
-          <select name="price_type">
-            <option value="monthly" {% if group.price_type == 'monthly' %}selected{% endif %}>Monthly</option>
-            <option value="per_lesson" {% if group.price_type == 'per_lesson' %}selected{% endif %}>Per Lesson</option>
-          </select>
-        </div>
-      </div>
-      <div class="fgroup"><label>Color (Hex)</label><input type="color" name="color" value="{{ group.color or '#4C6EF5' }}" style="height:40px;width:100%;padding:4px"></div>
-      <button class="btn block" style="margin-top:16px">Save Changes</button>
-    </form>
-  </div>
-</div>
 {% endblock %}
-"""
-
-import re
-text = re.sub(r'\{% block content %\}.*', new_content, text, flags=re.DOTALL)
-
-with open('templates/group_detail.html', 'w', encoding='utf-8') as f:
-    f.write(text)
+''')

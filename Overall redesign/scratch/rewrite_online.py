@@ -1,4 +1,5 @@
-{% extends "base.html" %}
+with open("templates/online.html", "w") as f:
+    f.write('''{% extends "base.html" %}
 {% block title %}Online Classes{% endblock %}
 {% block page_title %}Schedule{% endblock %}
 {% block page_subtitle %}Timetable · attendance · online · class invites{% endblock %}
@@ -25,7 +26,7 @@
 <div class="card">
   <div class="ct">Online Groups</div>
   {% for g in online_groups %}
-  <div class="row" style="cursor:pointer" onclick="openGroupAttendanceModal({{ g.id }})">
+  <div class="row" style="cursor:pointer" onclick="window.location='/groups/{{ g.id }}'">
     <div class="av" style="background:var(--accbg);color:var(--acc)"><i data-lucide="monitor"></i></div>
     <div class="rmain">
       <div class="rt">{{ g.name }} <span class="pill p-green" style="margin-left:6px">Online</span></div>
@@ -54,25 +55,6 @@
 
 {% block scripts %}
 <script>
-
-async function openGroupAttendanceModal(gid) {
-    try {
-        let res = await fetch(`/groups/${gid}/latest-lesson-modal`);
-        let html = await res.text();
-        let container = document.getElementById('modalContainer');
-        if(!container) {
-            container = document.createElement('div');
-            container.id = 'modalContainer';
-            document.body.appendChild(container);
-        }
-        container.innerHTML = html;
-        if(window.lucide) lucide.createIcons();
-        let modal = document.getElementById('lessonAttendanceModal');
-        if (modal) modal.classList.add('open');
-    } catch(e) {
-        console.error(e);
-    }
-}
 function toggleIncome() {
     let el = document.getElementById('incomeVal');
     let btn = document.getElementById('toggleEye');
@@ -89,3 +71,4 @@ function toggleIncome() {
 }
 </script>
 {% endblock %}
+''')

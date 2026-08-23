@@ -102,3 +102,16 @@ async def save_lesson(lid: int, request: Request, db: Session = Depends(get_db))
                 db.add(Attendance(lesson_id=lid, student_id=sid, status=val))
     db.commit()
     return RedirectResponse(f"/lessons/{lid}", status_code=303)
+
+@router.get("/{lid}/modal")
+def lesson_modal_view(lid: int, request: Request, db: Session = Depends(get_db)):
+    lesson = db.query(Lesson).get(lid)
+    records = db.query(Attendance).filter(Attendance.lesson_id == lid).all()
+    students = db.query(Student).filter(
+        Student.group_id == lesson.group_id, Student.active == True
+    ).all()
+    attended = {r.student_id: r for r in records}
+    return templates.TemplateResponse("lesson_modal.html", {
+        "request": request, "lesson": lesson, "records": records,
+        "students": students, "attended": attended
+    })
