@@ -363,12 +363,13 @@ def student_detail(sid: int, request: Request, db: Session = Depends(get_db)):
     monthly_list = sorted(monthly.items(), reverse=True)
 
     events = db.query(StudentEvent).filter(StudentEvent.student_id == sid).order_by(StudentEvent.created_at.desc()).all()
-    return templates.TemplateResponse("student_detail.html", {
+    template_name = "student_detail_modal.html" if request.query_params.get("modal") else "student_detail.html"
+    return templates.TemplateResponse(template_name, {
         "request": request,
         "student": s,
         "records": records,
         "present": present,
-        "absent": absent,
+        "absent": absent, "debt": 0,
         "excused": excused,
         "rate": rate,
         "monthly_list": monthly_list,
