@@ -22,11 +22,11 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <div class="card" style="padding:14px;box-shadow:none;background:var(--fill)">
         <div style="font-size:11px;color:var(--txt3)">Students</div>
-        <div style="font-size:18px;font-weight:700">{{ group.students|length }}</div>
+        <div style="font-size:24px;font-weight:700;font-family:var(--fm)">{{ group.students|length }}</div>
       </div>
       <div class="card" style="padding:14px;box-shadow:none;background:var(--fill)">
         <div style="font-size:11px;color:var(--txt3)">Total Lessons</div>
-        <div style="font-size:18px;font-weight:700">{{ group.lessons|length }}</div>
+        <div style="font-size:24px;font-weight:700;font-family:var(--fm)">{{ group.lessons|length }}</div>
       </div>
     </div>
     
@@ -36,7 +36,7 @@
       <div class="row" style="padding:0">
         <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="coins"></i></div>
         <div class="rmain">
-          <div class="rt">{{ group.price }} UZS</div>
+          <div class="rt" style="font-family:var(--fm);font-weight:600">{{ "{:,.0f}".format(group.price|float if group.price else 0) }} UZS</div>
           <div class="rs">{% if group.price_type == 'monthly' %}Monthly{% else %}Per Lesson{% endif %}</div>
         </div>
       </div>

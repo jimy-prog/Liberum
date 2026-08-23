@@ -3,112 +3,12 @@
 <a href="/monthly-report/" class="btn block" style="position:fixed;bottom:24px;right:24px;box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:100;border-radius:99px;"><i data-lucide="file-text"></i> Monthly Report</a>
 
 <!-- View Payment Modal -->
-<div class="ovl" id="viewPaymentModal" onclick="if(event.target===this)closeModal('viewPaymentModal')">
-  <div class="modal">
-    <div class="mt">
-      Payment Details
-      <button class="x" onclick="closeModal('viewPaymentModal')"><i data-lucide="x"></i></button>
-    </div>
-    <div style="margin-top:16px">
-      <div style="font-size:24px;font-weight:700;margin-bottom:4px" id="vpAmount"></div>
-      <div style="color:var(--txt2);font-size:13px;margin-bottom:16px" id="vpStudent"></div>
-      
-      <div class="frow">
-        <div class="fgroup"><label>Method</label><div id="vpMethod" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
-        <div class="fgroup"><label>Month</label><div id="vpMonth" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
-      </div>
-      
-      <div class="fgroup" style="margin-top:16px">
-        <label>Teacher Notes (Optional)</label>
-        <textarea class="form-control" placeholder="Add a note about this payment..."></textarea>
-      </div>
-      
-      <div class="fgroup">
-        <label>Check Image / Receipt</label>
-        <label style="display:block;border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer;background:var(--bg)">
-          <i data-lucide="upload-cloud" style="margin-bottom:8px"></i><br>
-          <span id="vpUploadText">Click to upload receipt</span>
-          <input type="file" style="display:none" onchange="document.getElementById('vpUploadText').innerText = this.files[0].name">
-        </label>
-      </div>
-      
-      <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
-    </div>
-  </div>
-</div>
-<script>
-function viewPayment(student, amount, method, month) {
-    let m = document.getElementById('viewPaymentModal');
-    if(m.parentNode !== document.body) document.body.appendChild(m);
-    document.getElementById('vpStudent').innerText = student;
-    document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
-    
-    // The user said the method and month are very large and ugly.
-    document.getElementById('vpMethod').innerText = method;
-    document.getElementById('vpMethod').style.fontSize = '14px';
-    document.getElementById('vpMonth').innerText = month;
-    document.getElementById('vpMonth').style.fontSize = '14px';
-    
-    // Also increase z-index
-    m.style.zIndex = '99999';
-    m.classList.add('open');
-}
-</script>
+
 
 {% endblock %}
 {% block page_title %}Payments
 <!-- View Payment Modal -->
-<div class="ovl" id="viewPaymentModal" onclick="if(event.target===this)closeModal('viewPaymentModal')">
-  <div class="modal">
-    <div class="mt">
-      Payment Details
-      <button class="x" onclick="closeModal('viewPaymentModal')"><i data-lucide="x"></i></button>
-    </div>
-    <div style="margin-top:16px">
-      <div style="font-size:24px;font-weight:700;margin-bottom:4px" id="vpAmount"></div>
-      <div style="color:var(--txt2);font-size:13px;margin-bottom:16px" id="vpStudent"></div>
-      
-      <div class="frow">
-        <div class="fgroup"><label>Method</label><div id="vpMethod" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
-        <div class="fgroup"><label>Month</label><div id="vpMonth" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
-      </div>
-      
-      <div class="fgroup" style="margin-top:16px">
-        <label>Teacher Notes (Optional)</label>
-        <textarea class="form-control" placeholder="Add a note about this payment..."></textarea>
-      </div>
-      
-      <div class="fgroup">
-        <label>Check Image / Receipt</label>
-        <label style="display:block;border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer;background:var(--bg)">
-          <i data-lucide="upload-cloud" style="margin-bottom:8px"></i><br>
-          <span id="vpUploadText">Click to upload receipt</span>
-          <input type="file" style="display:none" onchange="document.getElementById('vpUploadText').innerText = this.files[0].name">
-        </label>
-      </div>
-      
-      <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
-    </div>
-  </div>
-</div>
-<script>
-function viewPayment(student, amount, method, month) {
-    let m = document.getElementById('viewPaymentModal');
-    if(m.parentNode !== document.body) document.body.appendChild(m);
-    document.getElementById('vpStudent').innerText = student;
-    document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
-    
-    // The user said the method and month are very large and ugly.
-    document.getElementById('vpMethod').innerText = method;
-    document.getElementById('vpMethod').style.fontSize = '14px';
-    document.getElementById('vpMonth').innerText = month;
-    document.getElementById('vpMonth').style.fontSize = '14px';
-    
-    // Also increase z-index
-    m.style.zIndex = '99999';
-    m.classList.add('open');
-}
-</script>
+
 
 {% endblock %}
 {% block topbar_actions %}
@@ -121,57 +21,7 @@ function viewPayment(student, amount, method, month) {
 </div>
 
 <!-- View Payment Modal -->
-<div class="ovl" id="viewPaymentModal" onclick="if(event.target===this)closeModal('viewPaymentModal')">
-  <div class="modal">
-    <div class="mt">
-      Payment Details
-      <button class="x" onclick="closeModal('viewPaymentModal')"><i data-lucide="x"></i></button>
-    </div>
-    <div style="margin-top:16px">
-      <div style="font-size:24px;font-weight:700;margin-bottom:4px" id="vpAmount"></div>
-      <div style="color:var(--txt2);font-size:13px;margin-bottom:16px" id="vpStudent"></div>
-      
-      <div class="frow">
-        <div class="fgroup"><label>Method</label><div id="vpMethod" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
-        <div class="fgroup"><label>Month</label><div id="vpMonth" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
-      </div>
-      
-      <div class="fgroup" style="margin-top:16px">
-        <label>Teacher Notes (Optional)</label>
-        <textarea class="form-control" placeholder="Add a note about this payment..."></textarea>
-      </div>
-      
-      <div class="fgroup">
-        <label>Check Image / Receipt</label>
-        <label style="display:block;border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer;background:var(--bg)">
-          <i data-lucide="upload-cloud" style="margin-bottom:8px"></i><br>
-          <span id="vpUploadText">Click to upload receipt</span>
-          <input type="file" style="display:none" onchange="document.getElementById('vpUploadText').innerText = this.files[0].name">
-        </label>
-      </div>
-      
-      <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
-    </div>
-  </div>
-</div>
-<script>
-function viewPayment(student, amount, method, month) {
-    let m = document.getElementById('viewPaymentModal');
-    if(m.parentNode !== document.body) document.body.appendChild(m);
-    document.getElementById('vpStudent').innerText = student;
-    document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
-    
-    // The user said the method and month are very large and ugly.
-    document.getElementById('vpMethod').innerText = method;
-    document.getElementById('vpMethod').style.fontSize = '14px';
-    document.getElementById('vpMonth').innerText = month;
-    document.getElementById('vpMonth').style.fontSize = '14px';
-    
-    // Also increase z-index
-    m.style.zIndex = '99999';
-    m.classList.add('open');
-}
-</script>
+
 
 {% endblock %}
 
@@ -257,57 +107,7 @@ function viewPayment(student, amount, method, month) {
 </div>
 
 <!-- View Payment Modal -->
-<div class="ovl" id="viewPaymentModal" onclick="if(event.target===this)closeModal('viewPaymentModal')">
-  <div class="modal">
-    <div class="mt">
-      Payment Details
-      <button class="x" onclick="closeModal('viewPaymentModal')"><i data-lucide="x"></i></button>
-    </div>
-    <div style="margin-top:16px">
-      <div style="font-size:24px;font-weight:700;margin-bottom:4px" id="vpAmount"></div>
-      <div style="color:var(--txt2);font-size:13px;margin-bottom:16px" id="vpStudent"></div>
-      
-      <div class="frow">
-        <div class="fgroup"><label>Method</label><div id="vpMethod" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
-        <div class="fgroup"><label>Month</label><div id="vpMonth" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
-      </div>
-      
-      <div class="fgroup" style="margin-top:16px">
-        <label>Teacher Notes (Optional)</label>
-        <textarea class="form-control" placeholder="Add a note about this payment..."></textarea>
-      </div>
-      
-      <div class="fgroup">
-        <label>Check Image / Receipt</label>
-        <label style="display:block;border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer;background:var(--bg)">
-          <i data-lucide="upload-cloud" style="margin-bottom:8px"></i><br>
-          <span id="vpUploadText">Click to upload receipt</span>
-          <input type="file" style="display:none" onchange="document.getElementById('vpUploadText').innerText = this.files[0].name">
-        </label>
-      </div>
-      
-      <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
-    </div>
-  </div>
-</div>
-<script>
-function viewPayment(student, amount, method, month) {
-    let m = document.getElementById('viewPaymentModal');
-    if(m.parentNode !== document.body) document.body.appendChild(m);
-    document.getElementById('vpStudent').innerText = student;
-    document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
-    
-    // The user said the method and month are very large and ugly.
-    document.getElementById('vpMethod').innerText = method;
-    document.getElementById('vpMethod').style.fontSize = '14px';
-    document.getElementById('vpMonth').innerText = month;
-    document.getElementById('vpMonth').style.fontSize = '14px';
-    
-    // Also increase z-index
-    m.style.zIndex = '99999';
-    m.classList.add('open');
-}
-</script>
+
 
 {% endblock %}
 
@@ -347,19 +147,34 @@ document.getElementById('recordForm').addEventListener('submit', function(e) {
 </script>
 
 <!-- View Payment Modal -->
-<div class="ovl" id="viewPaymentModal" onclick="if(event.target===this)closeModal('viewPaymentModal')">
+
+
+{% endblock %}
+
+
+<div class="ovl" id="viewPaymentModal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="modal">
     <div class="mt">
       Payment Details
-      <button class="x" onclick="closeModal('viewPaymentModal')"><i data-lucide="x"></i></button>
+      <button class="x" onclick="document.getElementById('viewPaymentModal').classList.remove('open')"><i data-lucide="x"></i></button>
     </div>
     <div style="margin-top:16px">
       <div style="font-size:24px;font-weight:700;margin-bottom:4px" id="vpAmount"></div>
       <div style="color:var(--txt2);font-size:13px;margin-bottom:16px" id="vpStudent"></div>
       
       <div class="frow">
-        <div class="fgroup"><label>Method</label><div id="vpMethod" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
-        <div class="fgroup"><label>Month</label><div id="vpMonth" style="padding:10px;background:var(--fill);border-radius:6px;font-weight:500"></div></div>
+        <div class="fgroup">
+            <label>Method</label>
+            <select id="vpMethod" class="form-control" style="font-size:14px;font-weight:500;">
+                <option>Cash</option>
+                <option>Card</option>
+                <option>Transfer</option>
+            </select>
+        </div>
+        <div class="fgroup">
+            <label>Month</label>
+            <input type="month" id="vpMonth" class="form-control" style="font-size:14px;font-weight:500;">
+        </div>
       </div>
       
       <div class="fgroup" style="margin-top:16px">
@@ -376,7 +191,7 @@ document.getElementById('recordForm').addEventListener('submit', function(e) {
         </label>
       </div>
       
-      <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
+      <button class="btn block" style="margin-top:16px" onclick="document.getElementById('viewPaymentModal').classList.remove('open')">Save Updates</button>
     </div>
   </div>
 </div>
@@ -387,16 +202,14 @@ function viewPayment(student, amount, method, month) {
     document.getElementById('vpStudent').innerText = student;
     document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
     
-    // The user said the method and month are very large and ugly.
-    document.getElementById('vpMethod').innerText = method;
-    document.getElementById('vpMethod').style.fontSize = '14px';
-    document.getElementById('vpMonth').innerText = month;
-    document.getElementById('vpMonth').style.fontSize = '14px';
+    // Set method and month
+    let methodSelect = document.getElementById('vpMethod');
+    if ([...methodSelect.options].some(o => o.value === method)) {
+        methodSelect.value = method;
+    }
+    document.getElementById('vpMonth').value = month;
     
-    // Also increase z-index
     m.style.zIndex = '99999';
     m.classList.add('open');
 }
 </script>
-
-{% endblock %}

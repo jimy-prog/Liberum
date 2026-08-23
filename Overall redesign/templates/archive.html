@@ -26,10 +26,10 @@
 
 <div class="tab-bar">
   <a class="tab-btn on" href="#" onclick="switchTab('groups',this);return false">
-    🗂 Groups <span class="pill p-grey" style="margin-left:5px">{{ archived_groups|length }}</span>
+    <i data-lucide="folder"></i> Groups <span class="pill p-grey" style="margin-left:5px">{{ archived_groups|length }}</span>
   </a>
   <a class="tab-btn" href="#" onclick="switchTab('students',this);return false">
-    👤 Students <span class="pill p-grey" style="margin-left:5px">{{ archived_students|length }}</span>
+    <i data-lucide="users"></i> Students <span class="pill p-grey" style="margin-left:5px">{{ archived_students|length }}</span>
   </a>
 </div>
 
