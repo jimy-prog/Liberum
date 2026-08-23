@@ -85,17 +85,38 @@
   </div>
 
   <div class="card">
-    <div class="ct">Needs attention <span class="pill p-red">{{ recent_reviews|length }}</span></div>
-    {% if recent_reviews %}
-      {% for r in recent_reviews %}
+    <div class="ct">Needs attention <span class="pill p-red">{{ (recent_reviews|length) + (recent_waitlist|length) }}</span></div>
+    
+    {% for r in recent_reviews %}
       <div class="row" onclick="window.location='/reviews/inbox'">
         {% set parts = r.student.full_name.split() if r.student.full_name else [r.student.name] %}
         {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
+        <div class="av" style="background:var(--accbg);color:var(--acc)">{{ initials }}</div>
+        <div class="rmain">
+          <div class="rt">Low rating: {{ r.rating }}★</div>
+          <div class="rs">{{ r.student.name }} · {{ r.lesson.group.name }}</div>
+        </div>
+        <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
+      </div>
+    {% endfor %}
+
+    {% for w in recent_waitlist %}
+      <div class="row" onclick="window.location='/waitlist/'">
+        {% set parts = w.name.split() %}
+        {% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}
         <div class="av" style="background:var(--fill);color:var(--txt2)">{{ initials }}</div>
         <div class="rmain">
-          <div class="rt">Writing review waiting</div>
-          <div class="rs">Submitted by {{ r.student.full_name }}</div>
+          <div class="rt">{{ 'Trial lesson' if w.status == 'trial' else 'New Lead' }}</div>
+          <div class="rs">Waitlist · {{ w.name }}</div>
         </div>
+        <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
+      </div>
+    {% endfor %}
+
+    {% if not recent_reviews and not recent_waitlist %}
+      <div class="row" style="text-align:center;padding:24px;color:var(--txt3);justify-content:center;font-size:13px;">Nothing needs attention</div>
+    {% endif %}
+  </div>
         <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
       </div>
       {% endfor %}

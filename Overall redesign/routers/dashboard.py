@@ -4,7 +4,7 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
 from finance_rules import get_group_epl
-from database import get_db, Group, Student, Lesson, Attendance, Notification, Payment, WeeklyPerformance
+from database import get_db, Group, Waitlist, Student, Lesson, Attendance, Notification, Payment, WeeklyPerformance
 from scheduler import generate_month_lessons, check_unmarked_lessons, fix_archived_future_lessons
 from auth import get_current_user
 
@@ -246,7 +246,7 @@ def dashboard(request: Request, show_marked: int = 0, db: Session = Depends(get_
         "att_rate": att_rate, "att_trend": att_trend,
         "paid_count": paid_count, "unpaid_count": unpaid_count,
         "todays_data": todays_data, "notifications": notifications,
-        "upcoming": upcoming, "groups_data": groups_data, "history": history, "max_history_income": max_history_income,
+        "upcoming": upcoming, "groups_data": groups_data, "recent_waitlist": recent_waitlist, "history": history, "max_history_income": max_history_income,
         "show_marked": show_marked,
         "active_page": "dashboard", "main_section": "studio_home"
     })
