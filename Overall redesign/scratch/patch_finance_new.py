@@ -1,0 +1,65 @@
+html_content = """{% extends "base.html" %}
+{% block title %}Finance
+<a href="/monthly-report/" class="btn block" style="position:fixed;bottom:24px;right:24px;box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:100;border-radius:99px;"><i data-lucide="file-text"></i> Monthly Report</a>
+{% endblock %}
+{% block page_title %}Finance{% endblock %}
+{% block topbar_actions %}
+<div style="display:flex;gap:8px;align-items:center">
+  <input class="form-control" type="month" value="{{ month_str }}" onchange="window.location='/finance/?month='+this.value" style="width:150px;padding:5px 10px">
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="segs">
+  <button class="" onclick="window.location='/payments/'">Payments</button>
+  <button class="on" onclick="window.location='/finance/'">Finance</button>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="v money">{{ "{:,.0f}".format(total_income) if total_income else 0 }}</div><div class="l">Income</div></div>
+  <div class="stat"><div class="v" style="color:var(--red)">{{ "{:,.0f}".format(total_expense) if total_expense else 0 }}</div><div class="l">Expenses</div></div>
+  <div class="stat"><div class="v" style="color:var(--greenD)">{{ "{:,.0f}".format(net_income) if net_income else 0 }}</div><div class="l">Net · {{ month_str }}</div></div>
+</div>
+
+<div class="card">
+  <div class="ct">Cash flow <button class="btn soft sm" onclick="openModal('addExpenseModal')"><i data-lucide="minus"></i>Add expense</button></div>
+  <div class="row">
+    <div class="rmain"><div class="rt">Student payments</div></div>
+    <span style="font-family:var(--fm);font-weight:600;font-size:14px;color:var(--greenD)">+ {{ "{:,.0f}".format(total_income) if total_income else 0 }}</span>
+  </div>
+  {% for e in expenses %}
+  <div class="row">
+    <div class="rmain"><div class="rt">{{ e.description }}</div><div class="rs">{{ e.date.strftime('%b %d') }}</div></div>
+    <span style="font-family:var(--fm);font-weight:600;font-size:14px;color:var(--red)">− {{ "{:,.0f}".format(e.amount) }}</span>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <div class="ct">Payment methods</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <span class="pill p-grey" style="padding:9px 16px">Cash</span>
+    <span class="pill p-grey" style="padding:9px 16px">Card</span>
+    <span class="pill p-grey" style="padding:9px 16px">Bank transfer</span>
+    <span class="pill p-grey" style="padding:9px 16px">Online</span>
+  </div>
+  <div style="font-size:12.5px;color:var(--txt2);margin-top:12px">Defaults live in Settings → Finance defaults.</div>
+</div>
+
+<!-- Modal for expenses if needed -->
+<div class="ovl" id="addExpenseModal" onclick="if(event.target===this)closeModal('addExpenseModal')">
+ <div class="modal">
+  <div class="mt">Add Expense<button class="x" onclick="closeModal('addExpenseModal')"><i data-lucide="x"></i></button></div>
+  <form method="post" action="/finance/expense">
+   <div class="fgroup"><label>Description</label><input name="description" placeholder="e.g. Rent, Materials" required></div>
+   <div class="fgroup"><label>Amount (UZS)</label><input type="number" name="amount" required></div>
+   <div class="fgroup"><label>Date</label><input type="date" name="date" required></div>
+   <button type="submit" class="btn block">Save Expense</button>
+  </form>
+ </div>
+</div>
+{% endblock %}
+"""
+
+with open("templates/finance.html", "w") as f:
+    f.write(html_content)

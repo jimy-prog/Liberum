@@ -1,0 +1,233 @@
+import re
+
+with open('templates/student_detail.html', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+new_content = """{% extends "base.html" %}
+{% block title %}{{ student.name }}{% endblock %}
+{% block page_title %}{{ student.name }}{% endblock %}
+{% block page_subtitle %}{{ student.level or 'No level' }} · {% if student.group %}{{ student.group.name }}{% else %}No Group{% endif %}{% endblock %}
+
+{% block topbar_actions %}
+<div style="display:flex;gap:8px">
+  {% if student.archived %}<span class="pill p-grey">Alumni</span>
+  {% elif student.active %}<span class="pill p-green">Active</span>
+  {% else %}<span class="pill p-grey">Inactive</span>{% endif %}
+  <button class="btn ghost sm" onclick="openModal('editStudent')"><i data-lucide="edit"></i>Edit</button>
+  {% if student.phone %}<button class="btn ghost sm" onclick="callStudent('{{ student.id }}','{{ (student.phone or '')|replace(\"'\", \"\") }}')"><i data-lucide="phone"></i>Call</button>{% endif %}
+  <button class="btn ghost sm" onclick="openHistoryPopup({{ student.id }})"><i data-lucide="clock"></i>History</button>
+  <button class="btn ghost sm" onclick="window.open('/reportcard/{{ student.id }}', '_blank')"><i data-lucide="file-text"></i>Report Card</button>
+</div>
+{% endblock %}
+
+{% block content %}
+<button class="btn ghost block" style="margin-bottom:16px;justify-content:flex-start" onclick="window.location='/students/'"><i data-lucide="arrow-left"></i>Back to students</button>
+
+<div class="grid2">
+  <div>
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="card" style="padding:14px;box-shadow:none;background:var(--fill)">
+        <div style="font-size:11px;color:var(--txt3)">Attendance</div>
+        <div style="font-size:18px;font-weight:700">{{ att_rate }}%</div>
+      </div>
+      <div class="card" style="padding:14px;box-shadow:none;background:var(--fill)">
+        <div style="font-size:11px;color:var(--txt3)">Payment</div>
+        <div style="font-size:18px;font-weight:700;color:{% if debt > 0 %}var(--red){% else %}var(--greenD){% endif %}">{% if debt > 0 %}Owes {{ debt }}{% else %}Paid{% endif %}</div>
+      </div>
+    </div>
+    
+    <!-- Contact -->
+    <div class="card">
+      <div class="ct">Contact details</div>
+      {% if student.phone %}
+      <div class="row" style="padding:0">
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div>
+        <div class="rmain">
+          <div class="rt">{{ student.phone }}</div>
+          <div class="rs">Student</div>
+        </div>
+        <button class="btn ghost sm" onclick="callStudent('{{ student.id }}','{{ (student.phone or '')|replace(\"'\", \"\") }}')">Call</button>
+      </div>
+      {% endif %}
+      {% if student.parent_phone %}
+      <div class="row" style="padding:0;margin-top:10px">
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div>
+        <div class="rmain">
+          <div class="rt">{{ student.parent_phone }}</div>
+          <div class="rs">Parent</div>
+        </div>
+        <button class="btn ghost sm" onclick="callStudent('{{ student.id }}','{{ (student.parent_phone or '')|replace(\"'\", \"\") }}')">Call</button>
+      </div>
+      {% endif %}
+      {% if student.email %}
+      <div class="row" style="padding:0;margin-top:10px">
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="mail"></i></div>
+        <div class="rmain">
+          <div class="rt">{{ student.email }}</div>
+          <div class="rs">Email</div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Notes -->
+    <div class="card">
+      <div class="ct">Teacher's note</div>
+      <div style="font-size:13px;line-height:1.6;color:var(--txt2);background:var(--fill);border-radius:12px;padding:12px 14px;">
+        {{ student.notes or 'No notes added.' }}
+      </div>
+    </div>
+    
+    <!-- Active Status -->
+    <div class="card">
+      <div class="ct">Status Management</div>
+      <div style="display:flex;gap:10px">
+        {% if student.active %}
+        <form action="/students/{{ student.id }}/pause" method="POST" style="flex:1">
+          <button type="submit" class="btn block ghost" style="color:var(--yellow)">Pause (Inactive)</button>
+        </form>
+        {% else %}
+        <form action="/students/{{ student.id }}/unpause" method="POST" style="flex:1">
+          <button type="submit" class="btn block ghost" style="color:var(--green)">Unpause (Active)</button>
+        </form>
+        {% endif %}
+        {% if student.archived %}
+        <form action="/students/{{ student.id }}/unarchive" method="POST" style="flex:1">
+          <button type="submit" class="btn block ghost" style="color:var(--blue)">Unarchive</button>
+        </form>
+        {% else %}
+        <form action="/students/{{ student.id }}/archive" method="POST" style="flex:1">
+          <button type="submit" class="btn block ghost" style="color:var(--txt3)">Archive (Alumni)</button>
+        </form>
+        {% endif %}
+      </div>
+      <form action="/students/{{ student.id }}/ban" method="POST" onsubmit="return askBanReason(this)" style="margin-top:10px">
+        <input type="hidden" name="reason" value="">
+        <button type="submit" class="btn block ghost" style="color:var(--red)"><i data-lucide="ban"></i> Ban Student</button>
+      </form>
+    </div>
+  </div>
+
+  <div>
+    <!-- Finances -->
+    <div class="card">
+      <div class="ct" style="display:flex;justify-content:space-between">
+        <span>Recent Payments</span>
+        <button class="btn sm" onclick="openModal('addPayment')"><i data-lucide="plus"></i>Payment</button>
+      </div>
+      {% for p in payments[:3] %}
+      <div class="row">
+        <div class="av" style="background:rgba(30,158,74,.12);color:var(--money)"><i data-lucide="banknote"></i></div>
+        <div class="rmain">
+          <div class="rt">{{ p.amount }} UZS</div>
+          <div class="rs">{{ p.date.strftime('%B %d, %Y') }}</div>
+        </div>
+        <span class="pill p-green">{{ p.method }}</span>
+      </div>
+      {% else %}
+      <div class="empty">No recent payments</div>
+      {% endfor %}
+      <button class="btn block ghost" style="margin-top:12px" onclick="window.location='/payments/?q={{ student.name }}'">View all payments</button>
+    </div>
+
+    <!-- Recent History -->
+    <div class="card">
+      <div class="ct">Recent Attendance</div>
+      {% for a in attendance_history %}
+      <div class="row" style="padding:0;margin-bottom:12px">
+        <div class="rmain">
+          <div class="rt">{% if a.lesson.group %}{{ a.lesson.group.name }}{% endif %}</div>
+          <div class="rs">{{ a.lesson.date.strftime('%B %d') }} · {{ a.lesson.topic or 'Lesson' }}</div>
+        </div>
+        {% if a.status == 'Present' %}<span class="pill p-green">Present</span>
+        {% elif a.status == 'Absent' %}<span class="pill p-red">Absent</span>
+        {% elif a.status == 'Excused' %}<span class="pill p-yellow">Excused</span>
+        {% else %}<span class="pill p-grey">{{ a.status }}</span>{% endif %}
+      </div>
+      {% else %}
+      <div class="empty">No attendance records</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Add Payment Modal -->
+<div class="ovl" id="addPayment">
+  <div class="modal">
+    <div class="mt">Record Payment<button type="button" class="x" onclick="document.getElementById('addPayment').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form action="/students/{{ student.id }}/add-payment" method="POST" style="margin-top:16px">
+      <div class="fgroup">
+        <label>Amount (UZS)</label>
+        <input type="number" name="amount" required>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label>Method</label><select name="method"><option>Cash</option><option>Card</option><option>Transfer</option></select></div>
+        <div class="fgroup"><label>Date</label><input type="date" name="date_str" required></div>
+      </div>
+      <div class="fgroup"><label>Notes</label><input name="notes" placeholder="e.g. September fee"></div>
+      <button class="btn block" style="margin-top:16px">Save Payment</button>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Student Modal -->
+<div class="ovl" id="editStudent">
+  <div class="modal">
+    <div class="mt">Edit Profile<button type="button" class="x" onclick="document.getElementById('editStudent').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form action="/students/{{ student.id }}/edit" method="POST" style="margin-top:16px">
+      <div class="fgroup"><label>Name</label><input name="name" value="{{ student.name }}" required></div>
+      <div class="frow">
+        <div class="fgroup"><label>Group</label>
+          <select name="group_id">
+            <option value="">No Group</option>
+            {% for g in groups %}
+            <option value="{{ g.id }}" {% if student.group_id == g.id %}selected{% endif %}>{{ g.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="fgroup"><label>Level</label><input name="level" value="{{ student.level or '' }}"></div>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label>Phone</label><input name="phone" value="{{ student.phone or '' }}"></div>
+        <div class="fgroup"><label>Parent Phone</label><input name="parent_phone" value="{{ student.parent_phone or '' }}"></div>
+      </div>
+      <div class="fgroup"><label>Email</label><input name="email" value="{{ student.email or '' }}"></div>
+      <div class="fgroup"><label>Notes</label><textarea name="notes" rows="2">{{ student.notes or '' }}</textarea></div>
+      <button class="btn block" style="margin-top:16px">Save Changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function callStudent(sid, phone) {
+  fetch(`/students/${sid}/log-call`, { method: 'POST' }).catch(() => {});
+  window.location.href = `tel:${phone}`;
+}
+
+function askBanReason(formEl) {
+  const reason = prompt('Reason for ban:');
+  if (reason === null) return false;
+  formEl.querySelector('input[name="reason"]').value = reason.trim();
+  return true;
+}
+
+function openHistoryPopup(studentId) {
+  window.open(`/students/${studentId}/history`, `history-${studentId}`, 'width=980,height=720,scrollbars=yes,resizable=yes');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    const di = document.querySelector('input[name="date_str"]');
+    if(di) di.value = today;
+});
+</script>
+{% endblock %}
+"""
+
+# Completely rewrite the file
+with open('templates/student_detail.html', 'w', encoding='utf-8') as f:
+    f.write(new_content)
+

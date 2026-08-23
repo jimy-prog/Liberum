@@ -1,0 +1,161 @@
+# ========== 1. PLACEMENT DASHBOARD ==========
+placement_html = r"""{% extends "base.html" %}
+{% block title %}Placement Tests | Liberum{% endblock %}
+{% block page_title %}Students{% endblock %}
+{% block page_subtitle %}CRM · groups · waitlist · performance · placement{% endblock %}
+{% block topbar_actions %}{% endblock %}
+
+{% block content %}
+<div class="segs">
+  <button onclick="window.location='/students/'">Students</button>
+  <button onclick="window.location='/groups/'">Groups</button>
+  <button onclick="window.location='/waitlist/'">Waitlist</button>
+  <button onclick="window.location='/performance/'">Performance</button>
+  <button class="on" onclick="window.location='/placement/'">Placement tests</button>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="v">{{ questions|length }}</div><div class="l">Question bank</div></div>
+  <div class="stat"><div class="v">{{ sessions|length }}</div><div class="l">Tests this month</div></div>
+</div>
+
+<div class="card">
+  <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
+    <span>New placement test</span>
+    <button class="btn ghost sm" onclick="document.getElementById('addQuestionModal').classList.add('open')"><i data-lucide="book-open"></i>Manage Questions</button>
+  </div>
+  <div style="font-size:13px;color:var(--txt2);margin-bottom:16px">
+    Generates a 4-digit PIN. The student takes the test on the tablet — no account needed.
+  </div>
+  <button class="btn" onclick="document.getElementById('createSessionModal').classList.add('open')"><i data-lucide="key-round"></i>Generate PIN</button>
+</div>
+
+<div class="card">
+  <div class="ct">Recent results</div>
+  {% for s in sessions %}
+  <div class="row">
+    {% if s.student_name %}{% set parts = s.student_name.split() %}{% set initials = (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper %}{% else %}{% set initials = '?' %}{% endif %}
+    <div class="av" style="background:var(--fill);color:var(--txt2)">{{ initials }}</div>
+    <div class="rmain">
+      <div class="rt">{{ s.student_name or 'Unknown' }}</div>
+      <div class="rs">{% if s.created_at %}{{ s.created_at.strftime('%b %d') }}{% endif %} · Target: {{ s.target_level.capitalize() if s.target_level else 'N/A' }}</div>
+    </div>
+    {% if s.status == 'completed' %}
+      <span class="pill p-green">{{ s.result_level or 'Done' }}</span>
+      {% if not s.student_id %}<button class="btn ghost sm" onclick="window.location='/students/?add_from_placement={{ s.id }}'">Enroll</button>{% endif %}
+    {% elif s.status == 'active' %}
+      <span class="pill p-grey">In Progress</span>
+    {% else %}
+      <span class="pill p-acc" style="font-family:var(--fm)">PIN: {{ s.pin_code }}</span>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="empty"><i data-lucide="clipboard-list"></i><b>No tests yet</b></div>
+  {% endfor %}
+</div>
+
+{% if questions %}
+<div class="card">
+  <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
+    <span>Question Bank <span class="pill p-acc">{{ questions|length }}</span></span>
+    <button class="btn ghost sm" onclick="document.getElementById('addQuestionModal').classList.add('open')"><i data-lucide="plus"></i>Add Question</button>
+  </div>
+  {% for level in ['elementary','pre-intermediate','intermediate','upper-intermediate','advanced'] %}
+  {% set level_qs = questions | selectattr('level','equalto',level) | list %}
+  {% if level_qs %}
+  <div style="margin-bottom:10px">
+    <div style="font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 4px">{{ level | replace('-',' ') | title }}</div>
+    {% for q in level_qs %}
+    <div class="row" style="align-items:flex-start">
+      <div class="rmain">
+        <div class="rt" style="font-size:13px">{{ q.text or q.prompt }}</div>
+        <div class="rs" style="margin-top:4px">
+          {% if q.option_a %}A: {{ q.option_a }}{% endif %}{% if q.option_b %} · B: {{ q.option_b }}{% endif %}
+          {% if q.correct_option %}<span class="pill p-green" style="margin-left:8px">✓ {{ q.correct_option }}</span>{% endif %}
+        </div>
+      </div>
+      <form action="/placement/question/{{ q.id }}/delete" method="POST">
+        <button type="submit" class="btn ghost sm" style="color:var(--red)"><i data-lucide="trash-2"></i></button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Create Session Modal -->
+<div class="ovl" id="createSessionModal">
+  <div class="modal">
+    <div class="mt">Placement PIN<button type="button" class="x" onclick="document.getElementById('createSessionModal').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form action="/placement/session/create" method="POST" style="margin-top:16px">
+      <div class="fgroup"><label>Student Name</label><input name="student_name" required placeholder="Enter client's full name"></div>
+      <div class="fgroup"><label>Phone (Optional)</label><input name="phone" placeholder="+998..."></div>
+      <div class="fgroup"><label>Target Level</label>
+        <select name="target_level" required>
+          <option value="elementary">Elementary</option>
+          <option value="pre-intermediate">Pre-Intermediate</option>
+          <option value="intermediate" selected>Intermediate</option>
+          <option value="upper-intermediate">Upper-Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+      <button type="submit" class="btn block" style="margin-top:16px">Generate Access PIN</button>
+    </form>
+  </div>
+</div>
+
+<!-- Add Question Modal -->
+<div class="ovl" id="addQuestionModal">
+  <div class="modal">
+    <div class="mt">Add Placement Question<button type="button" class="x" onclick="document.getElementById('addQuestionModal').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form action="/placement/question/add" method="POST" style="margin-top:16px">
+      <div class="fgroup"><label>Level</label>
+        <select name="level" required>
+          <option value="elementary">Elementary</option>
+          <option value="pre-intermediate">Pre-Intermediate</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="upper-intermediate">Upper-Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+      <div class="fgroup"><label>Question Text</label><textarea name="prompt" rows="2" required placeholder="Type question here..."></textarea></div>
+      <div class="frow">
+        <div class="fgroup"><label>Option A</label><input name="option_a" required></div>
+        <div class="fgroup"><label>Option B</label><input name="option_b" required></div>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label>Option C</label><input name="option_c" required></div>
+        <div class="fgroup"><label>Option D</label><input name="option_d" required></div>
+      </div>
+      <div class="fgroup"><label>Correct Option</label>
+        <select name="correct_option" required>
+          <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+        </select>
+      </div>
+      <button type="submit" class="btn block" style="margin-top:16px">Save Question</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+"""
+
+with open('templates/placement_dashboard.html', 'w', encoding='utf-8') as f:
+    f.write(placement_html)
+
+# ========== 2. FIX GROUPS - Modal uses old class names ==========
+with open('templates/groups.html', 'r', encoding='utf-8') as f:
+    g = f.read()
+
+# Replace old-style form classes in the Add Group modal
+g = g.replace('class="form-group"', 'class="fgroup"')
+g = g.replace('class="form-control"', '')
+g = g.replace('class="grid-2"', 'class="frow"')
+# Fix the modal open mechanism — button had onclick="openModal('addGroup')" which isn't defined
+g = g.replace("openModal('addGroup')", "document.getElementById('addGroup').classList.add('open')")
+
+with open('templates/groups.html', 'w', encoding='utf-8') as f:
+    f.write(g)
+
+print("Done")

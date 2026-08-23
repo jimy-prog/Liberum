@@ -1,0 +1,97 @@
+<div class="modal" id="studentDetailModal" style="display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">
+  <div class="modal-box" style="width:750px;max-width:95vw;max-height:90vh;overflow-y:auto;padding:0;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.12)">
+    
+    <!-- Header -->
+    <div style="padding:20px 24px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:20px;font-weight:600;color:var(--txt)">{{ student.name }}</div>
+        <div style="font-size:13px;color:var(--txt3);margin-top:4px">{{ student.level or 'No level' }} · {% if student.group %}{{ student.group.name }}{% else %}No Group{% endif %}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        {% if student.archived %}<span class="pill p-grey">Alumni</span>
+        {% elif student.active %}<span class="pill p-green">Active</span>
+        {% else %}<span class="pill p-grey">Inactive</span>{% endif %}
+        <button class="btn ghost sm" onclick="window.location='/students/{{ student.id }}'"><i data-lucide="external-link"></i>Open</button>
+        <button class="btn ghost sm" onclick="document.getElementById('studentDetailModal').remove()"><i data-lucide="x"></i></button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div style="padding:24px" class="grid2">
+      <div>
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div class="card" style="padding:14px;box-shadow:none;background:var(--fill)">
+            <div style="font-size:11px;color:var(--txt3)">Attendance</div>
+            <div style="font-size:18px;font-weight:700">{{ att_rate }}%</div>
+          </div>
+          <div class="card" style="padding:14px;box-shadow:none;background:var(--fill)">
+            <div style="font-size:11px;color:var(--txt3)">Payment</div>
+            <div style="font-size:18px;font-weight:700;color:{% if debt > 0 %}var(--red){% else %}var(--greenD){% endif %}">{% if debt > 0 %}Owes {{ debt }}{% else %}Paid{% endif %}</div>
+          </div>
+        </div>
+        
+        <!-- Contact -->
+        <div class="card">
+          <div class="ct">Contact details</div>
+          {% if student.phone %}
+          <div class="row" style="padding:0">
+            <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div>
+            <div class="rmain">
+              <div class="rt">Student phone</div>
+              <div class="rs">{{ student.phone }}</div>
+            </div>
+          </div>
+          {% endif %}
+          {% if student.parent_phone %}
+          <div class="row" style="padding:0;margin-top:10px">
+            <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="users"></i></div>
+            <div class="rmain">
+              <div class="rt">Parent phone</div>
+              <div class="rs">{{ student.parent_phone }}</div>
+            </div>
+          </div>
+          {% endif %}
+          {% if not student.phone and not student.parent_phone %}
+          <div style="font-size:13px;color:var(--txt3)">No contact details.</div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div>
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="ct">Quick actions</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+             <button class="btn ghost block" onclick="window.open('/reportcard/{{ student.id }}', '_blank')"><i data-lucide="file-text"></i>Report</button>
+             <button class="btn ghost block" onclick="openHistoryPopup({{ student.id }})"><i data-lucide="clock"></i>History</button>
+          </div>
+        </div>
+        
+        <!-- Tests -->
+        <div class="card">
+          <div class="ct">Recent tests</div>
+          {% if tests %}
+            {% for t in tests[:3] %}
+            <div class="row" style="padding:0;margin-bottom:10px">
+              <div class="rmain">
+                <div class="rt">{{ t.test_name }}</div>
+                <div class="rs">{{ t.test_date }}</div>
+              </div>
+              <div style="font-weight:600">{{ t.score }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div style="font-size:13px;color:var(--txt3)">No tests recorded.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+</script>

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+html_content = """{% extends "base.html" %}
 {% block title %}Settings{% endblock %}
 {% block page_title %}Settings{% endblock %}
 
@@ -10,10 +10,10 @@
  </div></div>
  
  <div class="card"><div class="ct">Workspace</div>
-  <div class="row" onclick="openModal('studioProfileModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="school"></i></div><div class="rmain"><div class="rt">Studio profile</div><div class="rs">Name, address, working hours</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
-  <div class="row" onclick="openModal('contactModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div><div class="rmain"><div class="rt">Contact</div><div class="rs">Phone, Telegram, email</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
+  <div class="row" onclick="openModal('editProfileModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="school"></i></div><div class="rmain"><div class="rt">Studio profile</div><div class="rs">Name, address, working hours</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
+  <div class="row" onclick="openModal('editProfileModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div><div class="rmain"><div class="rt">Contact</div><div class="rs">Phone, Telegram, email</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="toast('Link copied','link')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="link"></i></div><div class="rmain"><div class="rt">Public join link</div><div class="rs">liberum.uz/join/{{ _u.username }}</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
-  <div class="row" onclick="openModal('teamModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="users"></i></div><div class="rmain"><div class="rt">Roles & Permissions</div><div class="rs">Teachers, admins, access</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
+  <div class="row" onclick="window.location='/owner/users'"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="users"></i></div><div class="rmain"><div class="rt">Team</div><div class="rs">Teachers, roles & permissions</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
  </div>
  
  <div class="card"><div class="ct">Finance defaults</div>
@@ -64,3 +64,7 @@
 </div>
 
 {% endblock %}
+"""
+
+with open("templates/settings_page.html", "w") as f:
+    f.write(html_content)

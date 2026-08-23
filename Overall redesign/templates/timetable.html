@@ -49,6 +49,7 @@
 
 {% block content %}
 <div class="segs">
+  <button class="{% if view == 'monthly' %}on{% endif %}" onclick="window.location='/timetable/monthly'">Month</button>
   <button class="{% if view == 'weekly' %}on{% endif %}" onclick="window.location='/timetable/weekly'">Week</button>
   <button class="{% if view == 'daily' %}on{% endif %}" onclick="window.location='/timetable/'">Day</button>
   <button onclick="window.location='/timetable/online'">Online</button>

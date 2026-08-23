@@ -1,0 +1,58 @@
+import re
+
+with open("templates/library/teacher_dashboard.html", "r") as f:
+    text = f.read()
+
+# Replace tailwind classes with new UI classes
+new_html = r"""{% extends "base.html" %}
+{% block title %}Library{% endblock %}
+{% block page_title %}Learning / Library{% endblock %}
+
+{% block content %}
+<div class="segs">
+  <button onclick="window.location='/homework/'">Homework</button>
+  <button onclick="window.location='/courses/'">Courses</button>
+  <button class="on" onclick="window.location='/library/'">Library</button>
+</div>
+
+<div class="card" style="margin-bottom:16px;">
+  <div class="ct">Manage Resources</div>
+  <p class="rs mb-4" style="margin-bottom:16px">Upload new e-books or audio files for your students.</p>
+  <div style="display:flex;gap:10px;">
+    <button class="btn block" onclick="window.location='/library/books/manage'"><i data-lucide="book"></i> Manage Library Books</button>
+    <button class="btn block" onclick="window.location='/library/audio/manage'"><i data-lucide="headphones"></i> Manage Audio Lessons</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="ct">Grammar Test Activity</div>
+  {% if recent_grammar %}
+  {% for r in recent_grammar %}
+  <div class="row">
+    <div class="av" style="background:var(--fill);color:var(--txt2)">
+      {% set parts = r.student.name.split() %}
+      {{ (parts[0][0] + (parts[1][0] if parts|length > 1 else '')) | upper }}
+    </div>
+    <div class="rmain">
+      <div class="rt">{{ r.student.name }}</div>
+      <div class="rs">{{ r.grammar_topic.title }}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="rt">{{ r.score }} / {{ r.total_questions }}</div>
+      <div class="rs">{{ r.created_at.strftime('%d %b %Y, %H:%M') }}</div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="empty">
+    <i data-lucide="clipboard-list"></i>
+    <b>No Recent Activity</b>
+    <p>Students haven't completed any grammar tests recently.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+"""
+
+with open("templates/library/teacher_dashboard.html", "w") as f:
+    f.write(new_html)

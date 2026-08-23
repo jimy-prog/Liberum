@@ -1,0 +1,164 @@
+import re
+
+html = r"""{% extends "base.html" %}
+{% block title %}Waitlist{% endblock %}
+{% block page_title %}Students{% endblock %}
+{% block page_subtitle %}CRM · groups · waitlist · performance · placement{% endblock %}
+
+{% block extra_styles %}
+<style>
+.wl-head { display:grid; gap:10px; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--txt3); padding:0 12px 10px; border-bottom:1px solid var(--line); margin-bottom:8px; }
+.wl-row { display:grid; gap:10px; align-items:center; padding:12px; border-radius:10px; transition:.15s; font-size:13px; color:var(--txt2); }
+.wl-row:hover { background:var(--fill); color:var(--txt); }
+.wl-row + .wl-row { border-top:1px solid var(--line); }
+.wl-grid { grid-template-columns: 1.8fr 1.2fr 1.2fr 1fr 1.5fr 1.2fr 1.2fr 1fr 1fr 1.2fr 1.5fr; }
+.ft-btn { font-size:12px; padding:6px 12px; border-radius:6px; color:var(--txt2); background:var(--fill); border:none; cursor:pointer; font-weight:500; transition:.15s; }
+.ft-btn:hover { background:var(--bg3); color:var(--txt); }
+.ft-btn.active { background:var(--green); color:#fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="segs">
+  <button onclick="window.location='/students/'">Students</button>
+  <button onclick="window.location='/groups/'">Groups</button>
+  <button class="on" onclick="window.location='/waitlist/'">Waitlist</button>
+  <button onclick="window.location='/performance/'">Performance</button>
+  <button onclick="window.location='/placement/'">Placement tests</button>
+</div>
+
+<div class="card" style="background:var(--accbg);box-shadow:none;margin-bottom:14px">
+  <div style="display:flex;gap:14px;align-items:center">
+    <i data-lucide="link" style="color:var(--acc)"></i>
+    <div class="rmain">
+      <div class="rt" style="color:var(--acc2)">Join link is live</div>
+      <div class="rs">{{ request.url.scheme }}://{{ request.url.netloc }}/join/{{ user.username }}</div>
+    </div>
+    <button class="btn sm" onclick="navigator.clipboard.writeText('{{ request.url.scheme }}://{{ request.url.netloc }}/join/{{ user.username }}'); toast('Link copied','copy')"><i data-lucide="copy"></i>Copy</button>
+  </div>
+</div>
+
+<div class="card" style="padding:16px 0;">
+  <div style="display:flex; justify-content:space-between; align-items:center; padding:0 16px 16px;">
+    <div style="font-weight:600; font-size:14px;">ALL ENQUIRIES ({{ entries|length }})</div>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <div style="display:flex; gap:4px; margin-right:12px;">
+        <button class="ft-btn active">All</button>
+        <button class="ft-btn">New Enquiry</button>
+        <button class="ft-btn">Contacted</button>
+        <button class="ft-btn">Trial</button>
+        <button class="ft-btn">Enrolled</button>
+      </div>
+      <button class="btn sm" onclick="document.getElementById('addEntry').classList.add('open')"><i data-lucide="plus"></i>Add Enquiry</button>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <div style="min-width:1150px; padding:0 16px;">
+      <div class="wl-head wl-grid">
+        <div>Name</div><div>Phone</div><div>Parent</div><div>Mode</div><div>Wants Group</div><div>Schedule</div><div>Goal</div><div>How Found</div><div>Trial</div><div>Status</div><div>Actions</div>
+      </div>
+      
+      {% for w in entries %}
+      <div class="wl-row wl-grid">
+        <div style="font-weight:600; color:var(--txt);">{{ w.name }}</div>
+        <div>{{ w.phone or '—' }}</div>
+        <div>{{ w.parent_phone or '—' }}</div>
+        <div>{{ 'In-person' if w.mode == 'in-person' else 'Online' }}</div>
+        <div>{{ w.desired_group.name if w.desired_group else (w.desired_group_id or '—') }}</div>
+        <div>{{ w.preferred_schedule or '—' }}</div>
+        <div>{{ w.learning_goal or '—' }}</div>
+        <div>{{ w.how_found or '—' }}</div>
+        <div>{{ w.trial_date.strftime('%d/%m/%Y') if w.trial_date else '—' }}</div>
+        <div>
+          <form method="post" action="/waitlist/{{ w.id }}/update-status" style="margin:0">
+            <select name="status" onchange="this.form.submit()" style="font-size:11px; padding:4px 8px; border-radius:6px; border:1px solid var(--border); background:var(--card); color:var(--txt);">
+              <option value="new" {% if w.status=='new' %}selected{% endif %}>New Enquiry</option>
+              <option value="contacted" {% if w.status=='contacted' %}selected{% endif %}>Contacted</option>
+              <option value="trial" {% if w.status=='trial' %}selected{% endif %}>Trial</option>
+              <option value="enrolled" {% if w.status=='enrolled' %}selected{% endif %}>Enrolled</option>
+            </select>
+          </form>
+        </div>
+        <div style="display:flex; gap:6px;">
+          {% if w.phone %}<button class="btn ghost sm" style="padding:0 8px; height:26px" onclick="window.location.href='tel:{{ w.phone }}'">Call</button>{% endif %}
+          <button class="btn acc sm" style="padding:0 8px; height:26px" onclick="openEnroll({{ w.id }}, '{{ w.name }}')">Enroll <i data-lucide="arrow-right" style="width:12px"></i></button>
+          <form method="post" action="/waitlist/{{ w.id }}/delete" style="margin:0" onsubmit="return confirm('Delete this enquiry?')">
+            <button type="submit" class="btn ghost sm" style="padding:0 8px; height:26px; color:var(--red)"><i data-lucide="x" style="width:14px"></i></button>
+          </form>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty">Waitlist is empty</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Add Enquiry Modal -->
+<div class="ovl" id="addEntry" onclick="if(event.target===this)document.getElementById('addEntry').classList.remove('open')">
+  <div class="modal">
+    <div class="mt">Add Enquiry<button type="button" class="x" onclick="document.getElementById('addEntry').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form method="post" action="/waitlist/add" style="margin-top:16px">
+      <div class="fgroup"><label>Full Name *</label><input name="name" required></div>
+      <div class="frow">
+        <div class="fgroup"><label>Phone</label><input name="phone" placeholder="+998..."></div>
+        <div class="fgroup"><label>Parent Phone</label><input name="parent_phone"></div>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label>Mode</label>
+          <select name="mode"><option value="in-person">In-person</option><option value="online">Online</option></select>
+        </div>
+        <div class="fgroup"><label>Wants Group (Optional)</label>
+          <select name="desired_group_id"><option value="">-- Not sure --</option>{% for g in groups %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}</select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fgroup"><label>Schedule Pref</label><input name="preferred_schedule" placeholder="e.g. Evening"></div>
+        <div class="fgroup"><label>How Found</label><input name="how_found" placeholder="e.g. Instagram"></div>
+      </div>
+      <div class="fgroup"><label>Goal / Notes</label><textarea name="learning_goal" rows="2"></textarea></div>
+      <button type="submit" class="btn block" style="margin-top:16px">Add Enquiry</button>
+    </form>
+  </div>
+</div>
+
+<!-- Enroll Modal -->
+<div class="ovl" id="enrollModal" onclick="if(event.target===this)document.getElementById('enrollModal').classList.remove('open')">
+  <div class="modal">
+    <div class="mt">Enroll Student<button type="button" class="x" onclick="document.getElementById('enrollModal').classList.remove('open')"><i data-lucide="x"></i></button></div>
+    <form id="enrollForm" method="post" style="margin-top:16px">
+      <div class="fgroup">
+        <label>Assign to Group *</label>
+        <select name="group_id" required>
+          {% for g in groups %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Level</label>
+        <select name="level">
+          {% for lv in ['','A1','A2','B1','B2','C1'] %}<option value="{{ lv }}">{{ lv or 'Not assessed' }}</option>{% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn block" style="margin-top:16px">Enroll Now</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openEnroll(eid, name) {
+  const form = document.getElementById('enrollForm');
+  if (form) {
+      form.action = `/waitlist/${eid}/enroll`;
+  }
+  document.getElementById('enrollModal').classList.add('open');
+}
+</script>
+{% endblock %}
+"""
+
+with open('templates/waitlist.html', 'w', encoding='utf-8') as f:
+    f.write(html)
+print("done")
