@@ -74,7 +74,7 @@
     {% for time, lessons in day.lessons_by_time.items() %}
       {% for l in lessons %}
       {% set ns.has_events = true %}
-      <div class="evt" style="background:{{ l.group.color }}18;color:{{ l.group.color }}" onclick="window.location='/classes/{{ l.id }}/attendance'">
+      <div class="evt" style="background:{{ l.group.color }}18;color:{{ l.group.color }}" onclick="window.location='/lessons/{{ l.id }}'">
         {{ l.group.name }}
         <small>{{ l.time }} · {% if l.mode == 'online' %}Online{% else %}Room {{ l.room or '1' }}{% endif %}</small>
       </div>
@@ -110,13 +110,13 @@
         <div class="av" style="background:var(--accbg);color:var(--acc2)"><i data-lucide="clock"></i></div>
       {% endif %}
       <div class="rmain">
-        <div class="rt">{{ l.group.name }}</div>
+        <div class="rt" style="cursor:pointer" onclick="window.location=\'/groups/{{ l.group.id }}\'">{{ l.group.name }}</div>
         <div class="rs">{{ l.time }} · {% if l.mode == 'online' %}Online · Zoom{% else %}Room {{ l.room or '1' }}{% endif %} · {{ l.group.students|length }} students</div>
       </div>
       {% if l.mode == 'online' %}
         <button class="btn ghost sm" onclick="window.open('{{ l.group.zoom_link }}', '_blank')"><i data-lucide="link"></i>Zoom link</button>
       {% endif %}
-      <button class="btn {% if l.mode != 'online' %}btn-primary{% endif %} sm" style="background:var(--acc);color:#fff" onclick="window.location='/classes/{{ l.id }}/attendance'"><i data-lucide="check-square"></i>Attendance</button>
+      <button class="btn {% if l.mode != 'online' %}btn-primary{% endif %} sm" style="background:var(--acc);color:#fff" onclick="window.location='/lessons/{{ l.id }}'"><i data-lucide="check-square"></i>Attendance</button>
     </div>
     {% endfor %}
   {% endfor %}
@@ -141,10 +141,10 @@
   <div class="row">
     <div style="font-family:var(--fm);font-size:13px;font-weight:600;width:56px;color:{% if c.lesson.mode == 'online' %}var(--greenD){% else %}var(--acc2){% endif %}">{{ c.lesson.time }}</div>
     <div class="rmain">
-      <div class="rt">{{ c.lesson.group.name }}</div>
+      <div class="rt" style="cursor:pointer" onclick="window.location=\'/groups/{{ c.lesson.group.id }}\'">{{ c.lesson.group.name }}</div>
       <div class="rs">{% if c.lesson.mode == 'online' %}Online · Zoom{% else %}Room {{ c.lesson.room or '1' }}{% endif %} · {{ c.students|length }} students</div>
     </div>
-    <button class="btn soft sm" onclick="window.location='/classes/{{ c.lesson.id }}/attendance'">Attendance</button>
+    <button class="btn soft sm" onclick="window.location='/lessons/{{ c.lesson.id }}'">Attendance</button>
   </div>
   {% else %}
   <div class="empty">No classes on this day</div>
@@ -153,6 +153,62 @@
 </div>
 
 {% else %}
+<style>
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.cal-day-header {
+  background: var(--bg3);
+  padding: 8px 4px;
+  text-align: center;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.cal-day {
+  background: var(--bg2);
+  min-height: 110px;
+  padding: 8px;
+  position: relative;
+  transition: background .15s;
+}
+.cal-day.other-month { background: var(--bg3); opacity: 0.5; }
+.cal-day.today { background: var(--accbg); }
+.day-num {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 6px;
+  display: block;
+}
+.cal-day.today .day-num {
+  color: var(--acc);
+}
+.cal-lesson {
+  display: block;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: .7rem;
+  font-weight: 500;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  transition: opacity .15s;
+  cursor: pointer;
+}
+.cal-lesson:hover { opacity: .85; }
+</style>
+
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
   <div style="font-family:var(--fd);font-weight:600;font-size:18px">{{ month_start.strftime('%B %Y') }}</div>
   <div style="display:flex; align-items:center; gap:8px;">
@@ -160,8 +216,25 @@
     <button class="btn ghost sm" onclick="window.location='/timetable/monthly?month={{ next_month }}'">Next<i data-lucide="chevron-right"></i></button>
   </div>
 </div>
-<div class="card">
-  <div class="empty">Monthly view uses grid (skipped for brevity, stick to Week/Day tabs!)</div>
+
+<div class="cal-grid mb-6">
+  {% for day_name in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}
+  <div class="cal-day-header">{{ day_name }}</div>
+  {% endfor %}
+
+  {% for week in weeks %}
+  {% for day in week %}
+  <div class="cal-day {% if not day.in_month %}other-month{% endif %} {% if day.is_today %}today{% endif %}">
+    <div class="day-num">{{ day.date.day }}</div>
+    {% for lesson in day.lessons %}
+    <a href="/groups/{{ lesson.group_id }}" class="cal-lesson"
+       style="background:{{ lesson.group.color or '#4f46e5' }}22;color:{{ lesson.group.color or '#4f46e5' }};border:1px solid {{ lesson.group.color or '#4f46e5' }}44">
+      {% if lesson.time %}{{ lesson.time }} · {% endif %}{{ lesson.group.name }}
+    </a>
+    {% endfor %}
+  </div>
+  {% endfor %}
+  {% endfor %}
 </div>
 {% endif %}
 {% endblock %}

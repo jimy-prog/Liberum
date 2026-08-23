@@ -65,7 +65,7 @@ def finance_view(request: Request, month: str = None, db: Session = Depends(get_
 
     return templates.TemplateResponse("finance.html",{
         "request":request,"month_start":ms,"month_str":ms.strftime("%Y-%m"),
-        "active_stats":active_stats,"active_income":active_income,
+        "active_stats":active_stats,"active_income":active_income, "total_expense": 0, "net_income": active_income, "expenses": [],
         "active_countable":active_countable,"archived_stats":archived_stats,
         "archived_alltime":archived_alltime,"history":history,"active_page": "finance", "main_section": "money"
     })

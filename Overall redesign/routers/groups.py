@@ -164,3 +164,20 @@ def group_detail(gid: int, request: Request, month: str = None,
 def api_list_groups(db: Session = Depends(get_db)):
     groups = db.query(Group).filter(Group.status == "active").all()
     return [{"id": g.id, "name": g.name} for g in groups]
+
+
+@router.get("/{group_id}/journal")
+def group_journal(group_id: int, request: Request, db: Session = Depends(get_db)):
+    group = db.query(Group).get(group_id)
+    if not group:
+        return RedirectResponse("/groups/")
+    
+    past_lessons = db.query(Lesson).filter(
+        Lesson.group_id == group_id,
+        Lesson.status.in_(["Held", "Cancelled", "Holiday"])
+    ).order_by(Lesson.date.desc()).limit(20).all()
+    
+    return templates.TemplateResponse("group_journal.html", {
+        "request": request, "group": group, "lessons": past_lessons,
+        "active_page": "groups", "main_section": "academy"
+    })

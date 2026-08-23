@@ -25,10 +25,11 @@
       
       <div class="fgroup">
         <label>Check Image / Receipt</label>
-        <div style="border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer">
+        <label style="display:block;border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer;background:var(--bg)">
           <i data-lucide="upload-cloud" style="margin-bottom:8px"></i><br>
-          Click to upload receipt
-        </div>
+          <span id="vpUploadText">Click to upload receipt</span>
+          <input type="file" style="display:none" onchange="document.getElementById('vpUploadText').innerText = this.files[0].name">
+        </label>
       </div>
       
       <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
@@ -37,11 +38,20 @@
 </div>
 <script>
 function viewPayment(student, amount, method, month) {
+    let m = document.getElementById('viewPaymentModal');
+    if(m.parentNode !== document.body) document.body.appendChild(m);
     document.getElementById('vpStudent').innerText = student;
     document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
+    
+    // The user said the method and month are very large and ugly.
     document.getElementById('vpMethod').innerText = method;
+    document.getElementById('vpMethod').style.fontSize = '14px';
     document.getElementById('vpMonth').innerText = month;
-    document.getElementById('viewPaymentModal').classList.add('open');
+    document.getElementById('vpMonth').style.fontSize = '14px';
+    
+    // Also increase z-index
+    m.style.zIndex = '99999';
+    m.classList.add('open');
 }
 </script>
 
@@ -70,10 +80,11 @@ function viewPayment(student, amount, method, month) {
       
       <div class="fgroup">
         <label>Check Image / Receipt</label>
-        <div style="border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer">
+        <label style="display:block;border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer;background:var(--bg)">
           <i data-lucide="upload-cloud" style="margin-bottom:8px"></i><br>
-          Click to upload receipt
-        </div>
+          <span id="vpUploadText">Click to upload receipt</span>
+          <input type="file" style="display:none" onchange="document.getElementById('vpUploadText').innerText = this.files[0].name">
+        </label>
       </div>
       
       <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
@@ -82,11 +93,20 @@ function viewPayment(student, amount, method, month) {
 </div>
 <script>
 function viewPayment(student, amount, method, month) {
+    let m = document.getElementById('viewPaymentModal');
+    if(m.parentNode !== document.body) document.body.appendChild(m);
     document.getElementById('vpStudent').innerText = student;
     document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
+    
+    // The user said the method and month are very large and ugly.
     document.getElementById('vpMethod').innerText = method;
+    document.getElementById('vpMethod').style.fontSize = '14px';
     document.getElementById('vpMonth').innerText = month;
-    document.getElementById('viewPaymentModal').classList.add('open');
+    document.getElementById('vpMonth').style.fontSize = '14px';
+    
+    // Also increase z-index
+    m.style.zIndex = '99999';
+    m.classList.add('open');
 }
 </script>
 
@@ -123,10 +143,11 @@ function viewPayment(student, amount, method, month) {
       
       <div class="fgroup">
         <label>Check Image / Receipt</label>
-        <div style="border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer">
+        <label style="display:block;border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer;background:var(--bg)">
           <i data-lucide="upload-cloud" style="margin-bottom:8px"></i><br>
-          Click to upload receipt
-        </div>
+          <span id="vpUploadText">Click to upload receipt</span>
+          <input type="file" style="display:none" onchange="document.getElementById('vpUploadText').innerText = this.files[0].name">
+        </label>
       </div>
       
       <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
@@ -135,11 +156,20 @@ function viewPayment(student, amount, method, month) {
 </div>
 <script>
 function viewPayment(student, amount, method, month) {
+    let m = document.getElementById('viewPaymentModal');
+    if(m.parentNode !== document.body) document.body.appendChild(m);
     document.getElementById('vpStudent').innerText = student;
     document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
+    
+    // The user said the method and month are very large and ugly.
     document.getElementById('vpMethod').innerText = method;
+    document.getElementById('vpMethod').style.fontSize = '14px';
     document.getElementById('vpMonth').innerText = month;
-    document.getElementById('viewPaymentModal').classList.add('open');
+    document.getElementById('vpMonth').style.fontSize = '14px';
+    
+    // Also increase z-index
+    m.style.zIndex = '99999';
+    m.classList.add('open');
 }
 </script>
 
@@ -247,10 +277,11 @@ function viewPayment(student, amount, method, month) {
       
       <div class="fgroup">
         <label>Check Image / Receipt</label>
-        <div style="border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer">
+        <label style="display:block;border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer;background:var(--bg)">
           <i data-lucide="upload-cloud" style="margin-bottom:8px"></i><br>
-          Click to upload receipt
-        </div>
+          <span id="vpUploadText">Click to upload receipt</span>
+          <input type="file" style="display:none" onchange="document.getElementById('vpUploadText').innerText = this.files[0].name">
+        </label>
       </div>
       
       <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
@@ -259,11 +290,20 @@ function viewPayment(student, amount, method, month) {
 </div>
 <script>
 function viewPayment(student, amount, method, month) {
+    let m = document.getElementById('viewPaymentModal');
+    if(m.parentNode !== document.body) document.body.appendChild(m);
     document.getElementById('vpStudent').innerText = student;
     document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
+    
+    // The user said the method and month are very large and ugly.
     document.getElementById('vpMethod').innerText = method;
+    document.getElementById('vpMethod').style.fontSize = '14px';
     document.getElementById('vpMonth').innerText = month;
-    document.getElementById('viewPaymentModal').classList.add('open');
+    document.getElementById('vpMonth').style.fontSize = '14px';
+    
+    // Also increase z-index
+    m.style.zIndex = '99999';
+    m.classList.add('open');
 }
 </script>
 
@@ -327,10 +367,11 @@ document.getElementById('recordForm').addEventListener('submit', function(e) {
       
       <div class="fgroup">
         <label>Check Image / Receipt</label>
-        <div style="border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer">
+        <label style="display:block;border:1px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--txt3);cursor:pointer;background:var(--bg)">
           <i data-lucide="upload-cloud" style="margin-bottom:8px"></i><br>
-          Click to upload receipt
-        </div>
+          <span id="vpUploadText">Click to upload receipt</span>
+          <input type="file" style="display:none" onchange="document.getElementById('vpUploadText').innerText = this.files[0].name">
+        </label>
       </div>
       
       <button class="btn block" style="margin-top:16px" onclick="closeModal('viewPaymentModal')">Save Updates</button>
@@ -339,11 +380,20 @@ document.getElementById('recordForm').addEventListener('submit', function(e) {
 </div>
 <script>
 function viewPayment(student, amount, method, month) {
+    let m = document.getElementById('viewPaymentModal');
+    if(m.parentNode !== document.body) document.body.appendChild(m);
     document.getElementById('vpStudent').innerText = student;
     document.getElementById('vpAmount').innerText = new Intl.NumberFormat().format(amount) + ' UZS';
+    
+    // The user said the method and month are very large and ugly.
     document.getElementById('vpMethod').innerText = method;
+    document.getElementById('vpMethod').style.fontSize = '14px';
     document.getElementById('vpMonth').innerText = month;
-    document.getElementById('viewPaymentModal').classList.add('open');
+    document.getElementById('vpMonth').style.fontSize = '14px';
+    
+    // Also increase z-index
+    m.style.zIndex = '99999';
+    m.classList.add('open');
 }
 </script>
 

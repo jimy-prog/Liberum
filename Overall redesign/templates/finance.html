@@ -16,7 +16,7 @@
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="v money">{{ "{:,.0f}".format(total_income) if total_income else 0 }}</div><div class="l">Income</div></div>
+  <div class="stat"><div class="v money">{{ "{:,.0f}".format(active_income) if active_income else 0 }}</div><div class="l">Income</div></div>
   <div class="stat"><div class="v" style="color:var(--red)">{{ "{:,.0f}".format(total_expense) if total_expense else 0 }}</div><div class="l">Expenses</div></div>
   <div class="stat"><div class="v" style="color:var(--greenD)">{{ "{:,.0f}".format(net_income) if net_income else 0 }}</div><div class="l">Net · {{ month_str }}</div></div>
 </div>
@@ -25,7 +25,7 @@
   <div class="ct">Cash flow <button class="btn soft sm" onclick="openModal('addExpenseModal')"><i data-lucide="minus"></i>Add expense</button></div>
   <div class="row">
     <div class="rmain"><div class="rt">Student payments</div></div>
-    <span style="font-family:var(--fm);font-weight:600;font-size:14px;color:var(--greenD)">+ {{ "{:,.0f}".format(total_income) if total_income else 0 }}</span>
+    <span style="font-family:var(--fm);font-weight:600;font-size:14px;color:var(--greenD)">+ {{ "{:,.0f}".format(active_income) if active_income else 0 }}</span>
   </div>
   {% for e in expenses %}
   <div class="row">
