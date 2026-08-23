@@ -132,6 +132,7 @@ body{
 
   <!-- Email Password Form -->
   <form id="login-form">
+    <input type="hidden" id="csrf_token" value="{{ csrf_token|default('') }}">
     <div class="form-group">
       <label class="form-label">Email</label>
       <input class="form-control" type="text" id="email" required placeholder="Enter your email or username">
@@ -238,7 +239,7 @@ body{
       const res = await fetch("/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ identifier: emailOrUsername, password: pass })
+          body: JSON.stringify({ identifier: emailOrUsername, password: pass, csrf_token: document.getElementById("csrf_token").value })
       });
       const data = await res.json();
       if (res.ok) {
