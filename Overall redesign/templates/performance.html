@@ -21,6 +21,19 @@
 .sd.s1{background:var(--red-bg);border-color:var(--red)}
 .sd.s2{background:var(--yellow-bg);border-color:var(--yellow)}
 .sd.s3{background:var(--green-bg);border-color:var(--green)}
+.sd-input {
+  width: 36px; height: 28px;
+  border-radius: 6px; border: 1px solid var(--line);
+  background: transparent; color: var(--txt);
+  text-align: center; font-family: var(--fm);
+  font-size: 13px; font-weight: 600;
+  transition: all 0.2s;
+  margin: 0 auto; display: block;
+}
+.sd-input:focus { border-color: var(--acc); outline: none; background: var(--fill); }
+/* Hide number spin buttons */
+.sd-input::-webkit-outer-spin-button, .sd-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.sd-input[type=number] { -moz-appearance: textfield; }
 /* Charts */
 .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
 .chart-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px}
@@ -206,16 +219,14 @@
           </td>
           {% set tot=namespace(s=0,c=0) %}
           {% for w in weeks %}{% set wp=row.weeks.get(w) %}
-          {% for field,fattr in [('grammar','grammar'),('activity','activity'),('vocabulary','vocabulary')] %}
-          {% set val=wp.grammar if fattr=='grammar' and wp else wp.activity if fattr=='activity' and wp else wp.vocabulary if fattr=='vocabulary' and wp else none %}
+          {% for field,fattr in [('vocabulary','vocabulary'),('grammar','grammar'),('activity','activity'),('homework','homework')] %}
+          {% set val=wp.vocabulary if fattr=='vocabulary' and wp else wp.grammar if fattr=='grammar' and wp else wp.activity if fattr=='activity' and wp else wp.homework if fattr=='homework' and wp else none %}
           <td class="ps">
-            <div class="sd {% if val==1 %}s1{% elif val==2 %}s2{% elif val==3 %}s3{% endif %}"
-                 data-val="{{ val or 0 }}" data-sid="{{ s.id }}" data-week="{{ w }}" data-field="{{ field }}"
-                 onclick="cycleScore(this,'{{ month_str }}')">
-              {% if val==1 %}🔴{% elif val==2 %}🟡{% elif val==3 %}🟢{% else %}<span style="color:var(--txt3);font-size:.62rem">—</span>{% endif %}
-            </div>
+            <input type="number" min="0" max="10" class="sd-input"
+                 value="{{ val if val is not none else '' }}" data-sid="{{ s.id }}" data-week="{{ w }}" data-field="{{ field }}"
+                 onblur="saveScore(this,'{{ month_str }}')" placeholder="-">
           </td>
-          {% if val and val>0 %}{% set tot.s=tot.s+val %}{% set tot.c=tot.c+1 %}{% endif %}
+          {% if val is not none %}{% set tot.s=tot.s+val %}{% set tot.c=tot.c+1 %}{% endif %}
           {% endfor %}{% endfor %}
           <td class="pa">
             {% if tot.c>0 %}{% set avg=tot.s/tot.c %}
@@ -228,7 +239,7 @@
     </table>
   </div>
 </div>
-<div class="alert alert-info" style="font-size:.78rem"><strong>G</strong>=Grammar · <strong>A</strong>=Activity · <strong>V</strong>=Vocabulary · 🔴 Needs Work · 🟡 Revise · 🟢 Good</div>
+<div class="alert alert-info" style="font-size:.78rem"><strong>V</strong>=Vocabulary · <strong>G</strong>=Grammar · <strong>F</strong>=Fluency · <strong>H</strong>=Homework · Score out of 10</div>
 
 <!-- Line chart section -->
 {% if data %}

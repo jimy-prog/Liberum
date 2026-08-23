@@ -1,53 +1,109 @@
-with open("scratch/pre_redesign_perf.html", "r") as f:
-    old = f.read()
+with open("templates/performance.html", "r") as f:
+    text = f.read()
 
-styles = old.split("{% block extra_styles %}")[1].split("{% endblock %}")[0]
-scripts = old.split("{% block scripts %}")[1].split("{% endblock %}")[0]
+import re
 
-# Now, we need the charts and tables.
-charts_and_tables = old.split("{% block content %}")[1].split("{% block scripts %}")[0].replace("{% endblock %}", "").strip()
+# We will replace the table headers
+old_headers = r'''          {% for w in weeks %}
+          <th class="pwh" colspan="3">Week {{ w }}</th>
+          {% endfor %}
+          <th class="pth" rowspan="2" style="text-align:center">Avg</th>
+        </tr>
+        <tr>
+          {% for w in weeks %}
+          <th class="psh">G</th><th class="psh">A</th><th class="psh">V</th>
+          {% endfor %}'''
 
-# We need to remove the topbar_actions from old.
-# And construct a new templates/performance.html
+new_headers = '''          {% for w in weeks %}
+          <th class="pwh" colspan="4">Week {{ w }}</th>
+          {% endfor %}
+          <th class="pth" rowspan="2" style="text-align:center">Avg</th>
+        </tr>
+        <tr>
+          {% for w in weeks %}
+          <th class="psh" title="Vocabulary">V</th><th class="psh" title="Grammar">G</th><th class="psh" title="Fluency">F</th><th class="psh" title="Homework">H</th>
+          {% endfor %}'''
 
-new_html = f"""{{% extends "base.html" %}}
-{{% block title %}}Performance{{% endblock %}}
-{{% block page_title %}}Students{{% endblock %}}
-{{% block page_subtitle %}}CRM · groups · waitlist · performance · placement{{% endblock %}}
-{{% block topbar_actions %}}{{% endblock %}}
+text = re.sub(r'          {% for w in weeks %}\n          <th class="pwh" colspan="3".*?{% endfor %}', new_headers, text, flags=re.DOTALL)
 
-{{% block extra_styles %}}
-{styles.replace('var(--text3)', 'var(--txt3)').replace('var(--text)', 'var(--txt)').replace('var(--bg2)', 'var(--card)').replace('var(--bg3)', 'var(--fill)').replace('var(--bg4)', 'var(--line)').replace('var(--radius)', '20px').replace('.card-header', '.ct')}
-{{% endblock %}}
+# Replace the row data
+old_row = r'''          {% for w in weeks %}{% set wp=row.weeks.get\(w\) %}
+          {% for field,fattr in \[\('grammar','grammar'\),\('activity','activity'\),\('vocabulary','vocabulary'\)\] %}
+          {% set val=wp.grammar if fattr=='grammar' and wp else wp.activity if fattr=='activity' and wp else wp.vocabulary if fattr=='vocabulary' and wp else none %}
+          <td class="ps">
+            <div class="sd {% if val==1 %}s1{% elif val==2 %}s2{% elif val==3 %}s3{% endif %}"
+                 data-val="{{ val or 0 }}" data-sid="{{ s.id }}" data-week="{{ w }}" data-field="{{ field }}"
+                 onclick="cycleScore\(this,'{{ month_str }}'\)">
+              {% if val==1 %}🔴{% elif val==2 %}🟡{% elif val==3 %}🟢{% else %}<span style="color:var\(--txt3\);font-size:.62rem">—</span>{% endif %}
+            </div>
+          </td>
+          {% if val and val>0 %}{% set tot.s=tot.s\+val %}{% set tot.c=tot.c\+1 %}{% endif %}
+          {% endfor %}{% endfor %}'''
 
-{{% block content %}}
-<div class="segs">
-  <button onclick="window.location='/students/'">Students</button>
-  <button onclick="window.location='/groups/'">Groups</button>
-  <button onclick="window.location='/waitlist/'">Waitlist</button>
-  <button class="on" onclick="window.location='/performance/'">Performance</button>
-  <button onclick="window.location='/placement/'">Placement tests</button>
-</div>
+new_row = '''          {% for w in weeks %}{% set wp=row.weeks.get(w) %}
+          {% for field,fattr in [('vocabulary','vocabulary'),('grammar','grammar'),('activity','activity'),('homework','homework')] %}
+          {% set val=wp.vocabulary if fattr=='vocabulary' and wp else wp.grammar if fattr=='grammar' and wp else wp.activity if fattr=='activity' and wp else wp.homework if fattr=='homework' and wp else none %}
+          <td class="ps">
+            <input type="number" min="0" max="10" class="sd-input"
+                 value="{{ val if val is not none else '' }}" data-sid="{{ s.id }}" data-week="{{ w }}" data-field="{{ field }}"
+                 onblur="saveScore(this,'{{ month_str }}')" placeholder="-">
+          </td>
+          {% if val is not none %}{% set tot.s=tot.s+val %}{% set tot.c=tot.c+1 %}{% endif %}
+          {% endfor %}{% endfor %}'''
 
-<div class="card" style="background:var(--fill);box-shadow:none;margin-bottom:16px;padding:12px 16px;">
-  <div style="display:flex;gap:12px;align-items:center">
-    <div style="font-weight:600;font-size:14px;color:var(--txt2)">Filters:</div>
-    <select class="form-control" style="width:200px;padding:6px 12px;background:var(--card);border-radius:8px;border:1px solid var(--line);color:var(--txt);" onchange="window.location.href='/performance/?group_id='+this.value+'&month={{ month_str }}'">
-      {{% for g in groups %}}
-      <option value="{{{{ g.id }}}}" {{{{ 'selected' if sel_group and g.id==sel_group.id else '' }}}}>{{{{ g.name }}}}</option>
-      {{% endfor %}}
-    </select>
-    <input type="month" class="form-control" style="width:160px;padding:6px 12px;background:var(--card);border-radius:8px;border:1px solid var(--line);color:var(--txt);" value="{{{{ month_str }}}}" onchange="window.location.href='/performance/?group_id={{{{ sel_group.id if sel_group else '' }}}}&month='+this.value">
-  </div>
-</div>
+text = re.sub(r'          {% for w in weeks %}{% set wp=row.weeks.get\(w\).*?{% endfor %}{% endfor %}', new_row, text, flags=re.DOTALL)
 
-{charts_and_tables.replace('class="card mb-4"', 'class="card"').replace('class="card mt-4"', 'class="card"').replace('card-body', 'card-body').replace('.chart-card', '.card').replace('class="chart-card"', 'class="card"').replace('var(--text3)', 'var(--txt3)').replace('var(--text)', 'var(--txt)')}
-{{% endblock %}}
+# Update alert
+text = re.sub(r'<div class="alert alert-info".*?</div>', '<div class="alert alert-info" style="font-size:.78rem"><strong>V</strong>=Vocabulary · <strong>G</strong>=Grammar · <strong>F</strong>=Fluency · <strong>H</strong>=Homework · Score out of 10</div>', text)
 
-{{% block scripts %}}
-{scripts}
-{{% endblock %}}
-"""
+# Replace JS logic
+old_js = r'''const emojis={0:'<span style="color:var\(--text3\);font-size:.62rem">—</span>',1:'🔴',2:'🟡',3:'🟢'};
+const cls={0:'',1:'s1',2:'s2',3:'s3'};
+function cycleScore\(dot,month\){
+  const cur=parseInt\(dot.dataset.val\)\|\|0,next=\(cur\+1\)%4;
+  dot.dataset.val=next; dot.innerHTML=emojis\[next\];
+  dot.className='sd '\+cls\[next\];
+  fetch\('/performance/quick-save',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify\(\{student_id:parseInt\(dot.dataset.sid\),month,week:parseInt\(dot.dataset.week\),field:dot.dataset.field,value:next\|\|null\}\)\}\);
+  updateAvg\(dot\);
+}
+function updateAvg\(dot\){
+  const row=dot.closest\('tr'\);
+  let s=0,c=0;
+  row.querySelectorAll\('\.sd'\).forEach\(d=>{const v=parseInt\(d.dataset.val\)\|\|0;if\(v>0\){s\+=v;c\+\+;}}\);
+  const cell=row.querySelector\('\.pa'\);
+  if\(!cell\)return;
+  if\(!c\){cell.innerHTML='—';return;}
+  const avg=s/c,col=avg>=2\.5\?'var\(--green\)':avg>=1\.8\?'var\(--yellow\)':'var\(--red\)';
+  cell.innerHTML=`<span style="color:${col}">${avg.toFixed\(1\)}</span>`;
+}'''
+
+new_js = '''async function saveScore(input, month) {
+  let val = parseInt(input.value);
+  if (isNaN(val)) val = null;
+  else if (val < 0) val = 0;
+  else if (val > 10) val = 10;
+  input.value = val !== null ? val : '';
+  
+  await fetch('/performance/quick-save',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({student_id:parseInt(input.dataset.sid),month,week:parseInt(input.dataset.week),field:input.dataset.field,value:val})});
+  updateAvg(input);
+}
+function updateAvg(input){
+  const row=input.closest('tr');
+  let s=0,c=0;
+  row.querySelectorAll('.sd-input').forEach(d=>{
+    const v=parseInt(d.value);
+    if(!isNaN(v)){s+=v;c++;}
+  });
+  const cell=row.querySelector('.pa');
+  if(!cell)return;
+  if(!c){cell.innerHTML='—';return;}
+  const avg=s/c,col=avg>=8?'var(--green)':avg>=5?'var(--yellow)':'var(--red)';
+  cell.innerHTML=`<span style="color:${col};font-weight:700">${avg.toFixed(1)}</span>`;
+}'''
+
+text = re.sub(old_js, new_js, text, flags=re.DOTALL)
 
 with open("templates/performance.html", "w") as f:
-    f.write(new_html)
+    f.write(text)

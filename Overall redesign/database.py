@@ -112,6 +112,15 @@ class Attendance(Base):
     lesson = relationship("Lesson", back_populates="attendance")
     student = relationship("Student", back_populates="attendance")
 
+
+class Expense(Base):
+    __tablename__ = "expenses"
+    id = Column(Integer, primary_key=True)
+    amount = Column(Float, default=0)
+    description = Column(String, nullable=True)
+    category = Column(String, default="General")
+    date = Column(Date, default=datetime.utcnow)
+
 class Payment(Base):
     __tablename__ = "payments"
     id = Column(Integer, primary_key=True)
@@ -147,6 +156,7 @@ class WeeklyPerformance(Base):
     grammar = Column(Integer, nullable=True)
     activity = Column(Integer, nullable=True)
     vocabulary = Column(Integer, nullable=True)
+    homework = Column(Integer, nullable=True)
     notes = Column(Text, default="")
     created_at = Column(DateTime, default=datetime.utcnow)
     student = relationship("Student", back_populates="performance")

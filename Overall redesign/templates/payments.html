@@ -177,8 +177,10 @@ function viewPayment(student, amount, method, month) {
 
 {% block content %}
 <div class="segs">
-  <button class="on" onclick="window.location='/payments/'">Payments</button>
-  <button class="" onclick="window.location='/finance/'">Finance</button>
+  <button class="{% if True %}on{% endif %}" onclick="window.location='/payments/'">Payments</button>
+  <button class="{% if active_page == 'finance' %}on{% endif %}" onclick="window.location='/finance/'">Finance</button>
+  <button class="{% if active_page == 'payroll' %}on{% endif %}" onclick="window.location='/finance/payroll'">Payroll</button>
+  <button class="{% if active_page == 'monthly_report' %}on{% endif %}" onclick="window.location='/monthly-report/'">Monthly Report</button>
 </div>
 
 <div class="stats">
