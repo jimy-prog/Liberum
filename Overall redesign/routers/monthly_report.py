@@ -81,9 +81,11 @@ def monthly_report(request: Request, month: str = None, db: Session = Depends(ge
         if (getattr(g, "finance_mode", "standard") or "standard") == "standard" and (getattr(g, "epl_override", 0) or 0) <= 0:
             finance_formula = f"{total_countable} countable × {round(epl)} UZS (standard rate)"
         else:
-            held_for_formula = len(held) if len(held) > 0 else (g.lessons_per_week * g.weeks_per_month or 12)
+            lpw = getattr(g, "lessons_per_week", 3) or 3
+            wpm = getattr(g, "weeks_per_month", 4) or 4
+            held_for_formula = len(held) if len(held) > 0 else (lpw * wpm)
             finance_formula = (
-                f"{round(g.price_monthly):,} UZS × {int(g.teacher_pct * 100)}% ÷ {held_for_formula} lessons"
+                f"{round(getattr(g, 'price_monthly', 0) or 0):,} UZS × {int((getattr(g, 'teacher_pct', 0) or 0) * 100)}% ÷ {held_for_formula} lessons"
                 f" = {round(epl):,} UZS/lesson × {total_countable} countable"
             )
 

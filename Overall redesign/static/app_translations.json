@@ -1636,8 +1636,8 @@
     "uz": "Dushanba-Shanba, 09:00-19:00"
   },
   "Money": {
-    "ru": "Деньги",
-    "uz": "Pul"
+    "ru": "Финансы",
+    "uz": "Moliya"
   },
   "Money →": {
     "ru": "Деньги →",
@@ -1656,8 +1656,8 @@
     "uz": "Oylik"
   },
   "Monthly Report": {
-    "ru": "Ежемесячный отчет",
-    "uz": "Oylik hisobot"
+    "ru": "Отчет",
+    "uz": "Hisobot"
   },
   "Monthly Student Report Card": {
     "ru": "Ежемесячная табель успеваемости студента",
@@ -2168,7 +2168,7 @@
     "uz": "To'lovlar"
   },
   "Payroll": {
-    "ru": "Расчет заработной платы",
+    "ru": "Зарплата",
     "uz": "Ish haqi"
   },
   "Pending": {
@@ -2601,7 +2601,7 @@
   },
   "Schedule": {
     "ru": "Расписание",
-    "uz": "Jadval"
+    "uz": "Dars jadvali"
   },
   "Schedule Pref": {
     "ru": "Предпочтения расписания",
@@ -2796,8 +2796,8 @@
     "uz": "O'quvchining telefoni"
   },
   "Students": {
-    "ru": "Ученики",
-    "uz": "O'quvchilar"
+    "ru": "Студенты",
+    "uz": "Talabalar"
   },
   "Students List": {
     "ru": "Список учеников",
@@ -3746,5 +3746,21 @@
   "🖨 Print / Save as PDF": {
     "ru": "🖨 Печать / Сохранить как PDF",
     "uz": "🖨 Chop etish / PDF sifatida saqlash"
+  },
+  "Dashboard": {
+    "ru": "Главная",
+    "uz": "Asosiy"
+  },
+  "Help & Support": {
+    "ru": "Поддержка",
+    "uz": "Qo'llab-quvvatlash"
+  },
+  "Search...": {
+    "ru": "Поиск...",
+    "uz": "Qidiruv..."
+  },
+  "Save": {
+    "ru": "Сохранить",
+    "uz": "Saqlash"
   }
 }

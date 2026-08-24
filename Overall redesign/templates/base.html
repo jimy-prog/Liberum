@@ -257,10 +257,11 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
 
   function translateNodeApp(node) {
       if (node.nodeType === 3) { 
-          let text = node.textContent.trim();
+          let text = node.textContent.trim().replace(/\s+/g, ' ');
           if (!text || text.length < 2) return;
           
           let original = originalAppTexts.get(node);
+          if(original) original = original.replace(/\s+/g, ' ');
           if (!original) {
               original = text;
               originalAppTexts.set(node, original);
@@ -521,6 +522,34 @@ async function openStudentModal(id) {
     }
 }
 </script>
+
+
+<div class="ovl" id="languageModal" onclick="if(event.target==this)closeModal('languageModal')">
+  <div class="modal" style="max-width: 360px;">
+    <div class="mt">
+      <span>Language / Язык</span>
+      <button class="x" onclick="closeModal('languageModal')" style="border:none;cursor:pointer"><i data-lucide="x"></i></button>
+    </div>
+    <div style="font-size:14px;color:var(--txt2);margin-bottom:20px;">
+      Select your preferred language. The interface will update automatically.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:12px;background:var(--bg)">
+        <input type="radio" name="lang_sel" value="en" onclick="setAppLang('en')" style="width:18px;height:18px;accent-color:var(--acc)">
+        <span style="font-weight:600;font-size:15px;color:var(--txt)">English (Default)</span>
+      </label>
+      <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:12px;background:var(--bg)">
+        <input type="radio" name="lang_sel" value="ru" onclick="setAppLang('ru')" style="width:18px;height:18px;accent-color:var(--acc)">
+        <span style="font-weight:600;font-size:15px;color:var(--txt)">Русский</span>
+      </label>
+      <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:12px;background:var(--bg)">
+        <input type="radio" name="lang_sel" value="uz" onclick="setAppLang('uz')" style="width:18px;height:18px;accent-color:var(--acc)">
+        <span style="font-weight:600;font-size:15px;color:var(--txt)">O'zbekcha</span>
+      </label>
+    </div>
+    <button class="btn block" style="margin-top:20px;border-radius:12px;height:44px;font-size:15px;" onclick="closeModal('languageModal');window.location.reload();">Apply Changes</button>
+  </div>
+</div>
 
 </body>
 
