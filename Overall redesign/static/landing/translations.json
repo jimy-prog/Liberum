@@ -129,7 +129,7 @@
   },
   "Disconnected tools": {
     "ru": "Разрозненные инструменты",
-    "uz": "Bog'lanmagan asboblar"
+    "uz": "Tarqoq vositalar"
   },
   "Join your teacher on Liberum — structured learning, real mock exams, and feedback that moves your band score.": {
     "ru": "Присоединяйтесь к своему преподавателю на Liberum — структурированное обучение, настоящие пробные экзамены и обратная связь, которая повышает ваш балл.",
@@ -168,8 +168,8 @@
     "uz": "chegarasiz."
   },
   "Built for independent educators — and the students they teach": {
-    "ru": "Создано для независимых преподавателей — и студентов, которых они обучают",
-    "uz": "Mustaqil o'qituvchilar va ular o'qitadigan talabalar uchun yaratilgan"
+    "ru": "Создано для независимых преподавателей — и их студентов",
+    "uz": "Mustaqil o'qituvchilar va ularning talabalari uchun yaratilgan"
   },
   "Writing evaluated": {
     "ru": "Письменная работа оценена",
@@ -234,10 +234,6 @@
   "AK": {
     "ru": "АК",
     "uz": "AK"
-  },
-  "Studio": {
-    "ru": "Studio",
-    "uz": "Studio"
   },
   "Online & in-person": {
     "ru": "Онлайн и очно",
@@ -331,10 +327,6 @@
     "ru": "Следующая глава: маркетплейс, где находят выдающихся независимых преподавателей. Профессиональный профиль, реальные рейтинги, прозрачное ценообразование — и студенты, которые могут найти, сравнить и записаться к вам напрямую.",
     "uz": "Keyingi bob: buyuk mustaqil o'qituvchilar kashf etiladigan bozor. Professional profil, haqiqiy reytinglar, shaffof narxlar — va sizni to'g'ridan-to'g'ri topishi, solishtirishi va bron qilishi mumkin bo'lgan talabalar."
   },
-  "Liberum": {
-    "ru": "Liberum",
-    "uz": "Liberum"
-  },
   "English teacher": {
     "ru": "Учитель английского",
     "uz": "Ingliz tili o'qituvchisi"
@@ -397,7 +389,7 @@
   },
   "disconnected tools.": {
     "ru": "разрозненные инструменты.",
-    "uz": "bog'lanmagan asboblar."
+    "uz": "tarqoq vositalar."
   },
   "Writing Task 2 · Submission": {
     "ru": "Письменное задание 2 · Отправка",
@@ -565,7 +557,7 @@
   },
   "Build with it.": {
     "ru": "Стройте с ним.",
-    "uz": "U bilan quring."
+    "uz": "U bilan birga quring."
   },
   "Before Liberum": {
     "ru": "До Liberum",
@@ -642,5 +634,93 @@
   "Finance": {
     "ru": "Финансы",
     "uz": "Moliya"
+  },
+  "Products": {
+    "ru": "Продукты",
+    "uz": "Mahsulotlar"
+  },
+  "Solutions": {
+    "ru": "Решения",
+    "uz": "Yechimlar"
+  },
+  "History": {
+    "ru": "История",
+    "uz": "Tarix"
+  },
+  "Student & group management": {
+    "ru": "Управление студентами и группами",
+    "uz": "Talabalar va guruhlarni boshqarish"
+  },
+  "Schedule & attendance": {
+    "ru": "Расписание и посещаемость",
+    "uz": "Jadval va davomat"
+  },
+  "IELTS-style mock testing": {
+    "ru": "Пробные тесты в формате IELTS",
+    "uz": "IELTS formatidagi sinov testlari"
+  },
+  "AI evaluation": {
+    "ru": "Оценка ИИ",
+    "uz": "SI orqali baholash"
+  },
+  "Payments & finance": {
+    "ru": "Платежи и финансы",
+    "uz": "To'lovlar va moliya"
+  },
+  "Analytics & insights": {
+    "ru": "Аналитика и инсайты",
+    "uz": "Tahlil va xulosalar"
+  },
+  "Student and group management": {
+    "ru": "Управление студентами и группами",
+    "uz": "Talabalar va guruhlarni boshqarish"
+  },
+  "Schedule and attendance": {
+    "ru": "Расписание и посещаемость",
+    "uz": "Jadval va davomat"
+  },
+  "IELTS style mock testing": {
+    "ru": "Пробные тесты в формате IELTS",
+    "uz": "IELTS formatidagi sinov testlari"
+  },
+  "Payments and finance": {
+    "ru": "Платежи и финансы",
+    "uz": "To'lovlar va moliya"
+  },
+  "Analytics and insights": {
+    "ru": "Аналитика и инсайты",
+    "uz": "Tahlil va xulosalar"
+  },
+  "Student management": {
+    "ru": "Управление студентами",
+    "uz": "Talabalarni boshqarish"
+  },
+  "Mock testing": {
+    "ru": "Пробное тестирование",
+    "uz": "Sinov testlari"
+  },
+  "Analytics": {
+    "ru": "Аналитика",
+    "uz": "Tahlil"
+  },
+  "One teacher's tool": {
+    "ru": "Инструмент одного преподавателя",
+    "uz": "Bitta o'qituvchining vositasi"
+  },
+  "Infrastructure for independent educators": {
+    "ru": "Инфраструктура для независимых преподавателей",
+    "uz": "Mustaqil o'qituvchilar uchun infratuzilma"
+  },
+  "A global education ecosystem": {
+    "ru": "Глобальная образовательная экосистема",
+    "uz": "Global ta'lim ekotizimi"
+  },
+  "Education is changing.": {
+    "ru": "Образование меняется.",
+    "uz": "Ta'lim o'zgarmoqda."
+  },
+  "Liberum — infrastructure for independent educators": {
+    "ru": "Liberum — инфраструктура для независимых преподавателей",
+    "uz": "Liberum — mustaqil o'qituvchilar uchun infratuzilma"
   }
 }
