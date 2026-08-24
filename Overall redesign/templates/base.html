@@ -239,6 +239,91 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
 
 {% block extra_styles %}{% endblock %}
 </style>
+
+<script>
+  window.APP_LANG = localStorage.getItem('app_lang') || 'en';
+  window.app_i18n = {};
+  
+  if (window.APP_LANG !== 'en') {
+      fetch('/static/app_translations.json').then(r=>r.json()).then(d=>{
+          window.app_i18n = d;
+          translateApp();
+          setTimeout(translateApp, 300);
+          setTimeout(translateApp, 1000);
+      }).catch(e=>console.log(e));
+  }
+
+  const originalAppTexts = new WeakMap();
+
+  function translateNodeApp(node) {
+      if (node.nodeType === 3) { 
+          let text = node.textContent.trim();
+          if (!text || text.length < 2) return;
+          
+          let original = originalAppTexts.get(node);
+          if (!original) {
+              original = text;
+              originalAppTexts.set(node, original);
+          }
+          
+          if (window.app_i18n[original]) {
+              let t = window.APP_LANG === 'en' ? original : window.app_i18n[original][window.APP_LANG];
+              if (t && node.textContent.trim() !== t) {
+                  let match = node.textContent.match(/^(\s*)(.*?)(\s*)$/);
+                  if (typeof appObserver !== 'undefined') appObserver.disconnect();
+                  node.textContent = (match ? match[1] : '') + t + (match ? match[3] : '');
+                  if (typeof appObserver !== 'undefined') appObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+              }
+          }
+      } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE' && node.nodeName !== 'TEXTAREA') {
+          node.childNodes.forEach(translateNodeApp);
+          if (node.placeholder && window.app_i18n[node.placeholder]) {
+              let pt = window.APP_LANG === 'en' ? node.placeholder : window.app_i18n[node.placeholder][window.APP_LANG];
+              if (pt) node.placeholder = pt;
+          }
+          if (node.value && node.tagName === 'INPUT' && (node.type === 'submit' || node.type === 'button')) {
+              let ov = originalAppTexts.get(node) || node.value;
+              if (!originalAppTexts.has(node)) originalAppTexts.set(node, node.value);
+              if (window.app_i18n[ov]) {
+                  let vt = window.APP_LANG === 'en' ? ov : window.app_i18n[ov][window.APP_LANG];
+                  if (vt) node.value = vt;
+              }
+          }
+      }
+  }
+
+  function translateApp() {
+      if (window.APP_LANG === 'en') return;
+      translateNodeApp(document.body);
+  }
+
+  let appObserver;
+  window.addEventListener('DOMContentLoaded', () => {
+      appObserver = new MutationObserver((mutations) => {
+          if (window.APP_LANG === 'en') return;
+          mutations.forEach(m => {
+              if (m.type === 'childList') {
+                  m.addedNodes.forEach(translateNodeApp);
+              } else if (m.type === 'characterData') {
+                  translateNodeApp(m.target);
+              }
+          });
+      });
+      if (window.APP_LANG !== 'en') {
+          appObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+      }
+      
+      let radios = document.getElementsByName('lang_sel');
+      for (let r of radios) {
+          if (r.value === window.APP_LANG) r.checked = true;
+      }
+  });
+
+  function setAppLang(l) {
+      localStorage.setItem('app_lang', l);
+  }
+</script>
+
 </head>
 <body>
 <div class="app">

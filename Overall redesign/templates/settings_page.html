@@ -29,6 +29,32 @@
   </div>
 </div>
 
+
+<div class="ovl" id="languageModal" style="display:none" onclick="if(event.target==this)closeModal('languageModal')">
+  <div class="modal">
+    <div class="card" style="margin:0;max-width:400px;width:100%">
+      <div class="ct">Language Settings</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;">
+        <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:8px;">
+          <input type="radio" name="lang_sel" value="en" onclick="setAppLang('en')">
+          <span style="margin-left:8px;">English (Default)</span>
+        </label>
+        <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:8px;">
+          <input type="radio" name="lang_sel" value="ru" onclick="setAppLang('ru')">
+          <span style="margin-left:8px;">Русский (Russian)</span>
+        </label>
+        <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:8px;">
+          <input type="radio" name="lang_sel" value="uz" onclick="setAppLang('uz')">
+          <span style="margin-left:8px;">O'zbekcha (Uzbek)</span>
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn block" onclick="closeModal('languageModal');window.location.reload();">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 {% block page_title %}Settings
 <div class="ovl" id="otherSettingsModal" onclick="if(event.target===this)closeModal('otherSettingsModal')">
@@ -60,6 +86,32 @@
   </div>
 </div>
 
+
+<div class="ovl" id="languageModal" style="display:none" onclick="if(event.target==this)closeModal('languageModal')">
+  <div class="modal">
+    <div class="card" style="margin:0;max-width:400px;width:100%">
+      <div class="ct">Language Settings</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;">
+        <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:8px;">
+          <input type="radio" name="lang_sel" value="en" onclick="setAppLang('en')">
+          <span style="margin-left:8px;">English (Default)</span>
+        </label>
+        <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:8px;">
+          <input type="radio" name="lang_sel" value="ru" onclick="setAppLang('ru')">
+          <span style="margin-left:8px;">Русский (Russian)</span>
+        </label>
+        <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:8px;">
+          <input type="radio" name="lang_sel" value="uz" onclick="setAppLang('uz')">
+          <span style="margin-left:8px;">O'zbekcha (Uzbek)</span>
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn block" onclick="closeModal('languageModal');window.location.reload();">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block content %}
@@ -74,6 +126,7 @@
   <div class="row" onclick="openModal('contactModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div><div class="rmain"><div class="rt">Contact</div><div class="rs">Phone, Telegram, email</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="toast('Link copied','link')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="link"></i></div><div class="rmain"><div class="rt">Public join link</div><div class="rs">liberum.uz/join/{{ _u.username }}</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="openModal('teamModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="users"></i></div><div class="rmain"><div class="rt">Roles & Permissions</div><div class="rs">Teachers, admins, access</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
+   <div class="row" onclick="openModal('languageModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="globe"></i></div><div class="rmain"><div class="rt">Language</div><div class="rs">English (default), Русский, O'zbekcha</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
    <div class="row" onclick="openModal('otherSettingsModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="settings"></i></div><div class="rmain"><div class="rt">Other</div><div class="rs">Advanced systematic settings, online groups</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
  </div>
  
@@ -190,6 +243,32 @@
       </div>
       <button class="btn block" type="submit">Save Changes</button>
     </form>
+  </div>
+</div>
+
+
+<div class="ovl" id="languageModal" style="display:none" onclick="if(event.target==this)closeModal('languageModal')">
+  <div class="modal">
+    <div class="card" style="margin:0;max-width:400px;width:100%">
+      <div class="ct">Language Settings</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;">
+        <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:8px;">
+          <input type="radio" name="lang_sel" value="en" onclick="setAppLang('en')">
+          <span style="margin-left:8px;">English (Default)</span>
+        </label>
+        <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:8px;">
+          <input type="radio" name="lang_sel" value="ru" onclick="setAppLang('ru')">
+          <span style="margin-left:8px;">Русский (Russian)</span>
+        </label>
+        <label class="row" style="cursor:pointer;padding:12px;border:1px solid var(--line);border-radius:8px;">
+          <input type="radio" name="lang_sel" value="uz" onclick="setAppLang('uz')">
+          <span style="margin-left:8px;">O'zbekcha (Uzbek)</span>
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn block" onclick="closeModal('languageModal');window.location.reload();">Done</button>
+      </div>
+    </div>
   </div>
 </div>
 

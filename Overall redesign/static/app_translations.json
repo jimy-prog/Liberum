@@ -1,0 +1,3750 @@
+{
+  "! Your placement assessment has been submitted successfully.": {
+    "ru": "Ваше вступительное тестирование успешно отправлено.",
+    "uz": "Sizning joylashtirish baholashingiz muvaffaqiyatli topshirildi."
+  },
+  "\">": {
+    "ru": "\">",
+    "uz": "\">"
+  },
+  "&larr; Back to Explanation": {
+    "ru": "← Назад к объяснению",
+    "uz": "← Tushuntirishga qaytish"
+  },
+  "&larr; Back to Grammar List": {
+    "ru": "← Назад к списку грамматики",
+    "uz": "← Grammatika roʻyxatiga qaytish"
+  },
+  "&larr; Back to Library Dashboard": {
+    "ru": "← Назад к панели библиотеки",
+    "uz": "← Kutubxona boshqaruv paneliga qaytish"
+  },
+  "&larr; Back to Topics": {
+    "ru": "← Назад к темам",
+    "uz": "← Mavzularga qaytish"
+  },
+  "&nbsp;&bull;&nbsp; Please read carefully and select the best answer.": {
+    "ru": "&nbsp;•&nbsp; Пожалуйста, внимательно прочитайте и выберите лучший ответ.",
+    "uz": "&nbsp;•&nbsp; Iltimos, diqqat bilan o'qing va eng yaxshi javobni tanlang."
+  },
+  "&nbsp;·&nbsp; Schedule:": {
+    "ru": "&nbsp;·&nbsp; Расписание:",
+    "uz": "&nbsp;·&nbsp; Jadval:"
+  },
+  "&nbsp;·&nbsp; Teacher:": {
+    "ru": "&nbsp;·&nbsp; Учитель:",
+    "uz": "&nbsp;·&nbsp; O'qituvchi:"
+  },
+  "&times;": {
+    "ru": "×",
+    "uz": "×"
+  },
+  "' class=\"input-clean\" style=\"margin-top:8px; padding:8px; border-color:#86efac;\" onclick=\"this.select(); document.execCommand('copy');\">": {
+    "ru": "' class=\"input-clean\" style=\"margin-top:8px; padding:8px; border-color:#86efac;\" onclick=\"this.select(); document.execCommand('copy');\">",
+    "uz": "' class=\"input-clean\" style=\"margin-top:8px; padding:8px; border-color:#86efac;\" onclick=\"this.select(); document.execCommand('copy');\">"
+  },
+  "+ Add Holiday": {
+    "ru": "+ Добавить выходной",
+    "uz": "+ Bayram qo'shish"
+  },
+  "+ Add Lesson": {
+    "ru": "+ Добавить урок",
+    "uz": "+ Dars qo'shish"
+  },
+  "+ Assign Group": {
+    "ru": "+ Назначить группу",
+    "uz": "+ Guruh tayinlash"
+  },
+  ", you cannot pause or rewind the audio. It plays only once.": {
+    "ru": ", вы не можете поставить на паузу или перемотать аудио. Оно воспроизводится только один раз.",
+    "uz": ", siz audioni to'xtata olmaysiz yoki orqaga qaytara olmaysiz. U faqat bir marta ijro etiladi."
+  },
+  "- Select -": {
+    "ru": "- Выбрать -",
+    "uz": "- Tanlash -"
+  },
+  "-- Choose a teacher --": {
+    "ru": "-- Выберите учителя --",
+    "uz": "-- O'qituvchini tanlang --"
+  },
+  "-- No Exam Link (Self Guided) --": {
+    "ru": "-- Нет ссылки на экзамен (самостоятельное обучение) --",
+    "uz": "-- Imtihon havolasi yo'q (mustaqil o'rganish) --"
+  },
+  "-- Not sure --": {
+    "ru": "-- Не уверен --",
+    "uz": "-- Ishonchim komil emas --"
+  },
+  ". Student was added.": {
+    "ru": ". Студент добавлен.",
+    "uz": ". Talaba qo'shildi."
+  },
+  "0%": {
+    "ru": "0%",
+    "uz": "0%"
+  },
+  "0/10 (Waiting for AI)": {
+    "ru": "0/10 (Ожидание ИИ)",
+    "uz": "0/10 (AI kutmoqda)"
+  },
+  "00:00": {
+    "ru": "00:00",
+    "uz": "00:00"
+  },
+  "0:00": {
+    "ru": "0:00",
+    "uz": "0:00"
+  },
+  "0:00 / 0:00": {
+    "ru": "0:00 / 0:00",
+    "uz": "0:00 / 0:00"
+  },
+  "1. Content & Settings": {
+    "ru": "1. Содержание и настройки",
+    "uz": "1. Kontent va sozlamalar"
+  },
+  "1. FALSE": {
+    "ru": "1. ЛОЖЬ",
+    "uz": "1. YOLG'ON"
+  },
+  "1. TRUE&#10;2. FALSE&#10;3. NOT GIVEN&#10;4. C&#10;5. A": {
+    "ru": "1. ПРАВДА&#10;2. ЛОЖЬ&#10;3. НЕ УКАЗАНО&#10;4. C&#10;5. A",
+    "uz": "1. TO'G'RI&#10;2. YOLG'ON&#10;3. BERILMAGAN&#10;4. C&#10;5. A"
+  },
+  "1st of each month": {
+    "ru": "1-е число каждого месяца",
+    "uz": "Har oyning 1-sanasi"
+  },
+  "2) NOT GIVEN": {
+    "ru": "2) НЕ УКАЗАНО",
+    "uz": "2) BERILMAGAN"
+  },
+  "400,000 UZS per student": {
+    "ru": "400 000 UZS за студента",
+    "uz": "Har bir talaba uchun 400 000 UZS"
+  },
+  "5s": {
+    "ru": "5с",
+    "uz": "5s"
+  },
+  "6-Month Attendance History": {
+    "ru": "История посещаемости за 6 месяцев",
+    "uz": "6 oylik davomat tarixi"
+  },
+  "60% of group revenue": {
+    "ru": "60% от дохода группы",
+    "uz": "Guruh daromadining 60%"
+  },
+  "<p>Enter text here...</p>": {
+    "ru": "<p>Введите текст здесь...</p>",
+    "uz": "<p>Matnni shu yerga kiriting...</p>"
+  },
+  "=Fluency ·": {
+    "ru": "=Беглость ·",
+    "uz": "=Ravonlik ·"
+  },
+  "=Grammar ·": {
+    "ru": "=Грамматика ·",
+    "uz": "=Grammatika ·"
+  },
+  "=Homework · Score out of 10": {
+    "ru": "=Домашнее задание · Оценка из 10",
+    "uz": "=Uy vazifasi · 10 balldan"
+  },
+  "=Vocabulary ·": {
+    "ru": "=Словарный запас ·",
+    "uz": "=Lug'at ·"
+  },
+  "A = Absent": {
+    "ru": "О = Отсутствовал",
+    "uz": "Q = Yo'q"
+  },
+  "A+": {
+    "ru": "A+",
+    "uz": "A+"
+  },
+  "A-": {
+    "ru": "A-",
+    "uz": "A-"
+  },
+  "A1 Beginner": {
+    "ru": "A1 Начинающий",
+    "uz": "A1 Boshlang'ich"
+  },
+  "A2 Elementary": {
+    "ru": "A2 Элементарный",
+    "uz": "A2 Boshlang'ich daraja"
+  },
+  "AI Agent": {
+    "ru": "ИИ Агент",
+    "uz": "AI Agent"
+  },
+  "AI Evaluation & Analysis": {
+    "ru": "Оценка и анализ ИИ",
+    "uz": "AI Baholash va tahlil qilish"
+  },
+  "AI Extractor (PDF Ingestion)": {
+    "ru": "ИИ Экстрактор (загрузка PDF)",
+    "uz": "AI Ekstraktor (PDFni qabul qilish)"
+  },
+  "AI Reviewer (Instant)": {
+    "ru": "ИИ Проверяющий (мгновенно)",
+    "uz": "AI Tekshiruvchi (tezkor)"
+  },
+  "ALL ENQUIRIES (": {
+    "ru": "ВСЕ ЗАПРОСЫ (",
+    "uz": "BARCHA SO'ROVLAR ("
+  },
+  "Absent": {
+    "ru": "Отсутствует",
+    "uz": "Yo'q"
+  },
+  "Account Data": {
+    "ru": "Данные аккаунта",
+    "uz": "Hisob ma'lumotlari"
+  },
+  "Action": {
+    "ru": "Действие",
+    "uz": "Harakat"
+  },
+  "Actions": {
+    "ru": "Действия",
+    "uz": "Harakatlar"
+  },
+  "Active": {
+    "ru": "Активный",
+    "uz": "Faol"
+  },
+  "Active Assignments": {
+    "ru": "Активные задания",
+    "uz": "Faol topshiriqlar"
+  },
+  "Active Groups": {
+    "ru": "Активные группы",
+    "uz": "Faol guruhlar"
+  },
+  "Active attendance rate": {
+    "ru": "Активный процент посещаемости",
+    "uz": "Faol davomat darajasi"
+  },
+  "Active groups": {
+    "ru": "Активные группы",
+    "uz": "Faol guruhlar"
+  },
+  "Activity": {
+    "ru": "Активность",
+    "uz": "Faoliyat"
+  },
+  "Add": {
+    "ru": "Добавить",
+    "uz": "Qo'shish"
+  },
+  "Add Curriculum Timeline Event": {
+    "ru": "Добавить событие в расписание учебной программы",
+    "uz": "O'quv dasturi xronologiyasiga hodisa qo'shish"
+  },
+  "Add Enquiry": {
+    "ru": "Добавить запрос",
+    "uz": "So'rov qo'shish"
+  },
+  "Add Event": {
+    "ru": "Добавить событие",
+    "uz": "Hodisa qo'shish"
+  },
+  "Add Expense": {
+    "ru": "Добавить расход",
+    "uz": "Xarajat qo'shish"
+  },
+  "Add Holiday": {
+    "ru": "Добавить выходной",
+    "uz": "Bayram qo'shish"
+  },
+  "Add Lesson": {
+    "ru": "Добавить урок",
+    "uz": "Dars qo'shish"
+  },
+  "Add Manual Question": {
+    "ru": "Добавить вопрос вручную",
+    "uz": "Qo'lda savol qo'shish"
+  },
+  "Add New Section": {
+    "ru": "Добавить новый раздел",
+    "uz": "Yangi bo'lim qo'shish"
+  },
+  "Add New Student": {
+    "ru": "Добавить нового студента",
+    "uz": "Yangi talaba qo'shish"
+  },
+  "Add Placement Question": {
+    "ru": "Добавить вопрос для определения уровня",
+    "uz": "Joylashtirish savolini qo'shish"
+  },
+  "Add Question": {
+    "ru": "Добавить вопрос",
+    "uz": "Savol qo'shish"
+  },
+  "Add Section": {
+    "ru": "Добавить раздел",
+    "uz": "Bo'lim qo'shish"
+  },
+  "Add Student": {
+    "ru": "Добавить студента",
+    "uz": "Talaba qo'shish"
+  },
+  "Add Teachers": {
+    "ru": "Добавить учителей",
+    "uz": "O'qituvchilarni qo'shish"
+  },
+  "Add a note about this payment...": {
+    "ru": "Добавить примечание к этому платежу...",
+    "uz": "Ushbu to'lov haqida eslatma qo'shish..."
+  },
+  "Add expense": {
+    "ru": "Добавить расход",
+    "uz": "Xarajat qo'shish"
+  },
+  "Add lesson": {
+    "ru": "Добавить урок",
+    "uz": "Dars qo'shish"
+  },
+  "Add lesson to this day": {
+    "ru": "Добавить урок на этот день",
+    "uz": "Ushbu kunga dars qo'shish"
+  },
+  "Add student": {
+    "ru": "Добавить студента",
+    "uz": "Talaba qo'shish"
+  },
+  "Add student by username...": {
+    "ru": "Добавить студента по имени пользователя...",
+    "uz": "Talabani foydalanuvchi nomi bo'yicha qo'shish..."
+  },
+  "Address": {
+    "ru": "Адрес",
+    "uz": "Manzil"
+  },
+  "Admin Access": {
+    "ru": "Доступ администратора",
+    "uz": "Administrator kirishi"
+  },
+  "Advanced": {
+    "ru": "Продвинутый",
+    "uz": "Murakkab"
+  },
+  "Advanced systematic settings, online groups": {
+    "ru": "Расширенные системные настройки, онлайн-группы",
+    "uz": "Kengaytirilgan tizimli sozlamalar, onlayn guruhlar"
+  },
+  "Alerts": {
+    "ru": "Оповещения",
+    "uz": "Bildirishnomalar"
+  },
+  "All": {
+    "ru": "Все",
+    "uz": "Barchasi"
+  },
+  "All Grammar Topics": {
+    "ru": "Все темы по грамматике",
+    "uz": "Barcha grammatika mavzulari"
+  },
+  "All Levels": {
+    "ru": "Все уровни",
+    "uz": "Barcha darajalar"
+  },
+  "All-time attendance rate:": {
+    "ru": "Общий процент посещаемости:",
+    "uz": "Umumiy davomat darajasi:"
+  },
+  "Already have an account?": {
+    "ru": "Уже есть аккаунт?",
+    "uz": "Hisobingiz bormi?"
+  },
+  "Alumni": {
+    "ru": "Выпускники",
+    "uz": "Bitiruvchilar"
+  },
+  "Amount (UZS)": {
+    "ru": "Сумма (UZS)",
+    "uz": "Miqdor (UZS)"
+  },
+  "Analyze last Mock Test": {
+    "ru": "Проанализировать последний пробный тест",
+    "uz": "Oxirgi sinov testini tahlil qilish"
+  },
+  "Answer all questions below and submit to test your understanding.": {
+    "ru": "Ответьте на все вопросы ниже и отправьте, чтобы проверить свое понимание.",
+    "uz": "Tushunishingizni tekshirish uchun quyidagi barcha savollarga javob bering va yuboring."
+  },
+  "Any notes about today's lesson...": {
+    "ru": "Любые заметки об сегодняшнем уроке...",
+    "uz": "Bugungi dars haqida izohlar..."
+  },
+  "Appearance": {
+    "ru": "Внешний вид",
+    "uz": "Tashqi ko'rinish"
+  },
+  "Archive": {
+    "ru": "Архив",
+    "uz": "Arxiv"
+  },
+  "Archive (Alumni)": {
+    "ru": "Архив (Выпускники)",
+    "uz": "Arxiv (Bitiruvchilar)"
+  },
+  "Archive Group": {
+    "ru": "Архивировать группу",
+    "uz": "Guruhni arxivlash"
+  },
+  "Archived": {
+    "ru": "Архивировано",
+    "uz": "Arxivlangan"
+  },
+  "Ask Lexi or give a command...": {
+    "ru": "Спросите Лекси или дайте команду...",
+    "uz": "Lexidan so'rang yoki buyruq bering..."
+  },
+  "Ask questions, share advice, and collaborate with classmates.": {
+    "ru": "Задавайте вопросы, делитесь советами и сотрудничайте с одноклассниками.",
+    "uz": "Savollar bering, maslahatlar bilan bo'lishing va sinfdoshlar bilan hamkorlik qiling."
+  },
+  "Assessment Completed": {
+    "ru": "Оценка завершена",
+    "uz": "Baholash yakunlandi"
+  },
+  "Assign": {
+    "ru": "Назначить",
+    "uz": "Tayinlash"
+  },
+  "Assign Class Assignment": {
+    "ru": "Назначить классное задание",
+    "uz": "Sinf topshirig'ini tayinlash"
+  },
+  "Assign New Task": {
+    "ru": "Назначить новое задание",
+    "uz": "Yangi vazifa tayinlash"
+  },
+  "Assign Task": {
+    "ru": "Назначить задание",
+    "uz": "Vazifa tayinlash"
+  },
+  "Assign to Group *": {
+    "ru": "Назначить группе *",
+    "uz": "Guruhga tayinlash *"
+  },
+  "Assigned class work, deadlines, and direct practice links.": {
+    "ru": "Назначенная классная работа, сроки и прямые ссылки для практики.",
+    "uz": "Tayinlangan sinf ishi, muddatlar va to'g'ridan-to'g'ri amaliyot havolalari."
+  },
+  "Assignments & Mock Exams": {
+    "ru": "Задания и пробные экзамены",
+    "uz": "Topshiriqlar va sinov imtihonlari"
+  },
+  "Attendance": {
+    "ru": "Посещаемость",
+    "uz": "Davomat"
+  },
+  "Attendance rate": {
+    "ru": "Процент посещаемости",
+    "uz": "Davomat darajasi"
+  },
+  "Audio File (Required)": {
+    "ru": "Аудиофайл (обязательно)",
+    "uz": "Ovoz fayli (majburiy)"
+  },
+  "Audio Rules (Listening)": {
+    "ru": "Правила аудио (аудирование)",
+    "uz": "Ovoz qoidalari (tinglash)"
+  },
+  "Audio Starting...": {
+    "ru": "Аудио запускается...",
+    "uz": "Ovoz boshlanmoqda..."
+  },
+  "Audio Track Linked": {
+    "ru": "Аудиотрек привязан",
+    "uz": "Ovoz yo'li bog'langan"
+  },
+  "Audiobook": {
+    "ru": "Аудиокнига",
+    "uz": "Audiokitob"
+  },
+  "Audiobooks": {
+    "ru": "Аудиокниги",
+    "uz": "Audiokitoblar"
+  },
+  "Audiobooks & Podcasts": {
+    "ru": "Аудиокниги и подкасты",
+    "uz": "Audiokitoblar va podkastlar"
+  },
+  "Author": {
+    "ru": "Автор",
+    "uz": "Muallif"
+  },
+  "Author / Host": {
+    "ru": "Автор / Ведущий",
+    "uz": "Muallif / Mezbon"
+  },
+  "Auto-refreshes on save": {
+    "ru": "Автоматическое обновление при сохранении",
+    "uz": "Saqlashda avtomatik yangilanadi"
+  },
+  "Average": {
+    "ru": "Среднее",
+    "uz": "O'rtacha"
+  },
+  "Avg": {
+    "ru": "Ср.",
+    "uz": "O'rt."
+  },
+  "Avg Score": {
+    "ru": "Средний балл",
+    "uz": "O'rtacha ball"
+  },
+  "Avg. attendance": {
+    "ru": "Средняя посещаемость",
+    "uz": "O'rt. davomat"
+  },
+  "Awaiting Mic Authorization...": {
+    "ru": "Ожидание авторизации микрофона...",
+    "uz": "Mikrofon avtorizatsiyasi kutilmoqda..."
+  },
+  "Awaiting Teacher Review": {
+    "ru": "Ожидает проверки учителем",
+    "uz": "O'qituvchi tekshiruvini kutmoqda"
+  },
+  "B1 Intermediate": {
+    "ru": "B1 Средний",
+    "uz": "B1 O'rta"
+  },
+  "B2 Upper Int.": {
+    "ru": "B2 Выше среднего",
+    "uz": "B2 Yuqori o'rta"
+  },
+  "B2 Upper Intermediate": {
+    "ru": "B2 Выше среднего",
+    "uz": "B2 Yuqori o'rta"
+  },
+  "Back to Explanation": {
+    "ru": "Назад к объяснению",
+    "uz": "Tushuntirishga qaytish"
+  },
+  "Back to Group": {
+    "ru": "Назад к группе",
+    "uz": "Guruhga qaytish"
+  },
+  "Back to Library": {
+    "ru": "Назад в библиотеку",
+    "uz": "Kutubxonaga qaytish"
+  },
+  "Back to Manage Mocks": {
+    "ru": "Назад к управлению пробными",
+    "uz": "Sinov imtihonlarini boshqarishga qaytish"
+  },
+  "Back to Students": {
+    "ru": "Назад к студентам",
+    "uz": "Talabalarga qaytish"
+  },
+  "Back to students": {
+    "ru": "Назад к студентам",
+    "uz": "Talabalarga qaytish"
+  },
+  "Ban Student": {
+    "ru": "Заблокировать студента",
+    "uz": "Talabani bloklash"
+  },
+  "Band": {
+    "ru": "Балл",
+    "uz": "Ball"
+  },
+  "Band Score (0 - 9.0)": {
+    "ru": "Балл (0 - 9.0)",
+    "uz": "Ball (0 - 9.0)"
+  },
+  "Bank Details (for invoices)": {
+    "ru": "Банковские реквизиты (для счетов)",
+    "uz": "Bank rekvizitlari (hisob-fakturalar uchun)"
+  },
+  "Bank Transfer": {
+    "ru": "Банковский перевод",
+    "uz": "Bank o'tkazmasi"
+  },
+  "Bank transfer": {
+    "ru": "Банковский перевод",
+    "uz": "Bank o'tkazmasi"
+  },
+  "Banned": {
+    "ru": "Заблокирован",
+    "uz": "Bloklangan"
+  },
+  "Banned Date": {
+    "ru": "Дата блокировки",
+    "uz": "Bloklash sanasi"
+  },
+  "Banned List": {
+    "ru": "Список заблокированных",
+    "uz": "Bloklanganlar ro'yxati"
+  },
+  "Based on attendance and performance": {
+    "ru": "На основе посещаемости и успеваемости",
+    "uz": "Davomat va natijalarga asoslangan"
+  },
+  "Based on current month's attendance rate and academic scores.": {
+    "ru": "На основе процента посещаемости за текущий месяц и академических оценок.",
+    "uz": "Joriy oyning davomat darajasi va akademik baholariga asoslangan."
+  },
+  "Before we begin, we need to calibrate your microphone. Please grant permission and speak into your microphone to verify audio signals.": {
+    "ru": "Прежде чем мы начнем, нам нужно откалибровать ваш микрофон. Пожалуйста, предоставьте разрешение и говорите в микрофон, чтобы проверить аудиосигналы.",
+    "uz": "Boshlashdan oldin, mikrofoningizni kalibrlashimiz kerak. Iltimos, ruxsat bering va audio signallarni tekshirish uchun mikrofoningizga gapiring."
+  },
+  "Beginner": {
+    "ru": "Начинающий",
+    "uz": "Boshlang'ich"
+  },
+  "Billing day": {
+    "ru": "День выставления счета",
+    "uz": "Hisob-kitob kuni"
+  },
+  "Book File (EPUB or PDF) *": {
+    "ru": "Файл книги (EPUB или PDF) *",
+    "uz": "Kitob fayli (EPUB yoki PDF) *"
+  },
+  "Book Title *": {
+    "ru": "Название книги *",
+    "uz": "Kitob nomi *"
+  },
+  "Brief details about lessons taught...": {
+    "ru": "Краткие сведения о проведенных уроках...",
+    "uz": "O'tilgan darslar haqida qisqacha ma'lumotlar..."
+  },
+  "Brief summary...": {
+    "ru": "Краткое описание...",
+    "uz": "Qisqacha xulosa..."
+  },
+  "Browse Mock Tests": {
+    "ru": "Просмотреть пробные тесты",
+    "uz": "Sinov testlarini ko'rish"
+  },
+  "Bulk Import Answers": {
+    "ru": "Массовый импорт ответов",
+    "uz": "Javoblarni ommaviy import qilish"
+  },
+  "Bulk Paste Answers": {
+    "ru": "Массовая вставка ответов",
+    "uz": "Javoblarni ommaviy joylash"
+  },
+  "C1 Advanced": {
+    "ru": "C1 Продвинутый",
+    "uz": "C1 Yuqori daraja"
+  },
+  "C2 Proficient": {
+    "ru": "C2 Владение",
+    "uz": "C2 Mutaxassis"
+  },
+  "CC": {
+    "ru": "Копия",
+    "uz": "CC"
+  },
+  "Call": {
+    "ru": "Звонок",
+    "uz": "Qo'ng'iroq"
+  },
+  "Cancel": {
+    "ru": "Отмена",
+    "uz": "Bekor qilish"
+  },
+  "Cancel / Back": {
+    "ru": "Отмена / Назад",
+    "uz": "Bekor qilish / Orqaga"
+  },
+  "Cancelled": {
+    "ru": "Отменено",
+    "uz": "Bekor qilindi"
+  },
+  "Candidate:": {
+    "ru": "Кандидат:",
+    "uz": "Nomzod:"
+  },
+  "Cannot add this student. This phone number matches banned student:": {
+    "ru": "Невозможно добавить этого студента. Этот номер телефона соответствует заблокированному студенту:",
+    "uz": "Bu talabani qo'shib bo'lmaydi. Ushbu telefon raqami bloklangan talabaga tegishli:"
+  },
+  "Card": {
+    "ru": "Карта",
+    "uz": "Karta"
+  },
+  "Cash": {
+    "ru": "Наличные",
+    "uz": "Naqd pul"
+  },
+  "Cash flow": {
+    "ru": "Денежный поток",
+    "uz": "Pul oqimi"
+  },
+  "Catalog": {
+    "ru": "Каталог",
+    "uz": "Katalog"
+  },
+  "Change Password": {
+    "ru": "Изменить пароль",
+    "uz": "Parolni o'zgartirish"
+  },
+  "Check Image / Receipt": {
+    "ru": "Проверить изображение / квитанцию",
+    "uz": "Rasmni / Chekni tekshirish"
+  },
+  "Check back later as we are actively updating our library!": {
+    "ru": "Загляните позже, мы активно обновляем нашу библиотеку!",
+    "uz": "Kutubxonamizni faol yangilayotganimiz sababli keyinroq qayta tekshiring!"
+  },
+  "Checking...": {
+    "ru": "Проверка...",
+    "uz": "Tekshirilmoqda..."
+  },
+  "Chronological timeline of topics, weekly themes, and lectures.": {
+    "ru": "Хронологическая шкала тем, еженедельных тем и лекций.",
+    "uz": "Mavzular, haftalik mavzular va ma'ruzalarning xronologik jadvali."
+  },
+  "Class Schedule & Timetable": {
+    "ru": "Расписание занятий и учебный план",
+    "uz": "Dars jadvali va darslar ro'yxati"
+  },
+  "Class:": {
+    "ru": "Класс:",
+    "uz": "Sinf:"
+  },
+  "Classes & invites": {
+    "ru": "Занятия и приглашения",
+    "uz": "Darslar va takliflar"
+  },
+  "Classroom Discussion": {
+    "ru": "Обсуждение в классе",
+    "uz": "Sinf muhokamasi"
+  },
+  "Click to rate · saves instantly": {
+    "ru": "Нажмите для оценки · сохраняется мгновенно",
+    "uz": "Baholash uchun bosing · darhol saqlanadi"
+  },
+  "Click to upload receipt": {
+    "ru": "Нажмите, чтобы загрузить квитанцию",
+    "uz": "Chekni yuklash uchun bosing"
+  },
+  "Close": {
+    "ru": "Закрыть",
+    "uz": "Yopish"
+  },
+  "Color label": {
+    "ru": "Цветовая метка",
+    "uz": "Rang belgisi"
+  },
+  "Complete Setup": {
+    "ru": "Завершить настройку",
+    "uz": "Sozlashni yakunlash"
+  },
+  "Complete Setup — Liberum": {
+    "ru": "Завершить настройку — Liberum",
+    "uz": "Sozlashni yakunlash — Liberum"
+  },
+  "Component Target": {
+    "ru": "Цель компонента",
+    "uz": "Komponent maqsadi"
+  },
+  "Contact": {
+    "ru": "Контакт",
+    "uz": "Aloqa"
+  },
+  "Contact Details": {
+    "ru": "Контактные данные",
+    "uz": "Aloqa ma'lumotlari"
+  },
+  "Contact Main": {
+    "ru": "Основной контакт",
+    "uz": "Asosiy aloqa"
+  },
+  "Contact Support": {
+    "ru": "Обратиться в поддержку",
+    "uz": "Qo'llab-quvvatlash bilan bog'lanish"
+  },
+  "Contact details": {
+    "ru": "Контактные данные",
+    "uz": "Aloqa ma'lumotlari"
+  },
+  "Contacted": {
+    "ru": "Связался",
+    "uz": "Bog'lanildi"
+  },
+  "Copy": {
+    "ru": "Копировать",
+    "uz": "Nusxalash"
+  },
+  "Correct Answer": {
+    "ru": "Правильный ответ",
+    "uz": "To'g'ri javob"
+  },
+  "Correct Option": {
+    "ru": "Правильный вариант",
+    "uz": "To'g'ri variant"
+  },
+  "Correct Option (A, B, C, D)": {
+    "ru": "Правильный вариант (A, B, C, D)",
+    "uz": "To'g'ri variant (A, B, C, D)"
+  },
+  "Countable": {
+    "ru": "Исчисляемое",
+    "uz": "Sanaladigan"
+  },
+  "Course Curriculum & Roadmap": {
+    "ru": "Учебная программа и дорожная карта курса",
+    "uz": "Kurs dasturi va yo'l xaritasi"
+  },
+  "Course timeline is currently empty. Check back soon!": {
+    "ru": "График курса в настоящее время пуст. Загляните позже!",
+    "uz": "Kurs jadvali hozirda bo'sh. Tez orada qayta tekshiring!"
+  },
+  "Courses": {
+    "ru": "Курсы",
+    "uz": "Kurslar"
+  },
+  "Cover Image (Optional)": {
+    "ru": "Изображение обложки (необязательно)",
+    "uz": "Muqova rasmi (ixtiyoriy)"
+  },
+  "Cover Image (Poster)": {
+    "ru": "Изображение обложки (постер)",
+    "uz": "Muqova rasmi (plakat)"
+  },
+  "Create Account": {
+    "ru": "Создать аккаунт",
+    "uz": "Hisob yaratish"
+  },
+  "Create Foundation": {
+    "ru": "Создать основу",
+    "uz": "Asos yaratish"
+  },
+  "Create Group": {
+    "ru": "Создать группу",
+    "uz": "Guruh yaratish"
+  },
+  "Create Mock Exam": {
+    "ru": "Создать пробный экзамен",
+    "uz": "Sinov imtihoni yaratish"
+  },
+  "Create New Exam": {
+    "ru": "Создать новый экзамен",
+    "uz": "Yangi imtihon yaratish"
+  },
+  "Create Section": {
+    "ru": "Создать раздел",
+    "uz": "Bo'lim yaratish"
+  },
+  "Create a password": {
+    "ru": "Создать пароль",
+    "uz": "Parol yaratish"
+  },
+  "Create, edit, and publish your mock exams": {
+    "ru": "Создавайте, редактируйте и публикуйте свои пробные экзамены",
+    "uz": "Sinov imtihonlaringizni yaratish, tahrirlash va nashr qilish"
+  },
+  "Cue Card Prompt": {
+    "ru": "Подсказка на карточке-подсказке",
+    "uz": "Kartochka-buyruq"
+  },
+  "Current English Level": {
+    "ru": "Текущий уровень английского",
+    "uz": "Joriy ingliz tili darajasi"
+  },
+  "Current Password": {
+    "ru": "Текущий пароль",
+    "uz": "Joriy parol"
+  },
+  "Current Position": {
+    "ru": "Текущая позиция",
+    "uz": "Joriy holat"
+  },
+  "Current password incorrect": {
+    "ru": "Неверный текущий пароль",
+    "uz": "Joriy parol noto'g'ri"
+  },
+  "Custom Assessment": {
+    "ru": "Пользовательская оценка",
+    "uz": "Maxsus baholash"
+  },
+  "Date": {
+    "ru": "Дата",
+    "uz": "Sana"
+  },
+  "Date *": {
+    "ru": "Дата *",
+    "uz": "Sana *"
+  },
+  "Day": {
+    "ru": "День",
+    "uz": "Kun"
+  },
+  "Deadline / Due Date (Optional)": {
+    "ru": "Срок / Дата выполнения (необязательно)",
+    "uz": "Muddat / Tugallanish sanasi (ixtiyoriy)"
+  },
+  "Default Monthly Fee": {
+    "ru": "Ежемесячная плата по умолчанию",
+    "uz": "Standart oylik to'lov"
+  },
+  "Defaults live in Settings → Finance defaults.": {
+    "ru": "Настройки по умолчанию находятся в разделе Настройки → Финансовые настройки по умолчанию.",
+    "uz": "Standart sozlamalar Sozlamalar → Moliya standartlarida joylashgan."
+  },
+  "Delete": {
+    "ru": "Удалить",
+    "uz": "O'chirish"
+  },
+  "Describe an occasion when you heard someone complaining about something.": {
+    "ru": "Опишите случай, когда вы слышали, как кто-то жаловался на что-то.",
+    "uz": "Kimningdir nimadandir shikoyat qilayotganini eshitgan vaziyatni tasvirlang."
+  },
+  "Description": {
+    "ru": "Описание",
+    "uz": "Tavsif"
+  },
+  "Description / Summary": {
+    "ru": "Описание / Сводка",
+    "uz": "Tavsif / Xulosa"
+  },
+  "Detailed Feedback": {
+    "ru": "Подробная обратная связь",
+    "uz": "Batafsil fikr-mulohaza"
+  },
+  "Details": {
+    "ru": "Подробности",
+    "uz": "Tafsilotlar"
+  },
+  "Dismiss all": {
+    "ru": "Отклонить все",
+    "uz": "Barchasini yopish"
+  },
+  "Don't have an account?": {
+    "ru": "Нет аккаунта?",
+    "uz": "Hisobingiz yo'qmi?"
+  },
+  "Done": {
+    "ru": "Готово",
+    "uz": "Bajarildi"
+  },
+  "Download PDF / Print": {
+    "ru": "Скачать PDF / Печать",
+    "uz": "PDF yuklab olish / Chop etish"
+  },
+  "Draft": {
+    "ru": "Черновик",
+    "uz": "Qoralama"
+  },
+  "Draft mode. Students cannot see this test until published.": {
+    "ru": "Режим черновика. Студенты не смогут увидеть этот тест до публикации.",
+    "uz": "Qoralama rejimi. Talabalar bu testni nashr etilguncha ko'ra olmaydilar."
+  },
+  "E = Excused": {
+    "ru": "О = Освобожден",
+    "uz": "U = Uzrli"
+  },
+  "E.g., IELTS preparation, speaking practice, grammar...": {
+    "ru": "Например, подготовка к IELTS, разговорная практика, грамматика...",
+    "uz": "Masalan, IELTSga tayyorgarlik, gapirish amaliyoti, grammatika..."
+  },
+  "EXAM MODE · NO REPLAY": {
+    "ru": "РЕЖИМ ЭКЗАМЕНА · БЕЗ ПОВТОРА",
+    "uz": "IMTIHON REJIMI · QAYTA IJRO YO'Q"
+  },
+  "Edit": {
+    "ru": "Редактировать",
+    "uz": "Tahrirlash"
+  },
+  "Edit Config": {
+    "ru": "Редактировать конфигурацию",
+    "uz": "Konfiguratsiyani tahrirlash"
+  },
+  "Edit Mock": {
+    "ru": "Редактировать пробный",
+    "uz": "Sinovni tahrirlash"
+  },
+  "Edit Profile": {
+    "ru": "Редактировать профиль",
+    "uz": "Profilni tahrirlash"
+  },
+  "Edit group": {
+    "ru": "Редактировать группу",
+    "uz": "Guruhni tahrirlash"
+  },
+  "Elementary": {
+    "ru": "Начальный",
+    "uz": "Boshlang'ich"
+  },
+  "Email": {
+    "ru": "Электронная почта",
+    "uz": "Elektron pochta"
+  },
+  "Email Address": {
+    "ru": "Адрес электронной почты",
+    "uz": "Elektron pochta manzili"
+  },
+  "Email Us": {
+    "ru": "Напишите нам",
+    "uz": "Bizga elektron pochta yuboring"
+  },
+  "English Learning Centre": {
+    "ru": "Центр изучения английского",
+    "uz": "Ingliz tili o'quv markazi"
+  },
+  "English Learning Platform": {
+    "ru": "Платформа для изучения английского",
+    "uz": "Ingliz tili o'rganish platformasi"
+  },
+  "English Level": {
+    "ru": "Уровень английского",
+    "uz": "Ingliz tili darajasi"
+  },
+  "English Level *": {
+    "ru": "Уровень английского *",
+    "uz": "Ingliz tili darajasi *"
+  },
+  "Enhance your English with our curated digital resources.": {
+    "ru": "Улучшите свой английский с помощью наших отобранных цифровых ресурсов.",
+    "uz": "Bizning tanlangan raqamli resurslarimiz bilan ingliz tilingizni yaxshilang."
+  },
+  "Enroll": {
+    "ru": "Записаться",
+    "uz": "Ro'yxatdan o'tish"
+  },
+  "Enroll Now": {
+    "ru": "Записаться сейчас",
+    "uz": "Hozir ro'yxatdan o'tish"
+  },
+  "Enroll Student": {
+    "ru": "Записать студента",
+    "uz": "Talabani ro'yxatdan o'tkazish"
+  },
+  "Enrolled": {
+    "ru": "Зачислен",
+    "uz": "Ro'yxatdan o'tgan"
+  },
+  "Ensure you are in a quiet environment. Do not use external resources, books, or devices.": {
+    "ru": "Убедитесь, что вы находитесь в тихой обстановке. Не используйте внешние ресурсы, книги или устройства.",
+    "uz": "Sokin muhitda ekanligingizga ishonch hosil qiling. Tashqi resurslar, kitoblar yoki qurilmalardan foydalanmang."
+  },
+  "Enter Class Portal": {
+    "ru": "Войти в портал класса",
+    "uz": "Sinf portaliga kirish"
+  },
+  "Enter client's full name": {
+    "ru": "Введите полное имя клиента",
+    "uz": "Mijozning to'liq ismini kiriting"
+  },
+  "Enter correct answer (e.g. FALSE, 1994, B)": {
+    "ru": "Введите правильный ответ (например, ЛОЖЬ, 1994, Б)",
+    "uz": "To'g'ri javobni kiriting (masalan, YOLG'ON, 1994, B)"
+  },
+  "Enter text here...": {
+    "ru": "Введите текст здесь...",
+    "uz": "Matnni shu yerga kiriting..."
+  },
+  "Enter the 4-digit Access PIN provided by the administrator to begin your English test.": {
+    "ru": "Введите 4-значный PIN-код доступа, предоставленный администратором, чтобы начать тест по английскому языку.",
+    "uz": "Ingliz tili testini boshlash uchun administrator tomonidan berilgan 4 xonali kirish PIN-kodini kiriting."
+  },
+  "Enter the 6-character code given by your teacher.": {
+    "ru": "Введите 6-значный код, предоставленный вашим учителем.",
+    "uz": "O'qituvchingiz tomonidan berilgan 6 belgili kodni kiriting."
+  },
+  "Enter your email": {
+    "ru": "Введите ваш адрес электронной почты",
+    "uz": "Elektron pochta manzilingizni kiriting"
+  },
+  "Enter your email or username": {
+    "ru": "Введите ваш адрес электронной почты или имя пользователя",
+    "uz": "Elektron pochta yoki foydalanuvchi nomingizni kiriting"
+  },
+  "Enter your password": {
+    "ru": "Введите ваш пароль",
+    "uz": "Parolingizni kiriting"
+  },
+  "Evaluator Feedback & Analysis": {
+    "ru": "Отзывы и анализ оценщика",
+    "uz": "Baholovchi fikr-mulohazalari va tahlili"
+  },
+  "Evaluator Preference": {
+    "ru": "Предпочтения оценщика",
+    "uz": "Baholovchi afzalligi"
+  },
+  "Exact Answer Key": {
+    "ru": "Точный ключ ответа",
+    "uz": "Aniq javob kaliti"
+  },
+  "Exam": {
+    "ru": "Экзамен",
+    "uz": "Imtihon"
+  },
+  "Exam Completed!": {
+    "ru": "Экзамен завершен!",
+    "uz": "Imtihon yakunlandi!"
+  },
+  "Exam Instructions": {
+    "ru": "Инструкции к экзамену",
+    "uz": "Imtihon ko'rsatmalari"
+  },
+  "Exam Mode": {
+    "ru": "Режим экзамена",
+    "uz": "Imtihon rejimi"
+  },
+  "Exam Title": {
+    "ru": "Название экзамена",
+    "uz": "Imtihon nomi"
+  },
+  "Exam Type": {
+    "ru": "Тип экзамена",
+    "uz": "Imtihon turi"
+  },
+  "Examination Content": {
+    "ru": "Содержание экзамена",
+    "uz": "Imtihon mazmuni"
+  },
+  "Excused": {
+    "ru": "Освобожден",
+    "uz": "Uzrli"
+  },
+  "Expenses": {
+    "ru": "Расходы",
+    "uz": "Xarajatlar"
+  },
+  "Experiencing technical issues or have questions about your account? Send us an email and our team will get back to you within 24 hours.": {
+    "ru": "Возникли технические проблемы или есть вопросы по аккаунту? Отправьте нам электронное письмо, и наша команда свяжется с вами в течение 24 часов.",
+    "uz": "Texnik muammolar bormi yoki hisobingiz haqida savollaringiz bormi? Bizga elektron pochta yuboring va jamoamiz 24 soat ichida siz bilan bog'lanadi."
+  },
+  "Explanation (Optional)": {
+    "ru": "Объяснение (необязательно)",
+    "uz": "Tushuntirish (ixtiyoriy)"
+  },
+  "Extract Passages & Questions": {
+    "ru": "Извлечь отрывки и вопросы",
+    "uz": "Paragraf va savollarni ajratib olish"
+  },
+  "FALSE": {
+    "ru": "ЛОЖЬ",
+    "uz": "YOLG'ON"
+  },
+  "File": {
+    "ru": "Файл",
+    "uz": "Fayl"
+  },
+  "Filters:": {
+    "ru": "Фильтры:",
+    "uz": "Filtrlar:"
+  },
+  "Final Score": {
+    "ru": "Итоговый балл",
+    "uz": "Yakuniy ball"
+  },
+  "Finance": {
+    "ru": "Финансы",
+    "uz": "Moliya"
+  },
+  "Finance Defaults": {
+    "ru": "Финансовые настройки по умолчанию",
+    "uz": "Moliya standartlari"
+  },
+  "Finance defaults": {
+    "ru": "Финансовые настройки по умолчанию",
+    "uz": "Moliya standartlari"
+  },
+  "Focus Areas:": {
+    "ru": "Области фокусировки:",
+    "uz": "Diqqat markazida bo'lgan sohalar:"
+  },
+  "Free Mode": {
+    "ru": "Свободный режим",
+    "uz": "Bepul rejim"
+  },
+  "Full Name": {
+    "ru": "Полное имя",
+    "uz": "To'liq ism"
+  },
+  "Full Name *": {
+    "ru": "Полное имя *",
+    "uz": "To'liq ism *"
+  },
+  "Full Test": {
+    "ru": "Полный тест",
+    "uz": "To'liq test"
+  },
+  "Gap Fill / Blank": {
+    "ru": "Заполнение пробелов / Пустое",
+    "uz": "Bo'shliqni to'ldirish / Bo'sh"
+  },
+  "General Settings": {
+    "ru": "Общие настройки",
+    "uz": "Umumiy sozlamalar"
+  },
+  "Generate Access PIN": {
+    "ru": "Сгенерировать PIN-код доступа",
+    "uz": "Kirish PIN-kodini yaratish"
+  },
+  "Generate PIN": {
+    "ru": "Сгенерировать PIN-код",
+    "uz": "PIN yaratish"
+  },
+  "Generates a 4-digit PIN. The student takes the test on the tablet — no account needed.": {
+    "ru": "Генерирует 4-значный PIN-код. Студент проходит тест на планшете — аккаунт не требуется.",
+    "uz": "4 xonali PIN yaratadi. Talaba testni planshetda topshiradi — hisob kerak emas."
+  },
+  "Give teachers their own login to manage their groups": {
+    "ru": "Предоставьте учителям собственный логин для управления их группами",
+    "uz": "O'qituvchilarga o'z guruhlarini boshqarish uchun shaxsiy kirish imkoniyatini bering"
+  },
+  "Go back": {
+    "ru": "Вернуться",
+    "uz": "Orqaga qaytish"
+  },
+  "Goal": {
+    "ru": "Цель",
+    "uz": "Maqsad"
+  },
+  "Goal / Notes": {
+    "ru": "Цель / Примечания",
+    "uz": "Maqsad / Izohlar"
+  },
+  "Good luck! Stay focused and do your best.": {
+    "ru": "Удачи! Сосредоточьтесь и сделайте все возможное.",
+    "uz": "Omad tilaymiz! Diqqatingizni jamlang va qo'lingizdan kelganini qiling."
+  },
+  "Grade": {
+    "ru": "Оценка",
+    "uz": "Baho"
+  },
+  "Grammar": {
+    "ru": "Грамматика",
+    "uz": "Grammatika"
+  },
+  "Grammar Focus:": {
+    "ru": "Фокус грамматики:",
+    "uz": "Grammatika yo'nalishi:"
+  },
+  "Grammar Topic": {
+    "ru": "Тема грамматики",
+    "uz": "Grammatika mavzusi"
+  },
+  "Grammar Topics": {
+    "ru": "Темы грамматики",
+    "uz": "Grammatika mavzulari"
+  },
+  "Grammar · Activity · Vocabulary · Score: 1=Needs Work · 2=Revision · 3=Good": {
+    "ru": "Грамматика · Активность · Словарный запас · Оценка: 1=Требуется доработка · 2=Повторение · 3=Хорошо",
+    "uz": "Grammatika · Faoliyat · Lug'at · Ball: 1=Ishlash kerak · 2=Takrorlash · 3=Yaxshi"
+  },
+  "Group": {
+    "ru": "Группа",
+    "uz": "Guruh"
+  },
+  "Group *": {
+    "ru": "Группа *",
+    "uz": "Guruh *"
+  },
+  "Group Details": {
+    "ru": "Детали группы",
+    "uz": "Guruh tafsilotlari"
+  },
+  "Group Progress": {
+    "ru": "Прогресс группы",
+    "uz": "Guruh rivojlanishi"
+  },
+  "Group Revenue Split": {
+    "ru": "Распределение дохода группы",
+    "uz": "Guruh daromadini taqsimlash"
+  },
+  "Groups": {
+    "ru": "Группы",
+    "uz": "Guruhlar"
+  },
+  "HTML Copied to clipboard!": {
+    "ru": "HTML скопирован в буфер обмена!",
+    "uz": "HTML buferga nusxalandi!"
+  },
+  "HTML Explanation": {
+    "ru": "HTML объяснение",
+    "uz": "HTML tushuntirish"
+  },
+  "Held": {
+    "ru": "Проведено",
+    "uz": "O'tkazildi"
+  },
+  "Held / Scheduled": {
+    "ru": "Проведено / Запланировано",
+    "uz": "O'tkazilgan / Rejalashtirilgan"
+  },
+  "History": {
+    "ru": "История",
+    "uz": "Tarix"
+  },
+  "Holiday": {
+    "ru": "Выходной",
+    "uz": "Bayram"
+  },
+  "Home": {
+    "ru": "Главная",
+    "uz": "Bosh sahifa"
+  },
+  "Homework": {
+    "ru": "Домашнее задание",
+    "uz": "Uy vazifasi"
+  },
+  "Homework Assigned": {
+    "ru": "Домашнее задание назначено",
+    "uz": "Uy vazifasi tayinlangan"
+  },
+  "How Found": {
+    "ru": "Как нашли",
+    "uz": "Qanday topilgan"
+  },
+  "Human review & feedback": {
+    "ru": "Проверка и обратная связь от человека",
+    "uz": "Inson tomonidan ko'rib chiqish va fikr-mulohaza"
+  },
+  "I am a...": {
+    "ru": "Я...",
+    "uz": "Men..."
+  },
+  "I'm not sure": {
+    "ru": "Я не уверен",
+    "uz": "Ishonchim komil emas"
+  },
+  "IELTS SPEAKING SIMULATOR": {
+    "ru": "СИМУЛЯТОР IELTS SPEAKING",
+    "uz": "IELTS SPEAKING SIMULATORI"
+  },
+  "IN 2 H": {
+    "ru": "ЧЕРЕЗ 2 Ч",
+    "uz": "2 SOAT ICHIDA"
+  },
+  "If this is a Listening exam, the audio will play automatically. In": {
+    "ru": "Если это экзамен по аудированию, аудио будет воспроизводиться автоматически. В",
+    "uz": "Agar bu tinglash imtihoni bo'lsa, audio avtomatik ravishda ijro etiladi. Da"
+  },
+  "In Progress": {
+    "ru": "В процессе",
+    "uz": "Jarayonda"
+  },
+  "In-Person Classes": {
+    "ru": "Очные занятия",
+    "uz": "An'anaviy darslar"
+  },
+  "In-person": {
+    "ru": "Очно",
+    "uz": "Shaxsan"
+  },
+  "Inactive": {
+    "ru": "Неактивный",
+    "uz": "Faol emas"
+  },
+  "Include Grammar Scores": {
+    "ru": "Включить баллы по грамматике",
+    "uz": "Grammatika ballarini kiritish"
+  },
+  "Include Mock Tests": {
+    "ru": "Включить пробные тесты",
+    "uz": "Sinov testlarini kiritish"
+  },
+  "Include Profile & Goals": {
+    "ru": "Включить профиль и цели",
+    "uz": "Profil va maqsadlarni kiritish"
+  },
+  "Include Recent Lessons": {
+    "ru": "Включить недавние уроки",
+    "uz": "So'nggi darslarni kiritish"
+  },
+  "Income": {
+    "ru": "Доход",
+    "uz": "Daromad"
+  },
+  "Individual Score Trends (All Time)": {
+    "ru": "Тенденции индивидуальных баллов (за все время)",
+    "uz": "Individual ball tendensiyalari (barcha vaqtlar)"
+  },
+  "Initialising grader...": {
+    "ru": "Инициализация оценщика...",
+    "uz": "Baholovchi ishga tushirilmoqda..."
+  },
+  "Initializing virtual mock classroom. Please stand by...": {
+    "ru": "Инициализация виртуального пробного класса. Пожалуйста, подождите...",
+    "uz": "Virtual sinov sinfi ishga tushirilmoqda. Iltimos, kuting..."
+  },
+  "Instructions / Description": {
+    "ru": "Инструкции / Описание",
+    "uz": "Ko'rsatmalar / Tavsif"
+  },
+  "Interactive review. Manual record, pause, and custom pacing.": {
+    "ru": "Интерактивный обзор. Ручная запись, пауза и настраиваемый темп.",
+    "uz": "Interaktiv ko'rib chiqish. Qo'lda yozish, pauza va moslashtirilgan tezlik."
+  },
+  "Interested in partnering with us or have business inquiries? Contact our main office directly.": {
+    "ru": "Заинтересованы в партнерстве с нами или у вас есть деловые запросы? Свяжитесь с нашим главным офисом напрямую.",
+    "uz": "Biz bilan hamkorlik qilishga qiziqasizmi yoki biznes so'rovlaringiz bormi? Asosiy ofisimizga to'g'ridan-to'g'ri murojaat qiling."
+  },
+  "Intermediate": {
+    "ru": "Средний",
+    "uz": "O'rta"
+  },
+  "Invite Code": {
+    "ru": "Код приглашения",
+    "uz": "Taklif kodi"
+  },
+  "Invite receptionists or managers": {
+    "ru": "Пригласить администраторов или менеджеров",
+    "uz": "Resepsionistlar yoki menejerlarni taklif qilish"
+  },
+  "John Doe": {
+    "ru": "Джон Доу",
+    "uz": "Jon Dou"
+  },
+  "Join": {
+    "ru": "Присоединиться",
+    "uz": "Qo'shilish"
+  },
+  "Join Class": {
+    "ru": "Присоединиться к классу",
+    "uz": "Sinfga qo'shilish"
+  },
+  "Join a Class": {
+    "ru": "Присоединиться к классу",
+    "uz": "Sinfga qo'shilish"
+  },
+  "Join classes using codes provided by your teachers.": {
+    "ru": "Присоединяйтесь к занятиям, используя коды, предоставленные вашими учителями.",
+    "uz": "O'qituvchilaringiz tomonidan berilgan kodlar yordamida darslarga qo'shiling."
+  },
+  "Join link is live": {
+    "ru": "Ссылка для присоединения активна",
+    "uz": "Qo'shilish havolasi faol"
+  },
+  "Join the Waitlist": {
+    "ru": "Присоединиться к списку ожидания",
+    "uz": "Kutilayotganlar ro'yxatiga qo'shilish"
+  },
+  "Join with Code": {
+    "ru": "Присоединиться по коду",
+    "uz": "Kod bilan qo'shilish"
+  },
+  "Journal": {
+    "ru": "Журнал",
+    "uz": "Jurnal"
+  },
+  "Keep up the great work! 🚀": {
+    "ru": "Продолжайте в том же духе! 🚀",
+    "uz": "A'lo ishlarni davom eting! 🚀"
+  },
+  "Knowledge Check": {
+    "ru": "Проверка знаний",
+    "uz": "Bilimlarni tekshirish"
+  },
+  "Language Vision": {
+    "ru": "Языковое видение",
+    "uz": "Til ko'rinishi"
+  },
+  "Learn": {
+    "ru": "Учиться",
+    "uz": "O'rganish"
+  },
+  "Learning": {
+    "ru": "Обучение",
+    "uz": "O'rganish"
+  },
+  "Learning Goals": {
+    "ru": "Цели обучения",
+    "uz": "O'quv maqsadlari"
+  },
+  "Lesson Details": {
+    "ru": "Детали урока",
+    "uz": "Dars tafsilotlari"
+  },
+  "Lesson Held": {
+    "ru": "Урок проведен",
+    "uz": "Dars o'tkazildi"
+  },
+  "Lesson Held?": {
+    "ru": "Урок проведен?",
+    "uz": "Dars o'tkazildimi?"
+  },
+  "Lesson Log": {
+    "ru": "Журнал уроков",
+    "uz": "Dars jurnali"
+  },
+  "Lessons Done": {
+    "ru": "Уроки выполнены",
+    "uz": "Darslar bajarildi"
+  },
+  "Lessons Held": {
+    "ru": "Проведенные уроки",
+    "uz": "O'tkazilgan darslar"
+  },
+  "Lessons held": {
+    "ru": "Проведенные уроки",
+    "uz": "O'tkazilgan darslar"
+  },
+  "Let's try the": {
+    "ru": "Давайте попробуем",
+    "uz": "Keling, urinib ko'ramiz"
+  },
+  "Level": {
+    "ru": "Уровень",
+    "uz": "Daraja"
+  },
+  "Level:": {
+    "ru": "Уровень:",
+    "uz": "Daraja:"
+  },
+  "Lex": {
+    "ru": "Лекс",
+    "uz": "Leks"
+  },
+  "Lexi AI Tutor": {
+    "ru": "ИИ-репетитор Лекси",
+    "uz": "Lexi AI O'qituvchisi"
+  },
+  "Liber": {
+    "ru": "Либер",
+    "uz": "Liber"
+  },
+  "Liberum English": {
+    "ru": "Liberum Английский",
+    "uz": "Liberum English"
+  },
+  "Liberum Placement Testing Center": {
+    "ru": "Центр тестирования Liberum",
+    "uz": "Liberum joylashtirish test markazi"
+  },
+  "Liberum · web &amp; mobile · same account everywhere": {
+    "ru": "Liberum · веб и мобильный · один аккаунт везде",
+    "uz": "Liberum · veb va mobil · hamma joyda bir xil hisob"
+  },
+  "Liberum — Platform Redesign (Preview)": {
+    "ru": "Liberum — Редизайн платформы (Предварительный просмотр)",
+    "uz": "Liberum — Platforma qayta dizayni (Oldindan ko'rish)"
+  },
+  "Library": {
+    "ru": "Библиотека",
+    "uz": "Kutubxona"
+  },
+  "Library Dashboard": {
+    "ru": "Панель библиотеки",
+    "uz": "Kutubxona boshqaruv paneli"
+  },
+  "Light or Dark mode": {
+    "ru": "Светлый или темный режим",
+    "uz": "Yorug' yoki qorong'i rejim"
+  },
+  "Link to Mock Exam (Optional)": {
+    "ru": "Ссылка на пробный экзамен (необязательно)",
+    "uz": "Sinov imtihoniga havola (ixtiyoriy)"
+  },
+  "Linked Test:": {
+    "ru": "Связанный тест:",
+    "uz": "Bog'langan test:"
+  },
+  "Listen to professionally narrated books and podcasts to improve listening comprehension.": {
+    "ru": "Слушайте профессионально озвученные книги и подкасты для улучшения понимания на слух.",
+    "uz": "Tinglab tushunishni yaxshilash uchun professional ravishda hikoya qilingan kitoblar va podkastlarni tinglang."
+  },
+  "Listening Section": {
+    "ru": "Секция аудирования",
+    "uz": "Tinglash bo'limi"
+  },
+  "Load": {
+    "ru": "Загрузить",
+    "uz": "Yuklash"
+  },
+  "Login — Liberum": {
+    "ru": "Вход — Liberum",
+    "uz": "Kirish — Liberum"
+  },
+  "Low OCR Confidence": {
+    "ru": "Низкая уверенность OCR",
+    "uz": "OCR ishonchliligi past"
+  },
+  "Low OCR Confidence: Please verify the question prompt text and answer key.": {
+    "ru": "Низкая уверенность OCR: Пожалуйста, проверьте текст вопроса и ключ ответа.",
+    "uz": "OCR ishonchliligi past: Iltimos, savol matni va javob kalitini tekshiring."
+  },
+  "Manage Audio": {
+    "ru": "Управлять аудио",
+    "uz": "Ovozni boshqarish"
+  },
+  "Manage Audiobooks & Podcasts": {
+    "ru": "Управлять аудиокнигами и подкастами",
+    "uz": "Audiokitoblar va podkastlarni boshqarish"
+  },
+  "Manage Grammar Engine": {
+    "ru": "Управлять грамматическим движком",
+    "uz": "Grammatika dvigatelini boshqarish"
+  },
+  "Manage Library": {
+    "ru": "Управлять библиотекой",
+    "uz": "Kutubxonani boshqarish"
+  },
+  "Manage Library Books": {
+    "ru": "Управлять книгами библиотеки",
+    "uz": "Kutubxona kitoblarini boshqarish"
+  },
+  "Manage Mock Tests": {
+    "ru": "Управлять пробными тестами",
+    "uz": "Sinov testlarini boshqarish"
+  },
+  "Manage Questions": {
+    "ru": "Управлять вопросами",
+    "uz": "Savollarni boshqarish"
+  },
+  "Manage Resources": {
+    "ru": "Управлять ресурсами",
+    "uz": "Resurslarni boshqarish"
+  },
+  "Mark all present": {
+    "ru": "Отметить всех присутствующих",
+    "uz": "Barchasini hozir deb belgilash"
+  },
+  "Master grammar from A1 to C2 with detailed explanations and interactive tests.": {
+    "ru": "Изучите грамматику с A1 до C2 с подробными объяснениями и интерактивными тестами.",
+    "uz": "A1 dan C2 gacha grammatikani batafsil tushuntirishlar va interaktiv testlar bilan o'zlashtiring."
+  },
+  "Mastery Score": {
+    "ru": "Балл освоения",
+    "uz": "O'zlashtirish balli"
+  },
+  "Matching": {
+    "ru": "Сопоставление",
+    "uz": "Moslashtirish"
+  },
+  "Method": {
+    "ru": "Метод",
+    "uz": "Usul"
+  },
+  "Mock Library": {
+    "ru": "Библиотека пробных тестов",
+    "uz": "Sinov kutubxonasi"
+  },
+  "Mock Tests": {
+    "ru": "Пробные тесты",
+    "uz": "Sinov testlari"
+  },
+  "Mode": {
+    "ru": "Режим",
+    "uz": "Rejim"
+  },
+  "Mon-Sat, 09:00-19:00": {
+    "ru": "Пн-Сб, 09:00-19:00",
+    "uz": "Dushanba-Shanba, 09:00-19:00"
+  },
+  "Money": {
+    "ru": "Деньги",
+    "uz": "Pul"
+  },
+  "Money →": {
+    "ru": "Деньги →",
+    "uz": "Pul →"
+  },
+  "Monitor student grammar performance and manage digital resources.": {
+    "ru": "Отслеживайте успеваемость учащихся по грамматике и управляйте цифровыми ресурсами.",
+    "uz": "O'quvchilarning grammatika bo'yicha ko'rsatkichlarini kuzating va raqamli resurslarni boshqaring."
+  },
+  "Month": {
+    "ru": "Месяц",
+    "uz": "Oy"
+  },
+  "Monthly": {
+    "ru": "Ежемесячно",
+    "uz": "Oylik"
+  },
+  "Monthly Report": {
+    "ru": "Ежемесячный отчет",
+    "uz": "Oylik hisobot"
+  },
+  "Monthly Student Report Card": {
+    "ru": "Ежемесячная табель успеваемости студента",
+    "uz": "O'quvchining oylik baho varaqasi"
+  },
+  "Monthly fee": {
+    "ru": "Ежемесячная плата",
+    "uz": "Oylik to'lov"
+  },
+  "Mr. Richard": {
+    "ru": "Мистер Ричард",
+    "uz": "Janob Richard"
+  },
+  "Multiple Choice": {
+    "ru": "Множественный выбор",
+    "uz": "Ko'p tanlovli"
+  },
+  "My Attendance": {
+    "ru": "Моя посещаемость",
+    "uz": "Mening davomatim"
+  },
+  "My Ranking": {
+    "ru": "Мой рейтинг",
+    "uz": "Mening reytingim"
+  },
+  "NEW": {
+    "ru": "НОВЫЙ",
+    "uz": "YANGI"
+  },
+  "NO": {
+    "ru": "НЕТ",
+    "uz": "YO'Q"
+  },
+  "NOT GIVEN": {
+    "ru": "НЕ ДАНО",
+    "uz": "BERILMAGAN"
+  },
+  "Name": {
+    "ru": "Имя",
+    "uz": "Ism"
+  },
+  "Name, address, working hours": {
+    "ru": "Имя, адрес, часы работы",
+    "uz": "Ism, manzil, ish soatlari"
+  },
+  "Needs Grading": {
+    "ru": "Требуется оценка",
+    "uz": "Baholash kerak"
+  },
+  "Needs attention": {
+    "ru": "Требует внимания",
+    "uz": "E'tibor talab qiladi"
+  },
+  "Net income": {
+    "ru": "Чистый доход",
+    "uz": "Sof daromad"
+  },
+  "New Enquiry": {
+    "ru": "Новый запрос",
+    "uz": "Yangi so'rov"
+  },
+  "New Group": {
+    "ru": "Новая группа",
+    "uz": "Yangi guruh"
+  },
+  "New Lesson": {
+    "ru": "Новый урок",
+    "uz": "Yangi dars"
+  },
+  "New Password": {
+    "ru": "Новый пароль",
+    "uz": "Yangi parol"
+  },
+  "New Student": {
+    "ru": "Новый ученик",
+    "uz": "Yangi o'quvchi"
+  },
+  "New class": {
+    "ru": "Новый класс",
+    "uz": "Yangi sinf"
+  },
+  "New group": {
+    "ru": "Новая группа",
+    "uz": "Yangi guruh"
+  },
+  "New placement test": {
+    "ru": "Новый тест на определение уровня",
+    "uz": "Yangi joylashtirish testi"
+  },
+  "Next": {
+    "ru": "Далее",
+    "uz": "Keyingi"
+  },
+  "Next Steps": {
+    "ru": "Следующие шаги",
+    "uz": "Keyingi qadamlar"
+  },
+  "Next →": {
+    "ru": "Далее →",
+    "uz": "Keyingi →"
+  },
+  "No Cheating": {
+    "ru": "Без обмана",
+    "uz": "Aldamang"
+  },
+  "No Exam History Yet": {
+    "ru": "История экзаменов пока отсутствует",
+    "uz": "Hali imtihon tarixi yo'q"
+  },
+  "No Group": {
+    "ru": "Нет группы",
+    "uz": "Guruh yo'q"
+  },
+  "No Sections Found": {
+    "ru": "Разделы не найдены",
+    "uz": "Bo'limlar topilmadi"
+  },
+  "No active assignments": {
+    "ru": "Нет активных заданий",
+    "uz": "Faol topshiriqlar yo'q"
+  },
+  "No active students": {
+    "ru": "Нет активных учеников",
+    "uz": "Faol o'quvchilar yo'q"
+  },
+  "No active students this month": {
+    "ru": "В этом месяце нет активных учеников",
+    "uz": "Bu oyda faol o'quvchilar yo'q"
+  },
+  "No archived groups": {
+    "ru": "Нет архивных групп",
+    "uz": "Arxivlangan guruhlar yo'q"
+  },
+  "No archived students": {
+    "ru": "Нет архивных учеников",
+    "uz": "Arxivlangan o'quvchilar yo'q"
+  },
+  "No attendance records": {
+    "ru": "Записи о посещаемости отсутствуют",
+    "uz": "Davomat yozuvlari yo'q"
+  },
+  "No audio files uploaded yet.": {
+    "ru": "Аудиофайлы еще не загружены.",
+    "uz": "Hali hech qanday audiofayl yuklanmagan."
+  },
+  "No audio items available yet.": {
+    "ru": "Аудиозаписи пока недоступны.",
+    "uz": "Hali hech qanday audio element mavjud emas."
+  },
+  "No banned students": {
+    "ru": "Нет заблокированных учеников",
+    "uz": "Ta'qiqlangan o'quvchilar yo'q"
+  },
+  "No books available for this level yet.": {
+    "ru": "Для этого уровня пока нет книг.",
+    "uz": "Bu daraja uchun hali kitoblar mavjud emas."
+  },
+  "No books uploaded yet. Upload one on the left!": {
+    "ru": "Книги еще не загружены. Загрузите одну слева!",
+    "uz": "Hali kitoblar yuklanmagan. Chap tomonda birini yuklang!"
+  },
+  "No classes on this day": {
+    "ru": "Нет занятий в этот день",
+    "uz": "Bu kunda darslar yo'q"
+  },
+  "No classes today": {
+    "ru": "Сегодня нет занятий",
+    "uz": "Bugun darslar yo'q"
+  },
+  "No contact details.": {
+    "ru": "Нет контактных данных.",
+    "uz": "Aloqa ma'lumotlari yo'q."
+  },
+  "No data for this month": {
+    "ru": "Нет данных за этот месяц",
+    "uz": "Bu oy uchun ma'lumotlar yo'q"
+  },
+  "No exams found": {
+    "ru": "Экзамены не найдены",
+    "uz": "Imtihonlar topilmadi"
+  },
+  "No grammar quizzes taken recently.": {
+    "ru": "В последнее время не было пройдено грамматических тестов.",
+    "uz": "Yaqinda grammatika bo'yicha testlar olinmagan."
+  },
+  "No grammar topics available for this level yet.": {
+    "ru": "Для этого уровня пока нет грамматических тем.",
+    "uz": "Bu daraja uchun hali grammatika mavzulari mavjud emas."
+  },
+  "No groups assigned yet. Click \"+ Assign Group\" to track progress.": {
+    "ru": "Группы еще не назначены. Нажмите «+ Назначить группу», чтобы отслеживать прогресс.",
+    "uz": "Hali hech qanday guruh tayinlanmagan. Jarayonni kuzatish uchun \"+ Guruh tayinlash\" tugmasini bosing."
+  },
+  "No groups created yet": {
+    "ru": "Группы еще не созданы",
+    "uz": "Hali guruhlar yaratilmagan"
+  },
+  "No history entries yet.": {
+    "ru": "Записей истории пока нет.",
+    "uz": "Hali tarix yozuvlari yo'q."
+  },
+  "No lessons found for this period": {
+    "ru": "Уроки за этот период не найдены",
+    "uz": "Bu davr uchun darslar topilmadi"
+  },
+  "No lessons recorded yet.": {
+    "ru": "Уроки еще не записаны.",
+    "uz": "Hali darslar yozilmagan."
+  },
+  "No lessons this week yet": {
+    "ru": "На этой неделе еще нет уроков",
+    "uz": "Bu hafta hali darslar yo'q"
+  },
+  "No messages in this class yet. Say hello!": {
+    "ru": "В этом классе пока нет сообщений. Поздоровайтесь!",
+    "uz": "Bu sinfda hali xabarlar yo'q. Salom ayting!"
+  },
+  "No online groups found. Go to Settings > Other to set a group as online.": {
+    "ru": "Онлайн-группы не найдены. Перейдите в «Настройки» > «Другое», чтобы установить группу как онлайн.",
+    "uz": "Onlayn guruhlar topilmadi. Guruhni onlayn deb belgilash uchun Sozlamalar > Boshqa bo'limiga o'ting."
+  },
+  "No performance records for this month yet.": {
+    "ru": "Записей успеваемости за этот месяц пока нет.",
+    "uz": "Bu oy uchun hali hech qanday natija qaydlari yo'q."
+  },
+  "No public classes yet. Create one to start inviting students!": {
+    "ru": "Пока нет публичных занятий. Создайте одно, чтобы начать приглашать учеников!",
+    "uz": "Hali ommaviy darslar yo'q. Talabalarni taklif qilishni boshlash uchun bittasini yarating!"
+  },
+  "No questions available for this topic yet.": {
+    "ru": "Для этой темы пока нет доступных вопросов.",
+    "uz": "Bu mavzu bo'yicha hali savollar mavjud emas."
+  },
+  "No questions generated yet. The background AI is likely still working on this topic. Check back soon!": {
+    "ru": "Вопросы еще не сгенерированы. Фоновый ИИ, вероятно, все еще работает над этой темой. Загляните позже!",
+    "uz": "Savollar hali yaratilmagan. Fon AI, ehtimol, hali bu mavzu ustida ishlamoqda. Tez orada qaytib keling!"
+  },
+  "No questions in this section.": {
+    "ru": "В этом разделе нет вопросов.",
+    "uz": "Bu bo'limda savollar yo'q."
+  },
+  "No recent logs": {
+    "ru": "Нет недавних записей",
+    "uz": "Yaqinda jurnal yozuvlari yo'q"
+  },
+  "No recent payments": {
+    "ru": "Нет недавних платежей",
+    "uz": "Yaqinda to'lovlar yo'q"
+  },
+  "No recent registrations": {
+    "ru": "Нет недавних регистраций",
+    "uz": "Yaqinda ro'yxatdan o'tishlar yo'q"
+  },
+  "No recent submissions": {
+    "ru": "Нет недавних отправлений",
+    "uz": "Yaqinda yuborilganlar yo'q"
+  },
+  "No revenue to split for this month.": {
+    "ru": "Нет дохода для распределения за этот месяц.",
+    "uz": "Bu oy uchun bo'lishadigan daromad yo'q."
+  },
+  "No review requests found.": {
+    "ru": "Запросы на проверку не найдены.",
+    "uz": "Ko'rib chiqish so'rovlari topilmadi."
+  },
+  "No students in this class yet.": {
+    "ru": "В этом классе пока нет учеников.",
+    "uz": "Bu sinfda hali o'quvchilar yo'q."
+  },
+  "No students in this group": {
+    "ru": "В этой группе нет учеников",
+    "uz": "Bu guruhda o'quvchilar yo'q"
+  },
+  "No submissions yet": {
+    "ru": "Пока нет отправлений",
+    "uz": "Hali topshirilgan ishlar yo'q"
+  },
+  "No tasks assigned yet. You're all caught up!": {
+    "ru": "Задания еще не назначены. Вы все успели!",
+    "uz": "Hali topshiriqlar tayinlanmagan. Siz hammasini uddaladingiz!"
+  },
+  "No tests available": {
+    "ru": "Нет доступных тестов",
+    "uz": "Mavjud testlar yo'q"
+  },
+  "No tests recorded.": {
+    "ru": "Тесты не записаны.",
+    "uz": "Testlar yozilmagan."
+  },
+  "No tests yet": {
+    "ru": "Тестов пока нет",
+    "uz": "Hali testlar yo'q"
+  },
+  "No upcoming lessons": {
+    "ru": "Нет предстоящих уроков",
+    "uz": "Kelgusi darslar yo'q"
+  },
+  "No upcoming lessons scheduled.": {
+    "ru": "Предстоящие уроки не запланированы.",
+    "uz": "Kelgusi darslar rejalashtirilmagan."
+  },
+  "No updates recorded yet": {
+    "ru": "Обновления еще не записаны",
+    "uz": "Hali yangilanishlar qayd etilmagan"
+  },
+  "No users found": {
+    "ru": "Пользователи не найдены",
+    "uz": "Foydalanuvchilar topilmadi"
+  },
+  "Not set": {
+    "ru": "Не установлено",
+    "uz": "O'rnatilmagan"
+  },
+  "Notes": {
+    "ru": "Примечания",
+    "uz": "Izohlar"
+  },
+  "Notes (optional)": {
+    "ru": "Примечания (необязательно)",
+    "uz": "Izohlar (ixtiyoriy)"
+  },
+  "Notes:": {
+    "ru": "Примечания:",
+    "uz": "Izohlar:"
+  },
+  "Nothing needs attention": {
+    "ru": "Ничего не требует внимания",
+    "uz": "Hech narsa e'tibor talab qilmaydi"
+  },
+  "Obligatory: Select Evaluator": {
+    "ru": "Обязательно: Выберите оценщика",
+    "uz": "Majburiy: Baholovchini tanlang"
+  },
+  "Offline": {
+    "ru": "Оффлайн",
+    "uz": "Oflayn"
+  },
+  "Offline / In-person": {
+    "ru": "Оффлайн / Очно",
+    "uz": "Oflayn / Yuzma-yuz"
+  },
+  "One page your accountant will love": {
+    "ru": "Одна страница, которую полюбит ваш бухгалтер",
+    "uz": "Buxgalteringizga yoqadigan bir sahifa"
+  },
+  "Online": {
+    "ru": "Онлайн",
+    "uz": "Onlayn"
+  },
+  "Online Classes": {
+    "ru": "Онлайн-занятия",
+    "uz": "Onlayn darslar"
+  },
+  "Online Groups": {
+    "ru": "Онлайн-группы",
+    "uz": "Onlayn guruhlar"
+  },
+  "Online groups": {
+    "ru": "Онлайн-группы",
+    "uz": "Onlayn guruhlar"
+  },
+  "Online students": {
+    "ru": "Онлайн-ученики",
+    "uz": "Onlayn o'quvchilar"
+  },
+  "Open": {
+    "ru": "Открыть",
+    "uz": "Ochish"
+  },
+  "Open Fullscreen": {
+    "ru": "Открыть на весь экран",
+    "uz": "To'liq ekranda ochish"
+  },
+  "Open Test": {
+    "ru": "Открыть тест",
+    "uz": "Testni ochish"
+  },
+  "Option A": {
+    "ru": "Вариант А",
+    "uz": "A variant"
+  },
+  "Option B": {
+    "ru": "Вариант Б",
+    "uz": "B variant"
+  },
+  "Option C": {
+    "ru": "Вариант В",
+    "uz": "C variant"
+  },
+  "Option D": {
+    "ru": "Вариант Г",
+    "uz": "D variant"
+  },
+  "Or": {
+    "ru": "Или",
+    "uz": "Yoki"
+  },
+  "Original PDF": {
+    "ru": "Оригинальный PDF",
+    "uz": "Asl PDF"
+  },
+  "Other": {
+    "ru": "Другое",
+    "uz": "Boshqa"
+  },
+  "Other Settings": {
+    "ru": "Другие настройки",
+    "uz": "Boshqa sozlamalar"
+  },
+  "Outstanding": {
+    "ru": "Выдающийся",
+    "uz": "A'lo"
+  },
+  "Overall Band": {
+    "ru": "Общий балл",
+    "uz": "Umumiy ball"
+  },
+  "Overdue": {
+    "ru": "Просрочено",
+    "uz": "Muddati o'tgan"
+  },
+  "Overview": {
+    "ru": "Обзор",
+    "uz": "Umumiy ko'rinish"
+  },
+  "Owner Admin": {
+    "ru": "Админ-владелец",
+    "uz": "Egasi administrator"
+  },
+  "P = Present": {
+    "ru": "П = Присутствует",
+    "uz": "H = Hozir"
+  },
+  "PAID": {
+    "ru": "ОПЛАЧЕНО",
+    "uz": "TO'LANGAN"
+  },
+  "Parent": {
+    "ru": "Родитель",
+    "uz": "Ota-ona"
+  },
+  "Parent Phone": {
+    "ru": "Телефон родителя",
+    "uz": "Ota-ona telefoni"
+  },
+  "Parent phone": {
+    "ru": "Телефон родителя",
+    "uz": "Ota-ona telefoni"
+  },
+  "Parent's Phone (Optional)": {
+    "ru": "Телефон родителя (необязательно)",
+    "uz": "Ota-onaning telefon raqami (ixtiyoriy)"
+  },
+  "Parse & Save Answers": {
+    "ru": "Разобрать и сохранить ответы",
+    "uz": "Javoblarni tahlil qilish va saqlash"
+  },
+  "Part 1: Introduction": {
+    "ru": "Часть 1: Введение",
+    "uz": "1-qism: Kirish"
+  },
+  "Partnerships": {
+    "ru": "Партнерства",
+    "uz": "Hamkorliklar"
+  },
+  "Passage HTML": {
+    "ru": "HTML отрывка",
+    "uz": "Matn HTML"
+  },
+  "Password": {
+    "ru": "Пароль",
+    "uz": "Parol"
+  },
+  "Password & Security": {
+    "ru": "Пароль и безопасность",
+    "uz": "Parol va xavfsizlik"
+  },
+  "Password changed successfully": {
+    "ru": "Пароль успешно изменен",
+    "uz": "Parol muvaffaqiyatli o'zgartirildi"
+  },
+  "Paste your answers from a PDF/Word file below. Use standard numbering like": {
+    "ru": "Вставьте свои ответы из файла PDF/Word ниже. Используйте стандартную нумерацию, например:",
+    "uz": "Javoblaringizni PDF/Word faylidan quyiga joylashtiring. Standart raqamlashdan foydalaning, masalan:"
+  },
+  "Pause (Inactive)": {
+    "ru": "Пауза (неактивно)",
+    "uz": "To'xtatish (faol emas)"
+  },
+  "Payment": {
+    "ru": "Оплата",
+    "uz": "To'lov"
+  },
+  "Payment Details": {
+    "ru": "Детали платежа",
+    "uz": "To'lov ma'lumotlari"
+  },
+  "Payment Status": {
+    "ru": "Статус платежа",
+    "uz": "To'lov holati"
+  },
+  "Payment methods": {
+    "ru": "Способы оплаты",
+    "uz": "To'lov usullari"
+  },
+  "Payments": {
+    "ru": "Платежи",
+    "uz": "To'lovlar"
+  },
+  "Payroll": {
+    "ru": "Расчет заработной платы",
+    "uz": "Ish haqi"
+  },
+  "Pending": {
+    "ru": "В ожидании",
+    "uz": "Kutilmoqda"
+  },
+  "Pending & Recent Reviews": {
+    "ru": "В ожидании и недавние обзоры",
+    "uz": "Kutilayotgan va so'nggi sharhlar"
+  },
+  "Per Lesson": {
+    "ru": "За урок",
+    "uz": "Har bir dars uchun"
+  },
+  "Performance": {
+    "ru": "Производительность",
+    "uz": "Ishlash ko'rsatkichi"
+  },
+  "Phone": {
+    "ru": "Телефон",
+    "uz": "Telefon"
+  },
+  "Phone (Optional)": {
+    "ru": "Телефон (необязательно)",
+    "uz": "Telefon (ixtiyoriy)"
+  },
+  "Phone Number": {
+    "ru": "Номер телефона",
+    "uz": "Telefon raqami"
+  },
+  "Phone, Telegram, email": {
+    "ru": "Телефон, Telegram, email",
+    "uz": "Telefon, Telegram, elektron pochta"
+  },
+  "Placement PIN": {
+    "ru": "ПИН для определения уровня",
+    "uz": "Joylashtirish PIN-kodi"
+  },
+  "Placement Testing Portal": {
+    "ru": "Портал тестирования уровня",
+    "uz": "Joylashtirish testi portali"
+  },
+  "Placement tests": {
+    "ru": "Тесты на определение уровня",
+    "uz": "Joylashtirish testlari"
+  },
+  "Platform Updates": {
+    "ru": "Обновления платформы",
+    "uz": "Platforma yangilanishlari"
+  },
+  "Platform Users": {
+    "ru": "Пользователи платформы",
+    "uz": "Platforma foydalanuvchilari"
+  },
+  "Play": {
+    "ru": "Играть",
+    "uz": "O'ynash"
+  },
+  "Play Now": {
+    "ru": "Играть сейчас",
+    "uz": "Hozir o'ynash"
+  },
+  "Please hand the tablet back to the administrator.": {
+    "ru": "Пожалуйста, верните планшет администратору.",
+    "uz": "Iltimos, planshetni administratorga qaytaring."
+  },
+  "Podcast": {
+    "ru": "Подкаст",
+    "uz": "Podkast"
+  },
+  "Podcasts": {
+    "ru": "Подкасты",
+    "uz": "Podkastlar"
+  },
+  "Powered by": {
+    "ru": "Работает на",
+    "uz": "Qurilma tomonidan quvvatlanadi"
+  },
+  "Practice Weaknesses": {
+    "ru": "Практика слабых мест",
+    "uz": "Zaif tomonlarni mashq qilish"
+  },
+  "Pre-Intermediate": {
+    "ru": "Pre-Intermediate",
+    "uz": "Pre-Intermediate"
+  },
+  "Preferred Format": {
+    "ru": "Предпочтительный формат",
+    "uz": "Afzal format"
+  },
+  "Preparation Notes (Scratchpad)": {
+    "ru": "Заметки для подготовки (черновик)",
+    "uz": "Tayyorgarlik qaydlari (eskiz)"
+  },
+  "Preparing": {
+    "ru": "Подготовка",
+    "uz": "Tayyorlanmoqda"
+  },
+  "Present": {
+    "ru": "Присутствует",
+    "uz": "Hozir"
+  },
+  "Present + Held = paid": {
+    "ru": "Присутствует + Проведено = оплачено",
+    "uz": "Hozir + O'tkazilgan = to'langan"
+  },
+  "Prev": {
+    "ru": "Пред.",
+    "uz": "Oldingi"
+  },
+  "Price (UZS)": {
+    "ru": "Цена (UZS)",
+    "uz": "Narxi (UZS)"
+  },
+  "Progress": {
+    "ru": "Прогресс",
+    "uz": "Taraqqiyot"
+  },
+  "Prompt / Text": {
+    "ru": "Подсказка / Текст",
+    "uz": "Taklif / Matn"
+  },
+  "Provide constructive criticism, highlight strengths and weaknesses...": {
+    "ru": "Предоставьте конструктивную критику, выделите сильные и слабые стороны...",
+    "uz": "Konstruktiv tanqid qiling, kuchli va zaif tomonlarini ko'rsating..."
+  },
+  "Provide instructions for your students...": {
+    "ru": "Предоставьте инструкции для ваших учеников...",
+    "uz": "O'quvchilaringiz uchun ko'rsatmalar bering..."
+  },
+  "Public classes &amp; invite codes": {
+    "ru": "Публичные занятия и коды приглашения",
+    "uz": "Ommaviy darslar va taklif kodlari"
+  },
+  "Public join link": {
+    "ru": "Публичная ссылка для присоединения",
+    "uz": "Ommaviy qo'shilish havolasi"
+  },
+  "Publish": {
+    "ru": "Опубликовать",
+    "uz": "Nashr qilish"
+  },
+  "Publish Exam": {
+    "ru": "Опубликовать экзамен",
+    "uz": "Imtihonni nashr qilish"
+  },
+  "Published": {
+    "ru": "Опубликовано",
+    "uz": "Nashr qilingan"
+  },
+  "Published (Visible to students)": {
+    "ru": "Опубликовано (видно студентам)",
+    "uz": "Nashr qilingan (o'quvchilar uchun ko'rinadi)"
+  },
+  "Question 1 of 8": {
+    "ru": "Вопрос 1 из 8",
+    "uz": "8 savoldan 1-savol"
+  },
+  "Question Bank": {
+    "ru": "Банк вопросов",
+    "uz": "Savollar banki"
+  },
+  "Question Text": {
+    "ru": "Текст вопроса",
+    "uz": "Savol matni"
+  },
+  "Question Type": {
+    "ru": "Тип вопроса",
+    "uz": "Savol turi"
+  },
+  "Question bank": {
+    "ru": "Банк вопросов",
+    "uz": "Savollar banki"
+  },
+  "Questions": {
+    "ru": "Вопросы",
+    "uz": "Savollar"
+  },
+  "Questions are currently being generated for this topic. Check back soon!": {
+    "ru": "Вопросы для этой темы сейчас генерируются. Загляните позже!",
+    "uz": "Bu mavzu bo'yicha savollar hozirda yaratilmoqda. Tez orada qaytib keling!"
+  },
+  "Quick Add": {
+    "ru": "Быстрое добавление",
+    "uz": "Tez qo'shish"
+  },
+  "Quick actions": {
+    "ru": "Быстрые действия",
+    "uz": "Tezkor harakatlar"
+  },
+  "Quick add": {
+    "ru": "Быстрое добавление",
+    "uz": "Tez qo'shish"
+  },
+  "Quiz Submitted! 🎉": {
+    "ru": "Тест отправлен! 🎉",
+    "uz": "Test topshirildi! 🎉"
+  },
+  "RECORDING": {
+    "ru": "ЗАПИСЬ",
+    "uz": "YUZILMOQDA"
+  },
+  "Raw Score": {
+    "ru": "Первичный балл",
+    "uz": "Boshlang'ich ball"
+  },
+  "Read Online": {
+    "ru": "Читать онлайн",
+    "uz": "Onlayn o'qish"
+  },
+  "Read curated e-books and graded readers tailored for your English level.": {
+    "ru": "Читайте отобранные электронные книги и адаптированные тексты, подобранные по вашему уровню английского.",
+    "uz": "Ingliz tili darajangizga mos keladigan elektron kitoblar va darajalangan o'qish materiallarini o'qing."
+  },
+  "Reading Section": {
+    "ru": "Раздел «Чтение»",
+    "uz": "O'qish bo'limi"
+  },
+  "Ready to test your knowledge?": {
+    "ru": "Готовы проверить свои знания?",
+    "uz": "Bilimingizni sinashga tayyormisiz?"
+  },
+  "Reason": {
+    "ru": "Причина",
+    "uz": "Sabab"
+  },
+  "Recent Attendance": {
+    "ru": "Недавняя посещаемость",
+    "uz": "So'nggi davomat"
+  },
+  "Recent Grammar Quiz Activity": {
+    "ru": "Недавняя активность в грамматических тестах",
+    "uz": "So'nggi grammatika testi faoliyati"
+  },
+  "Recent Lessons": {
+    "ru": "Недавние уроки",
+    "uz": "So'nggi darslar"
+  },
+  "Recent OTPs": {
+    "ru": "Недавние одноразовые пароли",
+    "uz": "So'nggi OTPlar"
+  },
+  "Recent Payments": {
+    "ru": "Недавние платежи",
+    "uz": "So'nggi to'lovlar"
+  },
+  "Recent Submissions": {
+    "ru": "Недавние отправления",
+    "uz": "So'nggi topshirilgan ishlar"
+  },
+  "Recent Updates": {
+    "ru": "Недавние обновления",
+    "uz": "So'nggi yangilanishlar"
+  },
+  "Recent User Registrations": {
+    "ru": "Недавние регистрации пользователей",
+    "uz": "Yaqinda foydalanuvchi ro'yxatdan o'tishlari"
+  },
+  "Recent results": {
+    "ru": "Недавние результаты",
+    "uz": "So'nggi natijalar"
+  },
+  "Recent tests": {
+    "ru": "Недавние тесты",
+    "uz": "So'nggi testlar"
+  },
+  "Recheck with AI": {
+    "ru": "Перепроверить с помощью ИИ",
+    "uz": "AI bilan qayta tekshirish"
+  },
+  "Record": {
+    "ru": "Запись",
+    "uz": "Yozish"
+  },
+  "Record Payment": {
+    "ru": "Записать платеж",
+    "uz": "To'lovni qayd etish"
+  },
+  "Record payment": {
+    "ru": "Записать платеж",
+    "uz": "To'lovni qayd etish"
+  },
+  "Recording...": {
+    "ru": "Запись...",
+    "uz": "Yozilmoqda..."
+  },
+  "Reference number, etc.": {
+    "ru": "Справочный номер и т.д.",
+    "uz": "Ma'lumot raqami va h.k."
+  },
+  "Refresh Preview": {
+    "ru": "Обновить предпросмотр",
+    "uz": "Ko'rib chiqishni yangilash"
+  },
+  "Register Account": {
+    "ru": "Зарегистрировать аккаунт",
+    "uz": "Hisobni ro'yxatdan o'tkazish"
+  },
+  "Register your interest for classes with": {
+    "ru": "Зарегистрируйте свою заинтересованность в занятиях с",
+    "uz": "Darslarga qiziqishingizni ro'yxatdan o'tkazing"
+  },
+  "Register — Liberum": {
+    "ru": "Регистрация — Liberum",
+    "uz": "Ro'yxatdan o'tish — Liberum"
+  },
+  "Registration Successful | Liberum": {
+    "ru": "Регистрация успешна | Liberum",
+    "uz": "Ro'yxatdan o'tish muvaffaqiyatli | Liberum"
+  },
+  "Report": {
+    "ru": "Отчет",
+    "uz": "Hisobot"
+  },
+  "Report Card": {
+    "ru": "Табель успеваемости",
+    "uz": "Baholar varaqasi"
+  },
+  "Rescheduled": {
+    "ru": "Перенесено",
+    "uz": "Qayta rejalashtirilgan"
+  },
+  "Return to Dashboard": {
+    "ru": "Вернуться к панели управления",
+    "uz": "Boshqaruv paneliga qaytish"
+  },
+  "Revenue": {
+    "ru": "Доход",
+    "uz": "Daromad"
+  },
+  "Review Grammar": {
+    "ru": "Повторить грамматику",
+    "uz": "Grammatikani ko'rib chiqish"
+  },
+  "Review inbox": {
+    "ru": "Входящие для проверки",
+    "uz": "Sharhlar qutisi"
+  },
+  "Roles & Permissions": {
+    "ru": "Роли и разрешения",
+    "uz": "Rollar va ruxsatlar"
+  },
+  "Room": {
+    "ru": "Комната",
+    "uz": "Xona"
+  },
+  "SAT": {
+    "ru": "SAT",
+    "uz": "SAT"
+  },
+  "SOON": {
+    "ru": "СКОРО",
+    "uz": "TEZ KUNLARDA"
+  },
+  "Same account works on web & mobile": {
+    "ru": "Та же учетная запись работает на веб- и мобильных устройствах",
+    "uz": "Bir xil hisob veb va mobil qurilmalarda ishlaydi"
+  },
+  "Save All Answers": {
+    "ru": "Сохранить все ответы",
+    "uz": "Barcha javoblarni saqlash"
+  },
+  "Save All Changes": {
+    "ru": "Сохранить все изменения",
+    "uz": "Barcha o'zgarishlarni saqlash"
+  },
+  "Save All Questions": {
+    "ru": "Сохранить все вопросы",
+    "uz": "Barcha savollarni saqlash"
+  },
+  "Save Attendance": {
+    "ru": "Сохранить посещаемость",
+    "uz": "Davomatni saqlash"
+  },
+  "Save Changes": {
+    "ru": "Сохранить изменения",
+    "uz": "O'zgarishlarni saqlash"
+  },
+  "Save Content": {
+    "ru": "Сохранить контент",
+    "uz": "Kontentni saqlash"
+  },
+  "Save Expense": {
+    "ru": "Сохранить расход",
+    "uz": "Xarajatni saqlash"
+  },
+  "Save Payment": {
+    "ru": "Сохранить платеж",
+    "uz": "To'lovni saqlash"
+  },
+  "Save Profile": {
+    "ru": "Сохранить профиль",
+    "uz": "Profilni saqlash"
+  },
+  "Save Question": {
+    "ru": "Сохранить вопрос",
+    "uz": "Savolni saqlash"
+  },
+  "Save Settings": {
+    "ru": "Сохранить настройки",
+    "uz": "Sozlamalarni saqlash"
+  },
+  "Save Updates": {
+    "ru": "Сохранить обновления",
+    "uz": "Yangilanishlarni saqlash"
+  },
+  "Save changes": {
+    "ru": "Сохранить изменения",
+    "uz": "O'zgarishlarni saqlash"
+  },
+  "Save defaults": {
+    "ru": "Сохранить по умолчанию",
+    "uz": "Standart sozlamalarni saqlash"
+  },
+  "Save payment": {
+    "ru": "Сохранить платеж",
+    "uz": "To'lovni saqlash"
+  },
+  "Save settings": {
+    "ru": "Сохранить настройки",
+    "uz": "Sozlamalarni saqlash"
+  },
+  "Saved": {
+    "ru": "Сохранено",
+    "uz": "Saqlandi"
+  },
+  "Scanning Document...": {
+    "ru": "Сканирование документа...",
+    "uz": "Hujjat skanerlanmoqda..."
+  },
+  "Schedule": {
+    "ru": "Расписание",
+    "uz": "Jadval"
+  },
+  "Schedule Pref": {
+    "ru": "Предпочтения расписания",
+    "uz": "Jadval afzalliklari"
+  },
+  "Schedule →": {
+    "ru": "Расписание →",
+    "uz": "Jadval →"
+  },
+  "Scheduled": {
+    "ru": "Запланировано",
+    "uz": "Rejalashtirilgan"
+  },
+  "Score": {
+    "ru": "Балл",
+    "uz": "Ball"
+  },
+  "Scored in 10-30 seconds": {
+    "ru": "Оценено за 10-30 секунд",
+    "uz": "10-30 soniyada baholandi"
+  },
+  "Search students...": {
+    "ru": "Поиск учеников...",
+    "uz": "O'quvchilarni qidirish..."
+  },
+  "Section Title": {
+    "ru": "Название раздела",
+    "uz": "Bo'lim sarlavhasi"
+  },
+  "Security & Password": {
+    "ru": "Безопасность и пароль",
+    "uz": "Xavfsizlik va parol"
+  },
+  "Security &amp; data": {
+    "ru": "Безопасность и данные",
+    "uz": "Xavfsizlik va ma'lumotlar"
+  },
+  "Select Context Model": {
+    "ru": "Выбрать модель контекста",
+    "uz": "Kontekst modelini tanlash"
+  },
+  "Select Group": {
+    "ru": "Выбрать группу",
+    "uz": "Guruhni tanlang"
+  },
+  "Select Teacher": {
+    "ru": "Выбрать учителя",
+    "uz": "O'qituvchini tanlang"
+  },
+  "Select a group above to view performance.": {
+    "ru": "Выберите группу выше, чтобы просмотреть успеваемость.",
+    "uz": "Natijalarni ko'rish uchun yuqoridagi guruhni tanlang."
+  },
+  "Select...": {
+    "ru": "Выбрать...",
+    "uz": "Tanlang..."
+  },
+  "Self-guided reading": {
+    "ru": "Самостоятельное чтение",
+    "uz": "Mustaqil o'qish"
+  },
+  "Send": {
+    "ru": "Отправить",
+    "uz": "Yuborish"
+  },
+  "Set groups as online or offline.": {
+    "ru": "Установите группы как онлайн или оффлайн.",
+    "uz": "Guruhlarni onlayn yoki oflayn qilib belgilang."
+  },
+  "Settings": {
+    "ru": "Настройки",
+    "uz": "Sozlamalar"
+  },
+  "Settings & Assets": {
+    "ru": "Настройки и активы",
+    "uz": "Sozlamalar va aktivlar"
+  },
+  "Sign In": {
+    "ru": "Войти",
+    "uz": "Kirish"
+  },
+  "Sign in": {
+    "ru": "Войти",
+    "uz": "Kirish"
+  },
+  "Sign in with Google": {
+    "ru": "Войти с помощью Google",
+    "uz": "Google orqali kirish"
+  },
+  "Sign out": {
+    "ru": "Выйти",
+    "uz": "Chiqish"
+  },
+  "Sign up": {
+    "ru": "Зарегистрироваться",
+    "uz": "Ro'yxatdan o'tish"
+  },
+  "Sign up with Google": {
+    "ru": "Зарегистрироваться с помощью Google",
+    "uz": "Google orqali ro'yxatdan o'tish"
+  },
+  "Skip Prep": {
+    "ru": "Пропустить подготовку",
+    "uz": "Tayyorgarlikni o'tkazib yuborish"
+  },
+  "Source": {
+    "ru": "Источник",
+    "uz": "Manba"
+  },
+  "Speaking Section": {
+    "ru": "Раздел «Разговорная речь»",
+    "uz": "Nutq bo'limi"
+  },
+  "Speaking Test Setup": {
+    "ru": "Настройка теста разговорной речи",
+    "uz": "Nutq testini sozlash"
+  },
+  "Standard timed test. Questions progress automatically. No replays.": {
+    "ru": "Стандартный тест с ограничением по времени. Вопросы сменяются автоматически. Без повторов.",
+    "uz": "Standart vaqtli test. Savollar avtomatik ravishda o'tadi. Qayta tinglash yo'q."
+  },
+  "Start Assignment": {
+    "ru": "Начать задание",
+    "uz": "Topshiriqni boshlash"
+  },
+  "Start Exam": {
+    "ru": "Начать экзамен",
+    "uz": "Imtihonni boshlash"
+  },
+  "Start Recording": {
+    "ru": "Начать запись",
+    "uz": "Yozishni boshlash"
+  },
+  "Start Speaking Exam": {
+    "ru": "Начать устный экзамен",
+    "uz": "Nutq imtihonini boshlash"
+  },
+  "Started": {
+    "ru": "Начато",
+    "uz": "Boshlandi"
+  },
+  "Status": {
+    "ru": "Статус",
+    "uz": "Holat"
+  },
+  "Status Management": {
+    "ru": "Управление статусом",
+    "uz": "Holatni boshqarish"
+  },
+  "Strengths:": {
+    "ru": "Сильные стороны:",
+    "uz": "Kuchli tomonlari:"
+  },
+  "Student": {
+    "ru": "Ученик",
+    "uz": "O'quvchi"
+  },
+  "Student / Group": {
+    "ru": "Ученик / Группа",
+    "uz": "O'quvchi / Guruh"
+  },
+  "Student Name": {
+    "ru": "Имя ученика",
+    "uz": "O'quvchi ismi"
+  },
+  "Student Simulator": {
+    "ru": "Симулятор ученика",
+    "uz": "O'quvchi simulyatori"
+  },
+  "Student Submission": {
+    "ru": "Отправка ученика",
+    "uz": "O'quvchi topshirishi"
+  },
+  "Student name": {
+    "ru": "Имя ученика",
+    "uz": "O'quvchi ismi"
+  },
+  "Student payments": {
+    "ru": "Платежи студентов",
+    "uz": "O'quvchi to'lovlari"
+  },
+  "Student phone": {
+    "ru": "Телефон ученика",
+    "uz": "O'quvchi telefoni"
+  },
+  "Student's Full Name": {
+    "ru": "Полное имя ученика",
+    "uz": "O'quvchining to'liq ismi"
+  },
+  "Student's Phone": {
+    "ru": "Телефон ученика",
+    "uz": "O'quvchining telefoni"
+  },
+  "Students": {
+    "ru": "Ученики",
+    "uz": "O'quvchilar"
+  },
+  "Students List": {
+    "ru": "Список учеников",
+    "uz": "O'quvchilar ro'yxati"
+  },
+  "Students here cannot be enrolled until unbanned": {
+    "ru": "Ученики здесь не могут быть зачислены, пока не будут разблокированы",
+    "uz": "Bu yerdagi o'quvchilar taqiqlari bekor qilinmaguncha ro'yxatdan o'ta olmaydi"
+  },
+  "Students join with this code": {
+    "ru": "Ученики присоединяются по этому коду",
+    "uz": "O'quvchilar ushbu kod bilan qo'shiladilar"
+  },
+  "Students paid": {
+    "ru": "Студенты оплатили",
+    "uz": "O'quvchilar to'lashdi"
+  },
+  "Studio Name": {
+    "ru": "Название студии",
+    "uz": "Studiya nomi"
+  },
+  "Studio Profile": {
+    "ru": "Профиль студии",
+    "uz": "Studiya profili"
+  },
+  "Studio profile": {
+    "ru": "Профиль студии",
+    "uz": "Studiya profili"
+  },
+  "Submit": {
+    "ru": "Отправить",
+    "uz": "Yuborish"
+  },
+  "Submit Answers": {
+    "ru": "Отправить ответы",
+    "uz": "Javoblarni yuborish"
+  },
+  "Submit Assessment": {
+    "ru": "Отправить оценку",
+    "uz": "Baholashni yuborish"
+  },
+  "Submit Feedback": {
+    "ru": "Отправить отзыв",
+    "uz": "Fikr-mulohazani yuborish"
+  },
+  "Submit Quiz": {
+    "ru": "Отправить тест",
+    "uz": "Testni topshirish"
+  },
+  "Submit Registration": {
+    "ru": "Отправить регистрацию",
+    "uz": "Ro'yxatdan o'tishni yuborish"
+  },
+  "Submitted": {
+    "ru": "Отправлено",
+    "uz": "Topshirildi"
+  },
+  "Submitted Responses": {
+    "ru": "Отправленные ответы",
+    "uz": "Yuborilgan javoblar"
+  },
+  "Subtitles File (Optional, .vtt format recommended)": {
+    "ru": "Файл субтитров (необязательно, рекомендуется формат .vtt)",
+    "uz": "Subtitr fayli (ixtiyoriy, .vtt formati tavsiya etiladi)"
+  },
+  "Support": {
+    "ru": "Поддержка",
+    "uz": "Qo'llab-quvvatlash"
+  },
+  "Support & Help": {
+    "ru": "Поддержка и помощь",
+    "uz": "Qo'llab-quvvatlash va yordam"
+  },
+  "TRAINING": {
+    "ru": "ОБУЧЕНИЕ",
+    "uz": "TRENING"
+  },
+  "TRUE": {
+    "ru": "ВЕРНО",
+    "uz": "TO'G'RI"
+  },
+  "Tablet PIN:": {
+    "ru": "ПИН планшета:",
+    "uz": "Planshet PIN-kodi:"
+  },
+  "Take Quiz": {
+    "ru": "Пройти тест",
+    "uz": "Testni bajarish"
+  },
+  "Take Quiz &rarr;": {
+    "ru": "Пройти тест &rarr;",
+    "uz": "Testni bajarish &rarr;"
+  },
+  "Target Date / Period": {
+    "ru": "Целевая дата / Период",
+    "uz": "Maqsadli sana / Davr"
+  },
+  "Target Level": {
+    "ru": "Целевой уровень",
+    "uz": "Maqsad darajasi"
+  },
+  "Tashkent, Yunusobod": {
+    "ru": "Ташкент, Юнусабад",
+    "uz": "Toshkent, Yunusobod"
+  },
+  "Task Title": {
+    "ru": "Название задачи",
+    "uz": "Topshiriq sarlavhasi"
+  },
+  "Teacher": {
+    "ru": "Учитель",
+    "uz": "O'qituvchi"
+  },
+  "Teacher & owner · Liberum English": {
+    "ru": "Учитель и владелец · Liberum English",
+    "uz": "O'qituvchi va egasi · Liberum English"
+  },
+  "Teacher Feedback": {
+    "ru": "Отзыв учителя",
+    "uz": "O'qituvchi fikr-mulohazasi"
+  },
+  "Teacher Notes": {
+    "ru": "Заметки учителя",
+    "uz": "O'qituvchi izohlari"
+  },
+  "Teacher Notes (Optional)": {
+    "ru": "Заметки учителя (необязательно)",
+    "uz": "O'qituvchi izohlari (ixtiyoriy)"
+  },
+  "Teacher Review": {
+    "ru": "Проверка учителем",
+    "uz": "O'qituvchi ko'rib chiqishi"
+  },
+  "Teacher Share": {
+    "ru": "Доля учителя",
+    "uz": "O'qituvchi ulushi"
+  },
+  "Teacher Share (%)": {
+    "ru": "Доля учителя (%)",
+    "uz": "O'qituvchi ulushi (%)"
+  },
+  "Teacher income": {
+    "ru": "Доход учителя",
+    "uz": "O'qituvchi daromadi"
+  },
+  "Teacher share": {
+    "ru": "Доля учителя",
+    "uz": "O'qituvchi ulushi"
+  },
+  "Teacher's Feedback": {
+    "ru": "Отзыв учителя",
+    "uz": "O'qituvchining fikr-mulohazasi"
+  },
+  "Teacher's note": {
+    "ru": "Заметка учителя",
+    "uz": "O'qituvchining izohi"
+  },
+  "Teacher:": {
+    "ru": "Учитель:",
+    "uz": "O'qituvchi:"
+  },
+  "Teachers": {
+    "ru": "Учителя",
+    "uz": "O'qituvchilar"
+  },
+  "Teachers, admins, access": {
+    "ru": "Учителя, администраторы, доступ",
+    "uz": "O'qituvchilar, administratorlar, kirish"
+  },
+  "Telegram Handle": {
+    "ru": "Имя пользователя Telegram",
+    "uz": "Telegram foydalanuvchi nomi"
+  },
+  "Test": {
+    "ru": "Тест",
+    "uz": "Test"
+  },
+  "Test Completed!": {
+    "ru": "Тест завершен!",
+    "uz": "Test yakunlandi!"
+  },
+  "Test Microphone": {
+    "ru": "Проверить микрофон",
+    "uz": "Mikrofonni sinash"
+  },
+  "Test Mode": {
+    "ru": "Тестовый режим",
+    "uz": "Test rejimi"
+  },
+  "Test Preferences": {
+    "ru": "Настройки теста",
+    "uz": "Test afzalliklari"
+  },
+  "Test Scope": {
+    "ru": "Область теста",
+    "uz": "Test ko'lami"
+  },
+  "Test Your Knowledge": {
+    "ru": "Проверьте свои знания",
+    "uz": "Bilimingizni sinab ko'ring"
+  },
+  "Testing Mode": {
+    "ru": "Режим тестирования",
+    "uz": "Test rejimi"
+  },
+  "Tests": {
+    "ru": "Тесты",
+    "uz": "Testlar"
+  },
+  "Tests this month": {
+    "ru": "Тесты за этот месяц",
+    "uz": "Bu oy testlari"
+  },
+  "Thank you for registering. We have securely saved your information.": {
+    "ru": "Благодарим вас за регистрацию. Мы надежно сохранили вашу информацию.",
+    "uz": "Ro'yxatdan o'tganingiz uchun rahmat. Ma'lumotlaringizni xavfsiz saqladik."
+  },
+  "Thank you,": {
+    "ru": "Спасибо,",
+    "uz": "Rahmat,"
+  },
+  "The Bookshelf": {
+    "ru": "Книжная полка",
+    "uz": "Kitob javoni"
+  },
+  "The timer will begin as soon as you click start. Your answers will be automatically submitted when time runs out.": {
+    "ru": "Таймер запустится, как только вы нажмете «Начать». Ваши ответы будут автоматически отправлены по истечении времени.",
+    "uz": "Taymer \"Boshlash\" tugmasini bosishingiz bilanoq ishga tushadi. Vaqt tugagach, javoblaringiz avtomatik ravishda topshiriladi."
+  },
+  "There are currently no mock exams available. Please check back later.": {
+    "ru": "В настоящее время нет доступных пробных экзаменов. Пожалуйста, зайдите позже.",
+    "uz": "Hozirda sinov imtihonlari mavjud emas. Iltimos, keyinroq tekshiring."
+  },
+  "This Month": {
+    "ru": "Этот месяц",
+    "uz": "Bu oy"
+  },
+  "This Week": {
+    "ru": "Эта неделя",
+    "uz": "Bu hafta"
+  },
+  "This attempt was completed on": {
+    "ru": "Эта попытка была завершена",
+    "uz": "Bu urinish tugallandi"
+  },
+  "This exam contains Writing or Speaking sections. Please select who should review and grade your essay/speech submissions.": {
+    "ru": "Этот экзамен содержит разделы «Письмо» или «Говорение». Пожалуйста, выберите, кто должен проверять и оценивать ваши эссе/речи.",
+    "uz": "Bu imtihon Yozish yoki Nutq bo'limlarini o'z ichiga oladi. Iltimos, esse/nutq topshiriqlaringizni kim ko'rib chiqishi va baholashini tanlang."
+  },
+  "This exam has no sections populated yet.": {
+    "ru": "Этот экзамен еще не имеет заполненных разделов.",
+    "uz": "Bu imtihonda hali hech qanday bo'lim to'ldirilmagan."
+  },
+  "Time": {
+    "ru": "Время",
+    "uz": "Vaqt"
+  },
+  "Time Limit": {
+    "ru": "Ограничение по времени",
+    "uz": "Vaqt chegarasi"
+  },
+  "Time Limit (Min)": {
+    "ru": "Ограничение по времени (мин)",
+    "uz": "Vaqt chegarasi (min)"
+  },
+  "Timed logic & strict navigation": {
+    "ru": "Ограниченная по времени логика и строгая навигация",
+    "uz": "Vaqtli mantiq va qat'iy navigatsiya"
+  },
+  "Title": {
+    "ru": "Название",
+    "uz": "Sarlavha"
+  },
+  "Today": {
+    "ru": "Сегодня",
+    "uz": "Bugun"
+  },
+  "Today's Lesson": {
+    "ru": "Сегодняшний урок",
+    "uz": "Bugungi dars"
+  },
+  "Today's classes": {
+    "ru": "Сегодняшние занятия",
+    "uz": "Bugungi darslar"
+  },
+  "Toggle": {
+    "ru": "Переключить",
+    "uz": "Almashtirish"
+  },
+  "Topic": {
+    "ru": "Тема",
+    "uz": "Mavzu"
+  },
+  "Topic (Optional)": {
+    "ru": "Тема (необязательно)",
+    "uz": "Mavzu (ixtiyoriy)"
+  },
+  "Topic (optional)": {
+    "ru": "Тема (необязательно)",
+    "uz": "Mavzu (ixtiyoriy)"
+  },
+  "Topic / Event Title": {
+    "ru": "Название темы / события",
+    "uz": "Mavzu / Tadbir nomi"
+  },
+  "Topic Covered": {
+    "ru": "Освещенная тема",
+    "uz": "Qamrab olingan mavzu"
+  },
+  "Topic Title": {
+    "ru": "Название темы",
+    "uz": "Mavzu sarlavhasi"
+  },
+  "Topics Covered / Description": {
+    "ru": "Освещенные темы / Описание",
+    "uz": "Qamrab olingan mavzular / Tavsif"
+  },
+  "Total Attempts": {
+    "ru": "Всего попыток",
+    "uz": "Jami urinishlar"
+  },
+  "Total Lessons": {
+    "ru": "Всего уроков",
+    "uz": "Jami darslar"
+  },
+  "Total Students": {
+    "ru": "Всего учеников",
+    "uz": "Jami o'quvchilar"
+  },
+  "Total Teachers": {
+    "ru": "Всего учителей",
+    "uz": "Jami o'qituvchilar"
+  },
+  "Training Mode": {
+    "ru": "Режим обучения",
+    "uz": "Trening rejimi"
+  },
+  "Transfer": {
+    "ru": "Перевод",
+    "uz": "O'tkazish"
+  },
+  "Trial": {
+    "ru": "Пробный",
+    "uz": "Sinov"
+  },
+  "True / False / Not Given": {
+    "ru": "Верно / Неверно / Не дано",
+    "uz": "To'g'ri / Noto'g'ri / Berilmagan"
+  },
+  "Type": {
+    "ru": "Тип",
+    "uz": "Tur"
+  },
+  "Type a message...": {
+    "ru": "Написать сообщение...",
+    "uz": "Xabar yozing..."
+  },
+  "Type question here...": {
+    "ru": "Введите вопрос здесь...",
+    "uz": "Savolni bu yerga kiriting..."
+  },
+  "Type the question here...": {
+    "ru": "Введите вопрос здесь...",
+    "uz": "Savolni bu yerga kiriting..."
+  },
+  "Type your keywords or outline here. These notes will remain visible during your speech.": {
+    "ru": "Введите свои ключевые слова или план здесь. Эти заметки будут видны во время вашей речи.",
+    "uz": "Kalit so'zlaringizni yoki rejangizni bu yerga kiriting. Bu izohlar nutqingiz davomida ko'rinib turadi."
+  },
+  "Type your response here...": {
+    "ru": "Введите ваш ответ здесь...",
+    "uz": "Javobingizni bu yerga kiriting..."
+  },
+  "Type:": {
+    "ru": "Тип:",
+    "uz": "Turi:"
+  },
+  "UZS": {
+    "ru": "UZS",
+    "uz": "UZS"
+  },
+  "UZS / month potential": {
+    "ru": "UZS / месяц потенциально",
+    "uz": "UZS / oy salohiyati"
+  },
+  "UZS Income": {
+    "ru": "Доход в UZS",
+    "uz": "UZS daromad"
+  },
+  "UZS this month": {
+    "ru": "UZS в этом месяце",
+    "uz": "Bu oy UZS"
+  },
+  "Unarchive": {
+    "ru": "Разархивировать",
+    "uz": "Arxivdan chiqarish"
+  },
+  "Unban": {
+    "ru": "Разблокировать",
+    "uz": "Ta'qiqdan chiqarish"
+  },
+  "Universal Grammar": {
+    "ru": "Универсальная грамматика",
+    "uz": "Universal grammatika"
+  },
+  "Unpaid": {
+    "ru": "Неоплачено",
+    "uz": "Toʻlanmagan"
+  },
+  "Unpause (Active)": {
+    "ru": "Возобновить (Активно)",
+    "uz": "Davom ettirish (Faol)"
+  },
+  "Unpublish": {
+    "ru": "Отменить публикацию",
+    "uz": "Nashrdan olish"
+  },
+  "Untimed, open-ended practice": {
+    "ru": "Без ограничения по времени, практика без конечной даты",
+    "uz": "Muddat cheklovisiz, ochiq amaliyot"
+  },
+  "Upcoming": {
+    "ru": "Предстоящие",
+    "uz": "Kelgusi"
+  },
+  "Upcoming Lessons": {
+    "ru": "Предстоящие уроки",
+    "uz": "Kelgusi darslar"
+  },
+  "Update": {
+    "ru": "Обновить",
+    "uz": "Yangilash"
+  },
+  "Update Password": {
+    "ru": "Обновить пароль",
+    "uz": "Parolni yangilash"
+  },
+  "Upgrade": {
+    "ru": "Обновить",
+    "uz": "Obunani yangilash"
+  },
+  "Upload": {
+    "ru": "Загрузить",
+    "uz": "Yuklash"
+  },
+  "Upload Audio": {
+    "ru": "Загрузить аудио",
+    "uz": "Audio yuklash"
+  },
+  "Upload Book": {
+    "ru": "Загрузить книгу",
+    "uz": "Kitob yuklash"
+  },
+  "Upload Images": {
+    "ru": "Загрузить изображения",
+    "uz": "Rasmlarni yuklash"
+  },
+  "Upload New Audio": {
+    "ru": "Загрузить новое аудио",
+    "uz": "Yangi audio yuklash"
+  },
+  "Upload New Book": {
+    "ru": "Загрузить новую книгу",
+    "uz": "Yangi kitob yuklash"
+  },
+  "Upload PDF (AI)": {
+    "ru": "Загрузить PDF (ИИ)",
+    "uz": "PDF yuklash (AI)"
+  },
+  "Upload a WebVTT (.vtt) file for native web player subtitle support.": {
+    "ru": "Загрузите файл WebVTT (.vtt) для поддержки субтитров во встроенном веб-плеере.",
+    "uz": "Veb-pleyerda subtitrlar qo'llab-quvvatlanishi uchun WebVTT (.vtt) faylini yuklang."
+  },
+  "Upload new e-books or audio files for your students.": {
+    "ru": "Загрузите новые электронные книги или аудиофайлы для ваших студентов.",
+    "uz": "Talabalaringiz uchun yangi elektron kitoblar yoki audio fayllarni yuklang."
+  },
+  "Upload the diagram, chart, or map image for this task": {
+    "ru": "Загрузите изображение диаграммы, графика или карты для этого задания",
+    "uz": "Ushbu vazifa uchun diagramma, jadval yoki xarita tasvirini yuklang"
+  },
+  "Uploaded Audio": {
+    "ru": "Загруженное аудио",
+    "uz": "Yuklangan audio"
+  },
+  "Uploading...": {
+    "ru": "Загрузка...",
+    "uz": "Yuklanmoqda..."
+  },
+  "Upper-Intermediate": {
+    "ru": "Выше среднего",
+    "uz": "Yuqori-o'rtacha"
+  },
+  "Use the AI Extractor or add a section manually to start building.": {
+    "ru": "Используйте AI-экстрактор или добавьте раздел вручную, чтобы начать создание.",
+    "uz": "Yaratishni boshlash uchun AI Extractor'dan foydalaning yoki bo'limni qo'lda qo'shing."
+  },
+  "Users": {
+    "ru": "Пользователи",
+    "uz": "Foydalanuvchilar"
+  },
+  "View": {
+    "ru": "Просмотреть",
+    "uz": "Ko'rish"
+  },
+  "View All": {
+    "ru": "Просмотреть все",
+    "uz": "Barchasini ko'rish"
+  },
+  "View Course →": {
+    "ru": "Просмотреть курс →",
+    "uz": "Kursni ko'rish →"
+  },
+  "View Full Attempt Answers": {
+    "ru": "Просмотреть полные ответы на попытку",
+    "uz": "To'liq urinish javoblarini ko'rish"
+  },
+  "View History": {
+    "ru": "Просмотреть историю",
+    "uz": "Tarixni ko'rish"
+  },
+  "View Journal": {
+    "ru": "Просмотреть журнал",
+    "uz": "Jurnalni ko'rish"
+  },
+  "View Student Library": {
+    "ru": "Просмотреть библиотеку студента",
+    "uz": "Talaba kutubxonasini ko'rish"
+  },
+  "View all archived students and groups": {
+    "ru": "Просмотреть всех архивированных студентов и группы",
+    "uz": "Barcha arxivlangan talabalar va guruhlarni ko'rish"
+  },
+  "View all payments": {
+    "ru": "Просмотреть все платежи",
+    "uz": "Barcha to'lovlarni ko'rish"
+  },
+  "View deleted students and groups": {
+    "ru": "Просмотреть удаленных студентов и группы",
+    "uz": "O'chirilgan talabalar va guruhlarni ko'rish"
+  },
+  "Vocab": {
+    "ru": "Лексика",
+    "uz": "Lug'at"
+  },
+  "Vocabulary": {
+    "ru": "Словарь",
+    "uz": "Lug'at"
+  },
+  "Waiting": {
+    "ru": "Ожидание",
+    "uz": "Kutilmoqda"
+  },
+  "Waiting for examiner to complete the question...": {
+    "ru": "Ожидание завершения вопроса экзаменатором...",
+    "uz": "Imtihon oluvchining savolni yakunlashini kutmoqda..."
+  },
+  "Waitlist": {
+    "ru": "Список ожидания",
+    "uz": "Kutish ro'yxati"
+  },
+  "Waitlist is empty": {
+    "ru": "Список ожидания пуст",
+    "uz": "Kutish ro'yxati bo'sh"
+  },
+  "Wants Group": {
+    "ru": "Хочет группу",
+    "uz": "Guruh xohlaydi"
+  },
+  "Wants Group (Optional)": {
+    "ru": "Хочет группу (Необязательно)",
+    "uz": "Guruh xohlaydi (Ixtiyoriy)"
+  },
+  "Warning: this phone number was used before by": {
+    "ru": "Внимание: этот номер телефона ранее использовался",
+    "uz": "Ogohlantirish: bu telefon raqami avval foydalanilgan"
+  },
+  "We are here to help you get the most out of Liberum.": {
+    "ru": "Мы здесь, чтобы помочь вам максимально использовать Liberum.",
+    "uz": "Biz sizga Liberumdan maksimal darajada foydalanishga yordam berish uchun shu yerdamiz."
+  },
+  "We reply within an hour": {
+    "ru": "Мы отвечаем в течение часа",
+    "uz": "Bir soat ichida javob beramiz"
+  },
+  "Week": {
+    "ru": "Неделя",
+    "uz": "Hafta"
+  },
+  "Weekly Heatmap": {
+    "ru": "Недельная тепловая карта",
+    "uz": "Haftalik issiqlik xaritasi"
+  },
+  "Weekly Performance (🔴 Needs Work · 🟡 Revise · 🟢 Good)": {
+    "ru": "Еженедельная успеваемость (🔴 Требует доработки · 🟡 Пересмотреть · 🟢 Хорошо)",
+    "uz": "Haftalik natijalar (🔴 Ishlash kerak · 🟡 Qayta ko'rib chiqish · 🟢 Yaxshi)"
+  },
+  "Weekly Performance — Grammar · Activity · Vocabulary": {
+    "ru": "Еженедельная успеваемость — Грамматика · Активность · Словарный запас",
+    "uz": "Haftalik natijalar — Grammatika · Faoliyat · Lug'at"
+  },
+  "Welcome to Liberum!": {
+    "ru": "Добро пожаловать в Liberum!",
+    "uz": "Liberumga xush kelibsiz!"
+  },
+  "When": {
+    "ru": "Когда",
+    "uz": "Qachon"
+  },
+  "Word Count:": {
+    "ru": "Количество слов:",
+    "uz": "So'zlar soni:"
+  },
+  "Working Hours": {
+    "ru": "Рабочие часы",
+    "uz": "Ish vaqti"
+  },
+  "Workspace": {
+    "ru": "Рабочая область",
+    "uz": "Ish maydoni"
+  },
+  "Writing Graph Image": {
+    "ru": "Изображение графика для письма",
+    "uz": "Grafik tasvirni yozish"
+  },
+  "Writing Section": {
+    "ru": "Раздел письма",
+    "uz": "Yozma qism"
+  },
+  "YES": {
+    "ru": "ДА",
+    "uz": "HA"
+  },
+  "You": {
+    "ru": "Вы",
+    "uz": "Siz"
+  },
+  "You are currently not assigned to any active academic group. Please contact your teacher or administrator to get enrolled in your class.": {
+    "ru": "В настоящее время вы не прикреплены ни к одной активной академической группе. Пожалуйста, свяжитесь со своим учителем или администратором, чтобы записаться на занятия.",
+    "uz": "Hozirda siz hech qanday faol akademik guruhga biriktirilmagansiz. Iltimos, darsga yozilish uchun o'qituvchingiz yoki administrator bilan bog'laning."
+  },
+  "You are currently on the Solo plan. Upgrade to a Studio plan to invite other teachers.": {
+    "ru": "В настоящее время вы используете план \"Соло\". Обновитесь до плана \"Студия\", чтобы приглашать других учителей.",
+    "uz": "Hozirda siz Solo tarifdasiz. Boshqa o'qituvchilarni taklif qilish uchun Studio tarifiga o'ting."
+  },
+  "You have previously taken the quiz for this topic.": {
+    "ru": "Вы ранее проходили тест по этой теме.",
+    "uz": "Siz ilgari ushbu mavzu bo'yicha viktorinadan o'tgansiz."
+  },
+  "You haven't completed any mock exams yet. Take a test to see your progress here.": {
+    "ru": "Вы еще не прошли ни одного пробного экзамена. Пройдите тест, чтобы увидеть свой прогресс здесь.",
+    "uz": "Siz hali hech qanday sinov imtihonini yakunlamagansiz. Bu yerda o'z taraqqiyotingizni ko'rish uchun test topshiring."
+  },
+  "You haven't created any IELTS Mock exams yet. Click \"Create New Exam\" to get started building your digital test library!": {
+    "ru": "Вы еще не создали ни одного пробного экзамена IELTS. Нажмите \"Создать новый экзамен\", чтобы начать формировать свою цифровую библиотеку тестов!",
+    "uz": "Siz hali hech qanday IELTS sinov imtihonini yaratmagansiz. Raqamli test kutubxonangizni yaratishni boshlash uchun \"Yangi imtihon yaratish\" tugmasini bosing!"
+  },
+  "You haven't joined any classes yet. Ask your teacher for an invite code!": {
+    "ru": "Вы еще не присоединились ни к одному классу. Попросите у своего учителя код приглашения!",
+    "uz": "Siz hali hech qanday darsga qo'shilmagansiz. O'qituvchingizdan taklif kodini so'rang!"
+  },
+  "You're on the list!": {
+    "ru": "Вы в списке!",
+    "uz": "Siz ro'yxatdasiz!"
+  },
+  "Your Best Score:": {
+    "ru": "Ваш лучший результат:",
+    "uz": "Sizning eng yaxshi natijangiz:"
+  },
+  "Your Learning Community": {
+    "ru": "Ваше учебное сообщество",
+    "uz": "Sizning ta'lim hamjamiyatingiz"
+  },
+  "Your Response": {
+    "ru": "Ваш ответ",
+    "uz": "Sizning javobingiz"
+  },
+  "Your exam has been submitted to": {
+    "ru": "Ваш экзамен был отправлен в",
+    "uz": "Imtihoningiz yuborildi"
+  },
+  "Your personalized AI tutor fully synchronized with your lessons, test scores, and homework.": {
+    "ru": "Ваш персональный ИИ-репетитор, полностью синхронизированный с вашими уроками, результатами тестов и домашними заданиями.",
+    "uz": "Darslaringiz, test natijalaringiz va uy vazifalaringiz bilan to'liq sinxronlangan shaxsiy AI repetitoringiz."
+  },
+  "Your score has been recorded. Check the topics list for your mastery percentage.": {
+    "ru": "Ваш результат был записан. Проверьте список тем для получения процента освоения.",
+    "uz": "Natijangiz qayd etildi. O'zlashtirish foizingizni ko'rish uchun mavzular ro'yxatini tekshiring."
+  },
+  "Your score has been recorded. You can take the quiz again anytime to improve your score.": {
+    "ru": "Ваш результат был записан. Вы можете пройти тест еще раз в любое время, чтобы улучшить свой результат.",
+    "uz": "Natijangiz qayd etildi. Natijangizni yaxshilash uchun viktorinani istalgan vaqtda qayta topshirishingiz mumkin."
+  },
+  "Zoom Link": {
+    "ru": "Ссылка на Zoom",
+    "uz": "Zoom havolasi"
+  },
+  "Zoom link": {
+    "ru": "Ссылка на Zoom",
+    "uz": "Zoom havolasi"
+  },
+  "[No response submitted]": {
+    "ru": "[Ответ не отправлен]",
+    "uz": "[Javob yuborilmagan]"
+  },
+  "assessment to find your matching level.": {
+    "ru": "оценка для определения вашего соответствующего уровня.",
+    "uz": "mos darajangizni topish uchun baholash."
+  },
+  "e.g. 7.5": {
+    "ru": "напр. 7.5",
+    "uz": "masalan, 7.5"
+  },
+  "e.g. AB1234": {
+    "ru": "напр. AB1234",
+    "uz": "masalan, AB1234"
+  },
+  "e.g. Cambridge 18 Test 1": {
+    "ru": "напр. Cambridge 18 Тест 1",
+    "uz": "masalan, Cambridge 18 Test 1"
+  },
+  "e.g. Evening": {
+    "ru": "напр. Вечер",
+    "uz": "masalan, Kechqurun"
+  },
+  "e.g. Grammar Review": {
+    "ru": "напр. Обзор грамматики",
+    "uz": "masalan, Grammatikani ko'rib chiqish"
+  },
+  "e.g. Harry Potter": {
+    "ru": "напр. Гарри Поттер",
+    "uz": "masalan, Garri Potter"
+  },
+  "e.g. IELTS Writing Practice 1": {
+    "ru": "напр. IELTS Письменная практика 1",
+    "uz": "masalan, IELTS Yozma amaliyoti 1"
+  },
+  "e.g. Instagram": {
+    "ru": "напр. Instagram",
+    "uz": "masalan, Instagram"
+  },
+  "e.g. J.K. Rowling": {
+    "ru": "напр. Дж.К. Роулинг",
+    "uz": "masalan, J.K. Rowling"
+  },
+  "e.g. Mon/Wed/Fri": {
+    "ru": "напр. Пн/Ср/Пт",
+    "uz": "masalan, Dushanba/Chorshanba/Juma"
+  },
+  "e.g. Navruz": {
+    "ru": "напр. Навруз",
+    "uz": "masalan, Navro'z"
+  },
+  "e.g. Next Tuesday at 5 PM": {
+    "ru": "напр. Следующий вторник в 17:00",
+    "uz": "masalan, Keyingi seshanba soat 17:00 da"
+  },
+  "e.g. Oct 12 - Oct 18": {
+    "ru": "напр. 12 окт. - 18 окт.",
+    "uz": "masalan, 12-okt. - 18-okt."
+  },
+  "e.g. Past Perfect, IELTS Writing Task 2": {
+    "ru": "напр. Past Perfect, IELTS Письменное задание 2",
+    "uz": "masalan, Past Perfect, IELTS Yozma topshirig'i 2"
+  },
+  "e.g. Reading Passage 1": {
+    "ru": "напр. Отрывок для чтения 1",
+    "uz": "masalan, O'qish matni 1"
+  },
+  "e.g. Rent, Materials": {
+    "ru": "напр. Аренда, Материалы",
+    "uz": "masalan, Ijara, Materiallar"
+  },
+  "e.g. September fee": {
+    "ru": "напр. Плата за сентябрь",
+    "uz": "masalan, Sentyabr to'lovi"
+  },
+  "e.g. TRUE": {
+    "ru": "напр. ВЕРНО",
+    "uz": "masalan, TO'G'RI"
+  },
+  "e.g. Week 3: Academic Task 1 Line Graphs": {
+    "ru": "напр. Неделя 3: Академическое задание 1 Линейные графики",
+    "uz": "masalan, 3-hafta: Akademik topshiriq 1 Chiziqli grafiklar"
+  },
+  "e.g. Workbook p.45, essay draft": {
+    "ru": "напр. Рабочая тетрадь стр. 45, черновик эссе",
+    "uz": "masalan, Ish kitobi 45-bet, esse qoralamasi"
+  },
+  "for manual evaluation. Once reviewed, your final score and detailed comments will appear on this page.": {
+    "ru": "для ручной оценки. После проверки ваша окончательная оценка и подробные комментарии появятся на этой странице.",
+    "uz": "qo'lda baholash uchun. Ko'rib chiqilgandan so'ng, yakuniy natijangiz va batafsil sharhlar ushbu sahifada paydo bo'ladi."
+  },
+  "held this month": {
+    "ru": "проведено в этом месяце",
+    "uz": "shu oyda o'tkazilgan"
+  },
+  "https://zoom.us/j/123456789": {
+    "ru": "https://zoom.us/j/123456789",
+    "uz": "https://zoom.us/j/123456789"
+  },
+  "on any holiday if you taught that day — it will count for finance and show normally in reports.": {
+    "ru": "в любой праздник, если вы проводили занятие в этот день — это будет учтено в финансах и отобразится в отчетах как обычно.",
+    "uz": "agar o'sha kuni dars o'tgan bo'lsangiz, har qanday bayramda — bu moliya uchun hisobga olinadi va hisobotlarda odatdagidek ko'rsatiladi."
+  },
+  "or": {
+    "ru": "или",
+    "uz": "yoki"
+  },
+  "ora": {
+    "ru": "час",
+    "uz": "soat"
+  },
+  "s.value='Present')\">": {
+    "ru": "s.value='Присутствует')\">",
+    "uz": "s.value='Hozir')\">"
+  },
+  "um": {
+    "ru": "гм",
+    "uz": "hmm"
+  },
+  "will review your request and get in touch with you shortly.": {
+    "ru": "рассмотрит ваш запрос и свяжется с вами в ближайшее время.",
+    "uz": "so'rovingizni ko'rib chiqadi va tez orada siz bilan bog'lanadi."
+  },
+  "with a Reading/Listening band of": {
+    "ru": "с баллом по чтению/аудированию",
+    "uz": "O'qish/Tinglash bo'yicha band bilan"
+  },
+  "— = Cancelled": {
+    "ru": "— = Отменено",
+    "uz": "— = Bekor qilingan"
+  },
+  "— Cancelled": {
+    "ru": "— Отменено",
+    "uz": "— Bekor qilingan"
+  },
+  "← Back": {
+    "ru": "← Назад",
+    "uz": "← Orqaga"
+  },
+  "← Back to website": {
+    "ru": "← Назад на сайт",
+    "uz": "← Veb-saytga qaytish"
+  },
+  "← Course Library": {
+    "ru": "← Библиотека курсов",
+    "uz": "← Kurs kutubxonasi"
+  },
+  "← Prev": {
+    "ru": "← Пред.",
+    "uz": "← Oldingi"
+  },
+  "↑ Restore": {
+    "ru": "↑ Восстановить",
+    "uz": "↑ Tiklash"
+  },
+  "↻ Rescheduled": {
+    "ru": "↻ Перенесено",
+    "uz": "↻ Boshqa vaqtga ko'chirilgan"
+  },
+  "▲ On track": {
+    "ru": "▲ В процессе",
+    "uz": "▲ Rejada"
+  },
+  "◌ Excused": {
+    "ru": "◌ Освобожден",
+    "uz": "◌ Uzrli sabab bilan"
+  },
+  "● Held": {
+    "ru": "● Проведено",
+    "uz": "● O'tkazildi"
+  },
+  "⚠ Not Paid": {
+    "ru": "⚠ Не оплачено",
+    "uz": "⚠ To'lanmagan"
+  },
+  "✓ All Paid": {
+    "ru": "✓ Все оплачено",
+    "uz": "✓ Hammasi to'langan"
+  },
+  "✓ Paid": {
+    "ru": "✓ Оплачено",
+    "uz": "✓ To'langan"
+  },
+  "✓ Present": {
+    "ru": "✓ Присутствует",
+    "uz": "✓ Hozir"
+  },
+  "✕ Absent": {
+    "ru": "✕ Отсутствует",
+    "uz": "✕ Yo'q"
+  },
+  "✕ Cancelled": {
+    "ru": "✕ Отменено",
+    "uz": "✕ Bekor qilingan"
+  },
+  "🏆 Group Leaderboard": {
+    "ru": "🏆 Таблица лидеров группы",
+    "uz": "🏆 Guruh yetakchilari jadvali"
+  },
+  "🏖 Holiday": {
+    "ru": "🏖 Праздник",
+    "uz": "🏖 Bayram"
+  },
+  "👨‍🏫": {
+    "ru": "👨‍🏫",
+    "uz": "👨‍🏫"
+  },
+  "💡 Click any cell to cycle: Present → Absent → Excused → Present. Changes save instantly.": {
+    "ru": "💡 Нажмите любую ячейку, чтобы переключаться: Присутствует → Отсутствует → Освобожден → Присутствует. Изменения сохраняются мгновенно.",
+    "uz": "💡 Har qanday katakchani bosib aylantiring: Hozir → Yo'q → Uzrli sabab bilan → Hozir. O'zgarishlar darhol saqlanadi."
+  },
+  "💡 Held lessons will auto-create attendance records (all students marked Present — edit after if needed)": {
+    "ru": "💡 Проведенные уроки автоматически создадут записи о посещаемости (все студенты будут отмечены как Присутствующие — отредактируйте при необходимости).",
+    "uz": "💡 O'tkazilgan darslar davomat yozuvlarini avtomatik ravishda yaratadi (barcha talabalar Hozir deb belgilanadi — agar kerak bo'lsa, keyinroq tahrirlang)."
+  },
+  "💬 Class Discussion": {
+    "ru": "💬 Обсуждение в классе",
+    "uz": "💬 Sinf munozarasi"
+  },
+  "📅 Course Timeline": {
+    "ru": "📅 Хронология курса",
+    "uz": "📅 Kurs jadvali"
+  },
+  "📘 Student History": {
+    "ru": "📘 История студента",
+    "uz": "📘 Talaba tarixi"
+  },
+  "📚 Homework:": {
+    "ru": "📚 Домашнее задание:",
+    "uz": "📚 Uy vazifasi:"
+  },
+  "📝 Assignments & Tasks": {
+    "ru": "📝 Задания и задачи",
+    "uz": "📝 Topsiriqlar va vazifalar"
+  },
+  "🔴 Needs Work &nbsp;·&nbsp; 🟡 Needs Revision &nbsp;·&nbsp; 🟢 Good": {
+    "ru": "🔴 Требует доработки &nbsp;·&nbsp; 🟡 Требует пересмотра &nbsp;·&nbsp; 🟢 Хорошо",
+    "uz": "🔴 Ishlash kerak &nbsp;·&nbsp; 🟡 Qayta ko'rib chiqish kerak &nbsp;·&nbsp; 🟢 Yaxshi"
+  },
+  "🖨 Print / Save PDF": {
+    "ru": "🖨 Печать / Сохранить PDF",
+    "uz": "🖨 Chop etish / PDF saqlash"
+  },
+  "🖨 Print / Save as PDF": {
+    "ru": "🖨 Печать / Сохранить как PDF",
+    "uz": "🖨 Chop etish / PDF sifatida saqlash"
+  }
+}
