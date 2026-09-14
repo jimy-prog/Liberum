@@ -68,6 +68,10 @@ class StudentProfile(MasterBase):
     user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
     phone = Column(String, default="")
     parent_phone = Column(String, default="")
+    target_band = Column(Float, default=7.5)
+    notif_results = Column(Boolean, default=True)
+    notif_deadlines = Column(Boolean, default=True)
+    notif_product = Column(Boolean, default=False)
     
     user = relationship("User", back_populates="student_profile")
 
@@ -394,4 +398,107 @@ class GrammarQuizAttempt(MasterBase):
     
     tenant = relationship("PlatformTenant")
     topic = relationship("GrammarTopic")
+
+
+# ==========================================
+# MEET LIBERUM (meet.liberum.uz) MODELS
+# ==========================================
+
+class MeetTeacherProfile(MasterBase):
+    __tablename__ = "meet_teacher_profiles"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    headline = Column(String, default="")
+    bio = Column(String, default="")
+    subjects_json = Column(String, default="[]")  # List of subjects
+    specializations_json = Column(String, default="[]")  # Tags
+    languages_json = Column(String, default="[]")
+    experience_years = Column(Integer, default=1)
+    rating = Column(Float, default=5.0)
+    reviews_count = Column(Integer, default=0)
+    students_taught = Column(Integer, default=0)
+    lessons_taught = Column(Integer, default=0)
+    verified = Column(Boolean, default=True)
+    online = Column(Boolean, default=True)
+    avatar_color = Column(String, default="#7B61FF")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", foreign_keys=[user_id])
+    lesson_options = relationship("MeetLessonOption", back_populates="teacher", cascade="all, delete-orphan")
+    availabilities = relationship("MeetAvailability", back_populates="teacher", cascade="all, delete-orphan")
+    bookings = relationship("MeetBooking", back_populates="teacher", foreign_keys="MeetBooking.teacher_id", cascade="all, delete-orphan")
+
+
+class MeetLessonOption(MasterBase):
+    __tablename__ = "meet_lesson_options"
+    id = Column(Integer, primary_key=True)
+    teacher_id = Column(Integer, ForeignKey("meet_teacher_profiles.id"), nullable=False)
+    title = Column(String, nullable=False)
+    duration_min = Column(Integer, default=60)
+    price_uzs = Column(Integer, default=100000)
+    description = Column(String, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    teacher = relationship("MeetTeacherProfile", back_populates="lesson_options")
+
+
+class MeetAvailability(MasterBase):
+    __tablename__ = "meet_availabilities"
+    id = Column(Integer, primary_key=True)
+    teacher_id = Column(Integer, ForeignKey("meet_teacher_profiles.id"), nullable=False)
+    day = Column(String, nullable=False)  # "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+    enabled = Column(Boolean, default=True)
+    ranges_json = Column(String, default="[]")  # e.g. [{"start":"09:00","end":"12:00"}]
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    teacher = relationship("MeetTeacherProfile", back_populates="availabilities")
+
+
+class MeetBooking(MasterBase):
+    __tablename__ = "meet_bookings"
+    id = Column(Integer, primary_key=True)
+    lesson_option_id = Column(Integer, ForeignKey("meet_lesson_options.id"), nullable=True)
+    teacher_id = Column(Integer, ForeignKey("meet_teacher_profiles.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String, nullable=False)
+    date_str = Column(String, nullable=False)  # "Today", "Tomorrow", "Mon, Aug 24" etc.
+    time_str = Column(String, nullable=False)  # "17:30"
+    duration_min = Column(Integer, default=60)
+    price_uzs = Column(Integer, default=0)
+    status = Column(String, default="scheduled")  # scheduled, starting-soon, live, completed, cancelled
+    room_id = Column(String, unique=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    teacher = relationship("MeetTeacherProfile", back_populates="bookings", foreign_keys=[teacher_id])
+    student = relationship("User", foreign_keys=[student_id])
+    lesson_option = relationship("MeetLessonOption")
+    chat_messages = relationship("MeetClassMessage", back_populates="booking", cascade="all, delete-orphan")
+
+
+class MeetNotification(MasterBase):
+    __tablename__ = "meet_notifications"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    kind = Column(String, default="system")  # booking, reminder, system
+    title = Column(String, nullable=False)
+    body = Column(String, default="")
+    time_label = Column(String, default="Just now")
+    read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class MeetClassMessage(MasterBase):
+    __tablename__ = "meet_class_messages"
+    id = Column(Integer, primary_key=True)
+    booking_id = Column(Integer, ForeignKey("meet_bookings.id"), nullable=False)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    sender_name = Column(String, nullable=False)
+    text = Column(String, nullable=False)
+    time_str = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    booking = relationship("MeetBooking", back_populates="chat_messages")
+    sender = relationship("User", foreign_keys=[sender_id])
 

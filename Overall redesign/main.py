@@ -47,6 +47,7 @@ from routers import placement
 from routers import join
 from routers import library
 from routers import ai
+from routers import meet_api
 
 app = FastAPI(title=APP_NAME)
 
@@ -223,6 +224,7 @@ PUBLIC_PREFIXES = (
     "/placement/take",
     "/auth",
     "/join",
+    "/api/meet",
 )
 
 
@@ -622,6 +624,7 @@ for r in [dashboard.router, students.router, groups.router, lessons.router,
           mock_platform.router, owner.router, classes.router, reviews.router, placement.router, join.router, library.router, ai.router]:
     app.include_router(r)
 app.include_router(api_auth.router, prefix="/api")
+app.include_router(meet_api.router)
 
 def repair_teacher_tenant_mappings():
     import random
