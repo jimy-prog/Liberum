@@ -103,8 +103,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const loginWithBackend = async (email: string, password: string) => {
-    const res = await meetApi.login(email, password);
+  const loginWithBackend = async (identifier: string, password: string) => {
+    const res = await meetApi.login(identifier, password);
     setUser(res.user);
     return res.user;
   };

@@ -50,7 +50,8 @@ class RegisterMeetRequest(BaseModel):
 
 
 class LoginMeetRequest(BaseModel):
-    email: str
+    email: Optional[str] = None
+    identifier: Optional[str] = None
     password: str
 
 
@@ -428,9 +429,12 @@ async def meet_register(req: RegisterMeetRequest, response: Response):
 
 @router.post("/auth/login")
 async def meet_login(req: LoginMeetRequest, response: Response):
-    user = authenticate_user(req.email, req.password)
+    ident = (req.identifier or req.email or "").strip()
+    if not ident:
+        raise HTTPException(status_code=400, detail="Username or email is required")
+    user = authenticate_user(ident, req.password)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(status_code=401, detail="Invalid username/email or password")
 
     token = create_session(user.id)
     response.set_cookie(SESSION_KEY, token, httponly=True, max_age=60*60*24*30, samesite="lax", path="/")

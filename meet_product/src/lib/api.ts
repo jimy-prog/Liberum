@@ -36,10 +36,10 @@ export const meetApi = {
     });
   },
 
-  async login(email: string, password: string) {
+  async login(identifier: string, password: string) {
     return request<{ success: boolean; user: User }>("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ identifier, password }),
     });
   },
 

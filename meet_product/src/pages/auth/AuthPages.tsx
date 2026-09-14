@@ -66,7 +66,7 @@ function AuthLayout({ children, title, subtitle }: { children: ReactNode; title:
 }
 
 export function LoginPage() {
-  const { loginWithBackend, signIn } = useApp();
+  const { loginWithBackend } = useApp();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -103,8 +103,8 @@ export function LoginPage() {
       )}
 
       <form onSubmit={submit} className="space-y-4">
-        <Field label="Email">
-          <Input type="email" required placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <Field label="Username or email">
+          <Input type="text" required placeholder="username or email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
         <Field label="Password">
           <Input type="password" required placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -118,18 +118,6 @@ export function LoginPage() {
           {submitting ? "Logging in..." : "Log in"}
         </Btn>
       </form>
-      <div className="mt-6 rounded-xl border border-line bg-white p-3.5 text-center">
-        <p className="text-[13px] text-ink-500">
-          Exploring?{" "}
-          <button className="font-semibold text-brand-600 hover:underline" onClick={() => { signIn("student"); navigate("/app"); }}>
-            Demo as Student
-          </button>{" "}
-          ·{" "}
-          <button className="font-semibold text-brand-600 hover:underline" onClick={() => { signIn("teacher"); navigate("/app"); }}>
-            Demo as Teacher
-          </button>
-        </p>
-      </div>
       <p className="mt-6 text-center text-[13px] text-ink-500">
         New to Liberum?{" "}
         <Link to="/register" className="font-semibold text-brand-600 hover:underline">
