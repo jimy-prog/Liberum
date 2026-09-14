@@ -467,6 +467,9 @@ class MeetBooking(MasterBase):
     time_str = Column(String, nullable=False)  # "17:30"
     duration_min = Column(Integer, default=60)
     price_uzs = Column(Integer, default=0)
+    payment_method = Column(String, default="click")  # click, payme, balance
+    escrow_status = Column(String, default="held")  # held, released, refunded
+    payment_reference = Column(String, nullable=True)
     status = Column(String, default="scheduled")  # scheduled, starting-soon, live, completed, cancelled
     room_id = Column(String, unique=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -554,4 +557,18 @@ class MeetTeacherReview(MasterBase):
     teacher = relationship("MeetTeacherProfile", backref="reviews")
     student = relationship("User", foreign_keys=[student_id])
     booking = relationship("MeetBooking", backref="review", uselist=False)
+
+
+class MeetTeacherPayout(MasterBase):
+    __tablename__ = "meet_teacher_payouts"
+    id = Column(Integer, primary_key=True)
+    teacher_id = Column(Integer, ForeignKey("meet_teacher_profiles.id"), nullable=False)
+    amount_uzs = Column(Integer, nullable=False)
+    status = Column(String, default="pending")  # pending, completed, cancelled
+    card_pan = Column(String, nullable=False)  # e.g. "8600 **** **** 1234"
+    card_holder = Column(String, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
+
+    teacher = relationship("MeetTeacherProfile", backref="payouts")
 

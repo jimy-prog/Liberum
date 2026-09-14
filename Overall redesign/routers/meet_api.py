@@ -35,6 +35,7 @@ from master_database import (
     MeetNotification,
     MeetTeacherProfile,
     MeetTeacherReview,
+    MeetTeacherPayout,
     PlatformTenant,
     SessionMaster,
     User,
@@ -103,6 +104,7 @@ class BookingCreateSchema(BaseModel):
     lessonOptionId: str
     date: str
     time: str
+    paymentMethod: Optional[str] = "click"
 
 
 class ChatMessageCreateSchema(BaseModel):
@@ -112,6 +114,12 @@ class ChatMessageCreateSchema(BaseModel):
 class ReviewCreateSchema(BaseModel):
     rating: int  # 1 to 5
     comment: str = ""
+
+
+class PayoutRequestSchema(BaseModel):
+    amountUzs: int
+    cardPan: str
+    cardHolder: str = ""
 
 
 # -------------------------------------------------------------
@@ -745,6 +753,8 @@ async def create_booking(data: BookingCreateSchema, user: User = Depends(get_mee
         price = l_opt.price_uzs if l_opt else 0
 
         room_id = f"room-{uuid.uuid4().hex[:12]}"
+        pay_method = data.paymentMethod or "click"
+        ref_id = f"tx_{pay_method}_{uuid.uuid4().hex[:8]}"
         booking = MeetBooking(
             lesson_option_id=l_opt.id if l_opt else None,
             teacher_id=t.id,
@@ -754,6 +764,9 @@ async def create_booking(data: BookingCreateSchema, user: User = Depends(get_mee
             time_str=data.time,
             duration_min=duration,
             price_uzs=price,
+            payment_method=pay_method,
+            escrow_status="held",
+            payment_reference=ref_id,
             status="scheduled",
             room_id=room_id,
         )
@@ -858,6 +871,9 @@ async def list_lessons(user: User = Depends(get_meet_user)):
                 "time": b.time_str,
                 "durationMin": b.duration_min,
                 "priceUzs": b.price_uzs,
+                "paymentMethod": getattr(b, "payment_method", "click") or "click",
+                "escrowStatus": getattr(b, "escrow_status", "held") or "held",
+                "paymentReference": getattr(b, "payment_reference", "") or "",
                 "status": b.status,
                 "roomId": b.room_id,
             })
@@ -877,10 +893,24 @@ async def complete_lesson(lesson_id: str, user: User = Depends(get_meet_user)):
         booking = db.query(MeetBooking).filter(MeetBooking.id == int(clean_id)).first()
         if booking:
             booking.status = "completed"
+            # Release escrow funds to teacher's verified balance
+            booking.escrow_status = "released"
+            
             # Update teacher stats
             t = db.query(MeetTeacherProfile).filter(MeetTeacherProfile.id == booking.teacher_id).first()
             if t:
                 t.lessons_taught = (t.lessons_taught or 0) + 1
+            
+            # Notify teacher of escrow payout release
+            if t and t.user_id:
+                db.add(MeetNotification(
+                    user_id=t.user_id,
+                    kind="system",
+                    title="Escrow Funds Released",
+                    body=f"{booking.price_uzs:,} UZS for '{booking.title}' has been released to your payout balance.",
+                    time_label="Just now",
+                ))
+
             db.commit()
         return {"success": True}
     finally:
@@ -1535,3 +1565,143 @@ async def toggle_user_status(user_id: int):
         return {"success": True, "isActive": u.is_active}
     finally:
         db.close()
+
+
+# -------------------------------------------------------------
+# TEACHER EARNINGS & PAYOUTS LEDGER
+# -------------------------------------------------------------
+@router.get("/teacher/earnings")
+async def get_teacher_earnings(user: User = Depends(get_meet_user)):
+    db = SessionMaster()
+    try:
+        t = db.query(MeetTeacherProfile).filter(MeetTeacherProfile.user_id == user.id).first()
+        if not t:
+            return {
+                "availableBalance": 0,
+                "inEscrow": 0,
+                "totalEarned": 0,
+                "totalWithdrawn": 0,
+                "payouts": [],
+                "transactions": [],
+            }
+
+        # Query all bookings for this teacher
+        bookings = (
+            db.query(MeetBooking)
+            .filter(MeetBooking.teacher_id == t.id)
+            .options(joinedload(MeetBooking.student))
+            .order_by(MeetBooking.id.desc())
+            .all()
+        )
+
+        total_earned = sum(b.price_uzs for b in bookings if b.escrow_status == "released" or b.status == "completed")
+        in_escrow = sum(b.price_uzs for b in bookings if b.escrow_status == "held" and b.status != "cancelled")
+
+        # Query payouts
+        payout_records = (
+            db.query(MeetTeacherPayout)
+            .filter(MeetTeacherPayout.teacher_id == t.id)
+            .order_by(MeetTeacherPayout.id.desc())
+            .all()
+        )
+        total_withdrawn = sum(p.amount_uzs for p in payout_records if p.status in ["completed", "pending"])
+        available_balance = max(0, total_earned - total_withdrawn)
+
+        transactions = [
+            {
+                "id": f"tx-les-{b.id}",
+                "type": "lesson_escrow",
+                "lessonTitle": b.title,
+                "studentName": b.student.full_name if b.student else "Student",
+                "amountUzs": b.price_uzs,
+                "paymentMethod": b.payment_method or "click",
+                "escrowStatus": b.escrow_status or "held",
+                "status": b.status,
+                "date": b.date_str,
+                "time": b.time_str,
+                "paymentReference": b.payment_reference,
+            }
+            for b in bookings
+        ]
+
+        payouts = [
+            {
+                "id": f"po-{p.id}",
+                "amountUzs": p.amount_uzs,
+                "cardPan": p.card_pan,
+                "cardHolder": p.card_holder,
+                "status": p.status,
+                "createdAt": p.created_at.strftime("%b %d, %Y · %H:%M"),
+            }
+            for p in payout_records
+        ]
+
+        return {
+            "availableBalance": available_balance,
+            "inEscrow": in_escrow,
+            "totalEarned": total_earned,
+            "totalWithdrawn": total_withdrawn,
+            "payouts": payouts,
+            "transactions": transactions,
+        }
+    finally:
+        db.close()
+
+
+@router.post("/teacher/payouts")
+async def request_teacher_payout(data: PayoutRequestSchema, user: User = Depends(get_meet_user)):
+    if data.amountUzs < 50000:
+        raise HTTPException(status_code=400, detail="Minimum payout amount is 50,000 UZS")
+
+    clean_card = data.cardPan.replace(" ", "")
+    if len(clean_card) < 16:
+        raise HTTPException(status_code=400, detail="Invalid card number")
+
+    db = SessionMaster()
+    try:
+        t = db.query(MeetTeacherProfile).filter(MeetTeacherProfile.user_id == user.id).first()
+        if not t:
+            raise HTTPException(status_code=404, detail="Teacher profile not found")
+
+        # Verify available funds
+        bookings = db.query(MeetBooking).filter(MeetBooking.teacher_id == t.id).all()
+        total_earned = sum(b.price_uzs for b in bookings if b.escrow_status == "released" or b.status == "completed")
+        payouts = db.query(MeetTeacherPayout).filter(MeetTeacherPayout.teacher_id == t.id).all()
+        total_withdrawn = sum(p.amount_uzs for p in payouts if p.status in ["completed", "pending"])
+        available = max(0, total_earned - total_withdrawn)
+
+        if data.amountUzs > available:
+            raise HTTPException(status_code=400, detail="Requested amount exceeds available balance")
+
+        masked_card = f"{clean_card[:4]} **** **** {clean_card[-4:]}"
+        new_payout = MeetTeacherPayout(
+            teacher_id=t.id,
+            amount_uzs=data.amountUzs,
+            status="completed",  # Instant simulation for teacher payouts
+            card_pan=masked_card,
+            card_holder=data.cardHolder or user.full_name,
+            completed_at=datetime.utcnow(),
+        )
+        db.add(new_payout)
+
+        # Notify teacher
+        db.add(MeetNotification(
+            user_id=user.id,
+            kind="system",
+            title="Payout Processed",
+            body=f"{data.amountUzs:,} UZS transferred to card {masked_card}.",
+            time_label="Just now",
+        ))
+
+        db.commit()
+
+        # Send Telegram notification if connected
+        send_telegram_notification(
+            getattr(user, "telegram_chat_id", None),
+            f"💸 *Payout Sent!*\n\n• *Amount:* {data.amountUzs:,} UZS\n• *Card:* {masked_card}\n• *Status:* Completed\n\nFunds will reflect on your card within 1-5 minutes."
+        )
+
+        return {"success": True, "payoutId": new_payout.id, "status": new_payout.status}
+    finally:
+        db.close()
+

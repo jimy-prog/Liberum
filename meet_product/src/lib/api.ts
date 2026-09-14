@@ -1,5 +1,5 @@
 // API client for Meet Liberum backend integration
-import type { BookingDraft, DayAvailability, Lesson, Role, Teacher, User } from "./types";
+import type { BookingDraft, DayAvailability, Lesson, Role, Teacher, TeacherEarningsData, User } from "./types";
 
 const API_BASE = "/api/meet";
 
@@ -292,6 +292,18 @@ export const meetApi = {
   async toggleUserStatus(userId: number) {
     return request<{ success: boolean; isActive: boolean }>(`/admin/users/${userId}/toggle-status`, {
       method: "POST",
+    });
+  },
+
+  // Teacher Earnings & Payouts
+  async getTeacherEarnings() {
+    return request<TeacherEarningsData>("/teacher/earnings");
+  },
+
+  async requestPayout(amountUzs: number, cardPan: string, cardHolder?: string) {
+    return request<{ success: boolean; payoutId: number; status: string }>("/teacher/payouts", {
+      method: "POST",
+      body: JSON.stringify({ amountUzs, cardPan, cardHolder: cardHolder || "" }),
     });
   },
 };

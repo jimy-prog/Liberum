@@ -14,6 +14,7 @@ import {
   AvailabilityPage,
   TeacherCalendarPage,
   TeacherDashboard,
+  TeacherEarningsPage,
   TeacherLessonsPage,
   TeacherProfileEditor,
 } from "@/pages/teacher/TeacherPages";
@@ -112,6 +113,14 @@ function AppRoutes() {
         element={
           <AppShell>
             <TeacherProfileEditor />
+          </AppShell>
+        }
+      />
+      <Route
+        path="/app/earnings"
+        element={
+          <AppShell>
+            <TeacherEarningsPage />
           </AppShell>
         }
       />

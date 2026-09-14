@@ -65,6 +65,9 @@ export interface Lesson {
   time: string; // e.g. "17:30"
   durationMin: number;
   priceUzs: number;
+  paymentMethod?: string;
+  escrowStatus?: "held" | "released" | "refunded";
+  paymentReference?: string;
   status: LessonStatus;
 }
 
@@ -82,4 +85,37 @@ export interface BookingDraft {
   lessonOptionId: string;
   date: string;
   time: string;
+  paymentMethod?: string;
+}
+
+export interface TeacherPayout {
+  id: string;
+  amountUzs: number;
+  cardPan: string;
+  cardHolder: string;
+  status: "pending" | "completed" | "cancelled";
+  createdAt: string;
+}
+
+export interface TeacherTransaction {
+  id: string;
+  type: string;
+  lessonTitle: string;
+  studentName: string;
+  amountUzs: number;
+  paymentMethod: string;
+  escrowStatus: "held" | "released" | "refunded";
+  status: string;
+  date: string;
+  time: string;
+  paymentReference?: string;
+}
+
+export interface TeacherEarningsData {
+  availableBalance: number;
+  inEscrow: number;
+  totalEarned: number;
+  totalWithdrawn: number;
+  payouts: TeacherPayout[];
+  transactions: TeacherTransaction[];
 }

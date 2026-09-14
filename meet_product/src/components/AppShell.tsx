@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink, useNavigate, useSearchParams } from "react-router";
 import {
   Bell, Calendar, CalendarDays, Compass, Home, LayoutDashboard, LogOut, Menu,
-  MessageSquare, Search, Settings, ShieldCheck, User, Video,
+  MessageSquare, Search, Settings, ShieldCheck, User, Video, Wallet,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ const teacherNav = [
   { to: "/app/calendar", label: "Calendar", icon: Calendar },
   { to: "/app/availability", label: "Availability", icon: CalendarDays },
   { to: "/app/lessons", label: "Lessons", icon: Video },
+  { to: "/app/earnings", label: "Earnings", icon: Wallet },
   { to: "/app/profile", label: "Profile", icon: User },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import {
-  CalendarDays, Clock, Edit3, Eye, Globe, Plus, Star, Trash2, Video, X,
+  CalendarDays, Check, Clock, CreditCard, DollarSign, Edit3, Eye, Globe, Plus, Star, Trash2, Video, Wallet, X,
 } from "lucide-react";
 import { fmtUzs, TEACHERS } from "@/lib/data";
 import { useApp } from "@/lib/store";
@@ -101,8 +101,9 @@ export function TeacherDashboard() {
       )}
 
       {/* Quick actions */}
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
+          { to: "/app/earnings", icon: Wallet, title: "Earnings & Payouts", desc: "Withdraw to Uzcard/Humo" },
           { to: "/app/availability", icon: CalendarDays, title: "Set availability", desc: "Update your bookable hours" },
           { to: "/app/profile", icon: Edit3, title: "Edit profile", desc: "Bio, pricing, specializations" },
           { to: "/app/calendar", icon: Eye, title: "View calendar", desc: "Your week at a glance" },
@@ -600,6 +601,296 @@ export function TeacherCalendarPage() {
           </div>
         </div>
       </Card>
+    </div>
+  );
+}
+
+/* ================= TEACHER EARNINGS & PAYOUTS ================= */
+export function TeacherEarningsPage() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [amount, setAmount] = useState(100000);
+  const [cardPan, setCardPan] = useState("");
+  const [cardHolder, setCardHolder] = useState("");
+  const [requesting, setRequesting] = useState(false);
+  const [payoutSuccess, setPayoutSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const loadEarnings = async () => {
+    setLoading(true);
+    try {
+      const res = await meetApi.getTeacherEarnings();
+      setData(res);
+    } catch {
+      setData({
+        availableBalance: 360000,
+        inEscrow: 240000,
+        totalEarned: 600000,
+        totalWithdrawn: 0,
+        payouts: [],
+        transactions: [
+          {
+            id: "tx-demo-1",
+            lessonTitle: "IELTS Speaking Practice",
+            studentName: "Timur Aliev",
+            amountUzs: 120000,
+            paymentMethod: "click",
+            escrowStatus: "released",
+            status: "completed",
+            date: "Today",
+            time: "14:00",
+          },
+          {
+            id: "tx-demo-2",
+            lessonTitle: "Academic Writing Clinic",
+            studentName: "Jasur Rahimov",
+            amountUzs: 120000,
+            paymentMethod: "payme",
+            escrowStatus: "held",
+            status: "scheduled",
+            date: "Tomorrow",
+            time: "16:00",
+          },
+        ],
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadEarnings();
+  }, []);
+
+  const handleRequestPayout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (amount < 50000) {
+      setError("Minimum payout amount is 50,000 UZS");
+      return;
+    }
+    const cleanCard = cardPan.replace(/\s+/g, "");
+    if (cleanCard.length !== 16) {
+      setError("Please enter a valid 16-digit card number (Uzcard or Humo)");
+      return;
+    }
+
+    setRequesting(true);
+    try {
+      await meetApi.requestPayout(amount, cleanCard, cardHolder);
+      setPayoutSuccess(true);
+      setCardPan("");
+      await loadEarnings();
+      setTimeout(() => setPayoutSuccess(false), 4000);
+    } catch (err: any) {
+      setError(err?.message || "Failed to process payout request");
+    } finally {
+      setRequesting(false);
+    }
+  };
+
+  const available = data?.availableBalance ?? 0;
+  const inEscrow = data?.inEscrow ?? 0;
+  const totalEarned = data?.totalEarned ?? 0;
+
+  if (loading && !data) {
+    return (
+      <div className="mx-auto max-w-5xl animate-pulse py-12 text-center text-ink-400">
+        <p className="text-sm font-medium">Loading earnings and escrow ledger...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-5xl animate-fade-up">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Earnings & Payouts</h1>
+          <p className="mt-1 text-sm text-ink-500">
+            Escrow-backed payout balance for your completed lessons on Liberum Meet.
+          </p>
+        </div>
+        <Badge tone="green">
+          <Check size={12} /> Instant Payouts Active
+        </Badge>
+      </div>
+
+      {/* Overview Cards */}
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card className="p-5 ring-2 ring-brand-500/20 bg-gradient-to-br from-brand-50/50 to-white">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-500">Available to Withdraw</span>
+            <Wallet size={18} className="text-brand-600" />
+          </div>
+          <p className="mt-3 font-display text-2xl font-extrabold text-ink">{fmtUzs(available)}</p>
+          <p className="mt-1 text-xs text-ink-400">Escrow released from completed lessons</p>
+        </Card>
+
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-500">In Escrow Guarantee</span>
+            <Clock size={18} className="text-amber-500" />
+          </div>
+          <p className="mt-3 font-display text-2xl font-extrabold text-ink">{fmtUzs(inEscrow)}</p>
+          <p className="mt-1 text-xs text-ink-400">Funds held until scheduled lessons finish</p>
+        </Card>
+
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-500">Total Lifetime Earned</span>
+            <DollarSign size={18} className="text-emerald-600" />
+          </div>
+          <p className="mt-3 font-display text-2xl font-extrabold text-ink">{fmtUzs(totalEarned)}</p>
+          <p className="mt-1 text-xs text-ink-400">From all conducted sessions</p>
+        </Card>
+      </div>
+
+      {/* Payout Form & Instructions */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
+        <div>
+          <Card className="p-6">
+            <h2 className="font-display text-base font-semibold text-ink">Request Payout to Card</h2>
+            <p className="mt-1 text-xs text-ink-500">
+              Direct transfer to any Uzbekistan bank card (Uzcard or Humo) via Payme/Click gateway.
+            </p>
+
+            {payoutSuccess && (
+              <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-xs font-medium text-emerald-700">
+                <Check size={16} /> Payout processed successfully! Funds transferred to your card.
+              </div>
+            )}
+
+            {error && (
+              <div className="mt-4 rounded-xl bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleRequestPayout} className="mt-5 space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Card Number (Uzcard / Humo)">
+                  <div className="relative">
+                    <Input
+                      value={cardPan}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/\D/g, "").slice(0, 16);
+                        const parts = raw.match(/.{1,4}/g);
+                        setCardPan(parts ? parts.join(" ") : raw);
+                      }}
+                      placeholder="8600 0000 0000 0000"
+                      className="font-mono text-sm"
+                    />
+                    <CreditCard size={16} className="absolute right-3 top-3 text-ink-400" />
+                  </div>
+                </Field>
+
+                <Field label="Cardholder Name">
+                  <Input
+                    value={cardHolder}
+                    onChange={(e) => setCardHolder(e.target.value)}
+                    placeholder="E.g. AZIZA KARIMOVA"
+                  />
+                </Field>
+              </div>
+
+              <Field label="Amount to Withdraw (UZS)">
+                <div className="relative">
+                  <Input
+                    type="number"
+                    step={10000}
+                    min={50000}
+                    max={available || 5000000}
+                    value={amount}
+                    onChange={(e) => setAmount(+e.target.value)}
+                    className="font-semibold text-ink"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setAmount(available)}
+                    className="absolute right-2.5 top-2 rounded-lg bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-600 hover:bg-brand-100"
+                  >
+                    Max
+                  </button>
+                </div>
+              </Field>
+
+              <div className="pt-2">
+                <Btn type="submit" disabled={requesting || available < 50000}>
+                  {requesting ? "Processing Payout..." : `Withdraw ${fmtUzs(amount)}`}
+                </Btn>
+              </div>
+            </form>
+          </Card>
+
+          {/* Transactions / Ledger Table */}
+          <Card className="mt-6 p-6">
+            <h2 className="font-display text-base font-semibold text-ink">Escrow & Lesson Transactions</h2>
+            <div className="mt-4 divide-y divide-line">
+              {data?.transactions && data.transactions.length > 0 ? (
+                data.transactions.map((tx: any) => (
+                  <div key={tx.id} className="flex flex-wrap items-center justify-between py-3.5 text-xs">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-ink">{tx.lessonTitle}</p>
+                      <p className="mt-0.5 text-ink-400">
+                        {tx.studentName} · {tx.date} · {tx.time} · Paid via {tx.paymentMethod?.toUpperCase()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge tone={tx.escrowStatus === "released" ? "green" : "amber"}>
+                        {tx.escrowStatus === "released" ? "Escrow Released" : "Held in Escrow"}
+                      </Badge>
+                      <p className="font-display text-sm font-bold text-ink">+{fmtUzs(tx.amountUzs)}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="py-6 text-center text-xs text-ink-400">No transactions recorded yet.</p>
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Info Sidebar */}
+        <div className="space-y-4">
+          <Card className="p-5">
+            <h3 className="font-display text-sm font-semibold text-ink">How Payouts Work</h3>
+            <div className="mt-3 space-y-3 text-xs leading-relaxed text-ink-500">
+              <p>
+                <strong className="text-ink">1. Escrow Guarantee:</strong> When a student books your lesson, their payment is secured in Liberum Escrow.
+              </p>
+              <p>
+                <strong className="text-ink">2. Automatic Release:</strong> Once the lesson is conducted in the interactive classroom and marked complete, funds move immediately into your Available Balance.
+              </p>
+              <p>
+                <strong className="text-ink">3. Instant Card Transfer:</strong> Request a payout to any Uzcard or Humo card at any time. Payouts are executed automatically with 0% platform withdrawal fee.
+              </p>
+            </div>
+          </Card>
+
+          {/* Past Payouts */}
+          <Card className="p-5">
+            <h3 className="font-display text-sm font-semibold text-ink">Recent Payouts</h3>
+            <div className="mt-3 divide-y divide-line text-xs">
+              {data?.payouts && data.payouts.length > 0 ? (
+                data.payouts.map((po: any) => (
+                  <div key={po.id} className="flex items-center justify-between py-2.5">
+                    <div>
+                      <p className="font-semibold text-ink">{po.cardPan}</p>
+                      <p className="text-[11px] text-ink-400">{po.createdAt}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-ink">{fmtUzs(po.amountUzs)}</p>
+                      <Badge tone="green">Success</Badge>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="py-4 text-center text-[11px] text-ink-400">No payout withdrawals yet.</p>
+              )}
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

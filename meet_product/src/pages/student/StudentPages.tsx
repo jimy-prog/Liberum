@@ -44,9 +44,22 @@ export function LessonCard({ lesson, perspective }: { lesson: Lesson; perspectiv
         <p className="mt-0.5 text-[13px] text-ink-500">
           {perspective === "student" ? "with" : "student"} <span className="font-medium text-ink">{other}</span>
         </p>
-        <p className="mt-1 flex items-center gap-3 text-xs text-ink-400">
+        <p className="mt-1 flex flex-wrap items-center gap-2.5 text-xs text-ink-400">
           <span className="inline-flex items-center gap-1"><CalendarDays size={12} /> {lesson.date}</span>
           <span className="inline-flex items-center gap-1"><Clock size={12} /> {lesson.time} · {lesson.durationMin} min</span>
+          {lesson.priceUzs > 0 && (
+            <span className="font-medium text-ink">{fmtUzs(lesson.priceUzs)}</span>
+          )}
+          {lesson.escrowStatus === "held" && (
+            <span className="inline-flex items-center gap-1 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+              Escrow Held
+            </span>
+          )}
+          {lesson.escrowStatus === "released" && (
+            <span className="inline-flex items-center gap-1 rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+              Paid · Escrow Released
+            </span>
+          )}
         </p>
       </div>
       {joinable ? (
@@ -482,6 +495,7 @@ export function BookingPage() {
   const [lessonId, setLessonId] = useState(params.get("lesson") ?? defaultTeacher.lessons[0]?.id ?? "l1");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"click" | "payme" | "balance">("click");
   const [done, setDone] = useState(false);
 
   useEffect(() => {
@@ -666,12 +680,13 @@ export function BookingPage() {
                   { id: "click", name: "Click", tag: "Uzcard / Humo" },
                   { id: "payme", name: "Payme", tag: "Instant" },
                   { id: "balance", name: "Liberum Pay", tag: "0% Fee" },
-                ].map((pm, idx) => (
+                ].map((pm) => (
                   <div
                     key={pm.id}
+                    onClick={() => setPaymentMethod(pm.id as any)}
                     className={cn(
-                      "cursor-pointer rounded-xl border p-3 transition",
-                      idx === 0 ? "border-brand-500 bg-brand-50/50 ring-2 ring-brand-500/20" : "border-line bg-white hover:border-ink-300"
+                      "cursor-pointer rounded-xl border p-3 transition active:scale-[0.98]",
+                      paymentMethod === pm.id ? "border-brand-500 bg-brand-50/50 ring-2 ring-brand-500/20" : "border-line bg-white hover:border-ink-300"
                     )}
                   >
                     <p className="text-xs font-bold text-ink">{pm.name}</p>
@@ -689,11 +704,11 @@ export function BookingPage() {
               <Btn
                 size="lg"
                 onClick={() => {
-                  bookLesson({ teacherId: t.id, lessonOptionId: lessonId, date, time });
+                  bookLesson({ teacherId: t.id, lessonOptionId: lessonId, date, time, paymentMethod });
                   setDone(true);
                 }}
               >
-                <Check size={15} /> Confirm & Book Lesson
+                <Check size={15} /> Confirm & Pay with {paymentMethod === "click" ? "Click" : paymentMethod === "payme" ? "Payme" : "Liberum Pay"}
               </Btn>
             </div>
           </div>
