@@ -55,31 +55,135 @@ export default function ClassroomPage() {
   const otherName = lesson ? (iAmTeacher ? lesson.studentName : lesson.teacherName) : "Aziza Karimova";
   const otherInitials = otherName.split(" ").map((w) => w[0]).join("").slice(0, 2);
 
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const screenStreamRef = useRef<MediaStream | null>(null);
+  const pcRef = useRef<RTCPeerConnection | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [peerConnected, setPeerConnected] = useState(false);
 
-  // Real local camera when available (graceful fallback to avatar tile)
+  // WebRTC ICE Servers Configuration (Google STUN)
+  const rtcConfig: RTCConfiguration = {
+    iceServers: [
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun1.l.google.com:19302" },
+      { urls: "stun:stun2.l.google.com:19302" },
+    ],
+  };
+
+  // Real local camera & microphone
   useEffect(() => {
     if (!camOn) {
       streamRef.current?.getVideoTracks().forEach((t) => (t.enabled = false));
-      return;
+    } else {
+      streamRef.current?.getVideoTracks().forEach((t) => (t.enabled = true));
     }
-    if (streamRef.current) {
-      streamRef.current.getVideoTracks().forEach((t) => (t.enabled = true));
-      return;
+  }, [camOn]);
+
+  useEffect(() => {
+    if (!micOn) {
+      streamRef.current?.getAudioTracks().forEach((t) => (t.enabled = false));
+    } else {
+      streamRef.current?.getAudioTracks().forEach((t) => (t.enabled = true));
     }
-    navigator.mediaDevices
-      ?.getUserMedia({ video: true, audio: true })
-      .then((stream) => {
+  }, [micOn]);
+
+  // Initialize Media and WebRTC Peer Connection + WebSocket Tunnel
+  useEffect(() => {
+    let active = true;
+
+    async function initMediaAndSignaling() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (!active) return;
         streamRef.current = stream;
         if (videoRef.current) videoRef.current.srcObject = stream;
         setHasStream(true);
-      })
-      .catch(() => setHasStream(false));
+
+        // Setup RTCPeerConnection
+        const pc = new RTCPeerConnection(rtcConfig);
+        pcRef.current = pc;
+
+        stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+
+        // When remote peer tracks arrive
+        pc.ontrack = (event) => {
+          if (event.streams && event.streams[0]) {
+            setRemoteStream(event.streams[0]);
+            if (remoteVideoRef.current) {
+              remoteVideoRef.current.srcObject = event.streams[0];
+            }
+          }
+        };
+
+        pc.oniceconnectionstatechange = () => {
+          if (pc.iceConnectionState === "connected" || pc.iceConnectionState === "completed") {
+            setPeerConnected(true);
+            setConn("excellent");
+          } else if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
+            setPeerConnected(false);
+            setConn("weak");
+          }
+        };
+
+        // Connect WebSocket Signaling tunnel
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//${window.location.host}/api/meet/classroom/${lessonId || "room-1"}/signal`;
+        const ws = new WebSocket(wsUrl);
+        wsRef.current = ws;
+
+        pc.onicecandidate = (event) => {
+          if (event.candidate && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: "ice-candidate", candidate: event.candidate }));
+          }
+        };
+
+        ws.onmessage = async (evt) => {
+          try {
+            const data = JSON.parse(evt.data);
+            if (data.type === "peer-joined") {
+              // Create Offer
+              const offer = await pc.createOffer();
+              await pc.setLocalDescription(offer);
+              ws.send(JSON.stringify({ type: "sdp-offer", sdp: offer }));
+            } else if (data.type === "sdp-offer") {
+              // Remote peer sent offer, create answer
+              await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+              const answer = await pc.createAnswer();
+              await pc.setLocalDescription(answer);
+              ws.send(JSON.stringify({ type: "sdp-answer", sdp: answer }));
+            } else if (data.type === "sdp-answer") {
+              // Remote peer accepted our offer
+              await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+            } else if (data.type === "ice-candidate") {
+              // Add ICE Candidate
+              if (data.candidate) {
+                await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+              }
+            } else if (data.type === "peer-left") {
+              setPeerConnected(false);
+              setRemoteStream(null);
+            }
+          } catch (err) {
+            console.error("Signaling error:", err);
+          }
+        };
+      } catch (e) {
+        console.warn("User denied camera/mic or no devices available:", e);
+        setHasStream(false);
+      }
+    }
+
+    initMediaAndSignaling();
+
     return () => {
+      active = false;
       streamRef.current?.getTracks().forEach((t) => t.stop());
       screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+      pcRef.current?.close();
+      wsRef.current?.close();
     };
-  }, [camOn]);
+  }, [lessonId]);
 
   const handleToggleShare = async () => {
     if (sharing) {
@@ -89,6 +193,12 @@ export default function ClassroomPage() {
       if (videoRef.current && streamRef.current) {
         videoRef.current.srcObject = streamRef.current;
       }
+      // Re-replace track in WebRTC
+      if (pcRef.current && streamRef.current) {
+        const videoTrack = streamRef.current.getVideoTracks()[0];
+        const sender = pcRef.current.getSenders().find((s) => s.track?.kind === "video");
+        if (sender && videoTrack) sender.replaceTrack(videoTrack);
+      }
     } else {
       try {
         const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
@@ -97,26 +207,28 @@ export default function ClassroomPage() {
         if (videoRef.current) {
           videoRef.current.srcObject = screenStream;
         }
+        // Send screen track over WebRTC tunnel
+        if (pcRef.current) {
+          const screenVideoTrack = screenStream.getVideoTracks()[0];
+          const sender = pcRef.current.getSenders().find((s) => s.track?.kind === "video");
+          if (sender && screenVideoTrack) sender.replaceTrack(screenVideoTrack);
+        }
         screenStream.getVideoTracks()[0].onended = () => {
           setSharing(false);
           if (videoRef.current && streamRef.current) {
             videoRef.current.srcObject = streamRef.current;
           }
+          if (pcRef.current && streamRef.current) {
+            const videoTrack = streamRef.current.getVideoTracks()[0];
+            const sender = pcRef.current.getSenders().find((s) => s.track?.kind === "video");
+            if (sender && videoTrack) sender.replaceTrack(videoTrack);
+          }
         };
       } catch {
-        // User cancelled or screen sharing not permitted
         setSharing(false);
       }
     }
   };
-
-  // Demo: fluctuate connection subtly
-  useEffect(() => {
-    const id = setInterval(() => {
-      setConn((c) => (c === "excellent" && Math.random() > 0.85 ? "good" : "excellent"));
-    }, 9000);
-    return () => clearInterval(id);
-  }, []);
 
   useEffect(() => {
     if (ended) return;
@@ -244,20 +356,28 @@ export default function ClassroomPage() {
             <div className="grid min-h-0 gap-3 sm:grid-cols-2 sm:gap-4">
               {/* Other participant */}
               <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-900 via-[#1B1440] to-[#0E0F13] ring-1 ring-white/10">
-                <div className="bg-grid-dark absolute inset-0 opacity-30" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <Avatar initials={otherInitials} color="#7B61FF" size="xl" className="h-24 w-24 text-2xl ring-4 ring-white/10" />
-                  <div className="mt-4 flex items-end gap-1" aria-hidden>
-                    {[0.9, 0.6, 1.1, 0.7, 1.0].map((d, i) => (
-                      <span key={i} className="eq-bar h-3.5 w-1 rounded-full bg-brand-400" style={{ animationDelay: `${d * 0.3}s`, animationDuration: `${d}s` }} />
-                    ))}
-                  </div>
-                </div>
+                {remoteStream && peerConnected ? (
+                  <video ref={remoteVideoRef} autoPlay playsInline className="h-full w-full object-cover" />
+                ) : (
+                  <>
+                    <div className="bg-grid-dark absolute inset-0 opacity-30" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <Avatar initials={otherInitials} color="#7B61FF" size="xl" className="h-24 w-24 text-2xl ring-4 ring-white/10" />
+                      <div className="mt-4 flex items-end gap-1" aria-hidden>
+                        {[0.9, 0.6, 1.1, 0.7, 1.0].map((d, i) => (
+                          <span key={i} className="eq-bar h-3.5 w-1 rounded-full bg-brand-400" style={{ animationDelay: `${d * 0.3}s`, animationDuration: `${d}s` }} />
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full bg-black/50 px-3 py-1.5 text-xs font-medium backdrop-blur">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#4ADE80]" />
-                  {otherName} {iAmTeacher ? "· Student" : "· Teacher"}
+                  <span className={cn("h-1.5 w-1.5 rounded-full", peerConnected ? "bg-[#4ADE80]" : "bg-brand-400 animate-pulse")} />
+                  {otherName} {iAmTeacher ? "· Student" : "· Teacher"} {peerConnected ? "(Live)" : "(Waiting...)"}
                 </div>
-                <div className="absolute right-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-medium text-white/70 backdrop-blur">1080p</div>
+                <div className="absolute right-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-medium text-white/70 backdrop-blur">
+                  {peerConnected ? "WebRTC P2P" : "1080p"}
+                </div>
               </div>
 
               {/* Self */}

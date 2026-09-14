@@ -1,9 +1,17 @@
 import json
 import uuid
 from datetime import datetime
-from typing import List, Optional
+from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Request,
+    Response,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from pydantic import BaseModel
 from sqlalchemy.orm import joinedload
 
@@ -891,6 +899,57 @@ async def send_classroom_message(
         }
     finally:
         db.close()
+
+
+# -------------------------------------------------------------
+# WEBRTC SIGNALING (ROOM TUNNEL)
+# -------------------------------------------------------------
+class ClassroomSignalingManager:
+    def __init__(self):
+        # room_id -> list of active WebSocket connections
+        self.rooms: Dict[str, List[WebSocket]] = {}
+
+    async def connect(self, room_id: str, websocket: WebSocket):
+        await websocket.accept()
+        if room_id not in self.rooms:
+            self.rooms[room_id] = []
+        self.rooms[room_id].append(websocket)
+
+    def disconnect(self, room_id: str, websocket: WebSocket):
+        if room_id in self.rooms:
+            if websocket in self.rooms[room_id]:
+                self.rooms[room_id].remove(websocket)
+            if len(self.rooms[room_id]) == 0:
+                del self.rooms[room_id]
+
+    async def broadcast_to_peers(self, room_id: str, sender: WebSocket, message: dict):
+        if room_id in self.rooms:
+            for connection in self.rooms[room_id]:
+                if connection != sender:
+                    try:
+                        await connection.send_json(message)
+                    except Exception:
+                        pass
+
+
+signaling_hub = ClassroomSignalingManager()
+
+
+@router.websocket("/classroom/{lesson_id}/signal")
+async def classroom_signaling(websocket: WebSocket, lesson_id: str):
+    await signaling_hub.connect(lesson_id, websocket)
+    # Notify peer that a new participant joined
+    await signaling_hub.broadcast_to_peers(lesson_id, websocket, {"type": "peer-joined"})
+    try:
+        while True:
+            data = await websocket.receive_json()
+            # Forward SDP offers, SDP answers, ICE candidates, and mute signals to the other peer
+            await signaling_hub.broadcast_to_peers(lesson_id, websocket, data)
+    except WebSocketDisconnect:
+        signaling_hub.disconnect(lesson_id, websocket)
+        await signaling_hub.broadcast_to_peers(lesson_id, websocket, {"type": "peer-left"})
+    except Exception:
+        signaling_hub.disconnect(lesson_id, websocket)
 
 
 # -------------------------------------------------------------
