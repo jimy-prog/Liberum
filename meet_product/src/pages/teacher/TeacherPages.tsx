@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import {
   CalendarDays, Clock, Edit3, Eye, Globe, Plus, Star, Trash2, Video, X,
@@ -39,6 +39,17 @@ export function TeacherDashboard() {
   const todays = lessons.filter((l) => l.date === "Today");
   const upcoming = lessons.filter((l) => l.status === "scheduled" || l.status === "starting-soon");
   const next = todays[0] ?? upcoming[0];
+  const [stats, setStats] = useState<any>(null);
+
+  useEffect(() => {
+    meetApi.getTeacherStats()
+      .then((data) => setStats(data))
+      .catch(() => {});
+  }, [lessons]);
+
+  const earnings = stats ? stats.earnings : lessons.filter(l => l.status === "completed").reduce((acc, l) => acc + (l.priceUzs || 0), 0);
+  const ratingVal = stats?.rating || 4.9;
+  const reviewsCount = stats?.reviewsCount || 86;
 
   return (
     <div className="mx-auto max-w-5xl animate-fade-up">
@@ -51,9 +62,9 @@ export function TeacherDashboard() {
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
           { label: "Lessons today", value: String(todays.length), icon: Video },
-          { label: "This week", value: String(upcoming.length + 3), icon: CalendarDays },
-          { label: "Rating", value: `${ME.rating} · ${ME.reviewsCount} reviews`, icon: Star },
-          { label: "Est. earnings · Aug", value: fmtUzs(1840000).replace(" UZS", "") + " UZS", icon: Clock },
+          { label: "This week", value: String(upcoming.length), icon: CalendarDays },
+          { label: "Rating", value: `${ratingVal} · ${reviewsCount} reviews`, icon: Star },
+          { label: "Total earnings", value: fmtUzs(earnings).replace(" UZS", "") + " UZS", icon: Clock },
         ].map((s) => (
           <Card key={s.label} className="p-4">
             <s.icon size={15} className="text-brand-500" />
@@ -351,6 +362,21 @@ export function TeacherProfileEditor() {
     setLessons(p => p.map(l => l.id === id ? { ...l, priceUzs: newPrice } : l));
   };
 
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(profile.avatarUrl);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        setAvatarUrl(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-3xl animate-fade-up">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -369,9 +395,18 @@ export function TeacherProfileEditor() {
 
       <Card className="mt-6 p-6">
         <div className="flex items-center gap-5">
-          <Avatar initials={profile.initials} color={profile.color} size="xl" />
+          <Avatar initials={profile.initials} src={avatarUrl} color={profile.color} size="xl" />
           <div>
-            <Btn variant="outline" size="sm">Change photo</Btn>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoUpload}
+            />
+            <Btn variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+              Change photo
+            </Btn>
             <p className="mt-2 text-xs text-ink-400">Square photo, at least 400×400. Friendly and professional works best.</p>
           </div>
         </div>
@@ -435,34 +470,87 @@ export function TeacherProfileEditor() {
 
 /* ================= CALENDAR ================= */
 export function TeacherCalendarPage() {
-  const days = ["Mon 24", "Tue 25", "Wed 26", "Thu 27", "Fri 28", "Sat 29", "Sun 30"];
+  const { lessons } = useApp();
+  const [availabilities, setAvailabilities] = useState<{ day: string; enabled: boolean; ranges: { start: string; end: string }[] }[]>([]);
+
+  useEffect(() => {
+    meetApi.getMyAvailability()
+      .then((data) => {
+        if (data && data.length > 0) setAvailabilities(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Compute current week dates
+  const today = new Date();
+  const currentDayOfWeek = (today.getDay() + 6) % 7; // 0 = Mon, 6 = Sun
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - currentDayOfWeek);
+
+  const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const weekDays = dayNames.map((d, i) => {
+    const dt = new Date(monday);
+    dt.setDate(monday.getDate() + i);
+    return {
+      dayCode: d,
+      label: `${d} ${dt.getDate()}`,
+      dayNum: dt.getDate(),
+      month: dt.toLocaleString("en-US", { month: "short" }),
+      dateStr: dt.toISOString().split("T")[0],
+    };
+  });
+
   const hours = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"];
-  const events: Record<string, { title: string; student: string; row: number; span: number; live?: boolean }[]> = {
-    "Mon 24": [{ title: "IELTS Speaking", student: "Madina R.", row: 0, span: 2 }],
-    "Tue 25": [{ title: "Trial Lesson", student: "Sofia K.", row: 6, span: 1 }],
-    "Wed 26": [{ title: "Writing Clinic", student: "Bekzod A.", row: 6, span: 2 }],
-    "Thu 27": [{ title: "IELTS Speaking", student: "Jasur T.", row: 7, span: 2, live: true }],
-    "Sat 29": [{ title: "IELTS Speaking", student: "Group · 4", row: 1, span: 2 }],
+
+  // Map availability ranges to hour slots (0..10)
+  const isAvailableSlot = (dayCode: string, hourIndex: number) => {
+    const avail = availabilities.find((a) => a.day === dayCode && a.enabled);
+    if (!avail) return false;
+    const slotHour = 9 + hourIndex;
+    return avail.ranges.some((r) => {
+      const sH = parseInt(r.start.split(":")[0]);
+      const eH = parseInt(r.end.split(":")[0]);
+      return slotHour >= sH && slotHour < eH;
+    });
   };
-  const availabilityMap: Record<string, [number, number][]> = {
-    "Mon 24": [[0, 3], [6, 10]],
-    "Tue 25": [[0, 4]],
-    "Wed 26": [[5, 10]],
-    "Thu 27": [[0, 3], [6, 9]],
-    "Fri 28": [[1, 5]],
-    "Sat 29": [[1, 7]],
-  };
+
+  // Map real lessons to week days
+  const eventsByDay: Record<string, { title: string; student: string; row: number; span: number; live?: boolean }[]> = {};
+  lessons.forEach((l) => {
+    // Check if lesson falls on one of the week days or matches dayCode/date
+    const targetDay = weekDays.find((wd) => l.date === wd.dateStr || l.date.includes(wd.dayCode) || l.date.includes(String(wd.dayNum)));
+    const key = targetDay ? targetDay.dayCode : null;
+    if (key) {
+      const startH = parseInt(l.time.split(":")[0]) || 10;
+      const row = Math.max(0, Math.min(hours.length - 1, startH - 9));
+      const span = Math.max(1, Math.round((l.durationMin || 60) / 60));
+      if (!eventsByDay[key]) eventsByDay[key] = [];
+      eventsByDay[key].push({
+        title: l.title,
+        student: l.studentName,
+        row,
+        span,
+        live: l.status === "scheduled" && l.date === new Date().toISOString().split("T")[0],
+      });
+    }
+  });
 
   return (
     <div className="mx-auto max-w-6xl animate-fade-up">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Calendar</h1>
-          <p className="mt-1.5 text-sm text-ink-500">Week of Aug 24 – 30 · UTC+5</p>
+          <p className="mt-1.5 text-sm text-ink-500">
+            Week of {weekDays[0].month} {weekDays[0].dayNum} – {weekDays[6].month} {weekDays[6].dayNum} · UTC+5
+          </p>
         </div>
         <div className="flex items-center gap-4 text-xs text-ink-400">
-          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-brand-100 ring-1 ring-brand-200" /> Available</span>
-          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-brand-500" /> Lesson</span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-sm bg-brand-100 ring-1 ring-brand-200" /> Bookable window
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-sm bg-brand-500" /> Booked lesson
+          </span>
         </div>
       </div>
 
@@ -470,10 +558,10 @@ export function TeacherCalendarPage() {
         <div className="min-w-[820px]">
           <div className="grid grid-cols-[64px_repeat(7,1fr)] border-b border-line">
             <div className="p-3" />
-            {days.map((d) => (
-              <div key={d} className="border-l border-line p-3 text-center">
-                <p className="font-display text-[13px] font-semibold text-ink">{d.split(" ")[0]}</p>
-                <p className="text-[11px] text-ink-400">Aug {d.split(" ")[1]}</p>
+            {weekDays.map((wd) => (
+              <div key={wd.dayCode} className="border-l border-line p-3 text-center">
+                <p className="font-display text-[13px] font-semibold text-ink">{wd.dayCode}</p>
+                <p className="text-[11px] text-ink-400">{wd.month} {wd.dayNum}</p>
               </div>
             ))}
           </div>
@@ -483,17 +571,17 @@ export function TeacherCalendarPage() {
                 <div key={h} className="h-12 border-b border-line pr-2 pt-1 text-right text-[10px] font-medium text-ink-300">{h}</div>
               ))}
             </div>
-            {days.map((d) => (
-              <div key={d} className="relative border-l border-line">
+            {weekDays.map((wd) => (
+              <div key={wd.dayCode} className="relative border-l border-line">
                 {hours.map((h, i) => {
-                  const avail = (availabilityMap[d] ?? []).some(([s, e]) => i >= s && i < e);
+                  const avail = isAvailableSlot(wd.dayCode, i);
                   return <div key={h} className={cn("h-12 border-b border-line", avail && "bg-brand-50/70")} />;
                 })}
-                {(events[d] ?? []).map((ev, i) => (
+                {(eventsByDay[wd.dayCode] ?? []).map((ev, i) => (
                   <div
                     key={i}
                     className={cn(
-                      "absolute left-1 right-1 rounded-lg p-2 text-white shadow-sm",
+                      "absolute left-1 right-1 rounded-lg p-2 text-white shadow-sm z-10",
                       ev.live ? "bg-gradient-to-br from-brand-500 to-brand-700 ring-2 ring-brand-300" : "bg-brand-500/90"
                     )}
                     style={{ top: ev.row * 48 + 2, height: ev.span * 48 - 6 }}

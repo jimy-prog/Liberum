@@ -39,6 +39,7 @@ export interface Teacher {
   verified: boolean;
   online: boolean;
   color: string; // avatar tint
+  avatarUrl?: string;
   lessons: LessonOption[];
   availability: DayAvailability[];
   nextAvailable: string;

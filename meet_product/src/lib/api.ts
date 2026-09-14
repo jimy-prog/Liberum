@@ -53,6 +53,13 @@ export const meetApi = {
     });
   },
 
+  async updateAccount(data: { name?: string; language?: string }) {
+    return request<{ success: boolean; user: User }>("/auth/account", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
+
   // Teachers
   async listTeachers() {
     return request<Teacher[]>("/teachers");
@@ -138,6 +145,52 @@ export const meetApi = {
   async markNotificationsRead() {
     return request<{ success: boolean }>("/notifications/mark-read", {
       method: "POST",
+    });
+  },
+
+  // Stats
+  async getTeacherStats() {
+    return request<{
+      lessonsToday: number;
+      thisWeek: number;
+      rating: number;
+      reviewsCount: number;
+      earnings: number;
+    }>("/teacher/stats");
+  },
+
+  // Direct Messages
+  async listDirectMessages() {
+    return request<{
+      userId: number;
+      name: string;
+      role: string;
+      initials: string;
+      color: string;
+      last: string;
+      time: string;
+      unread: number;
+    }[]>("/messages");
+  },
+
+  async getThreadMessages(contactId: number) {
+    return request<{
+      id: number;
+      from: "me" | "them";
+      text: string;
+      time: string;
+    }[]>(`/messages/${contactId}`);
+  },
+
+  async sendDirectMessage(recipientId: number, message: string) {
+    return request<{
+      id: number;
+      from: "me";
+      text: string;
+      time: string;
+    }>("/messages", {
+      method: "POST",
+      body: JSON.stringify({ recipient_id: recipientId, message }),
     });
   },
 };

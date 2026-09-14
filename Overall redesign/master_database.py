@@ -502,3 +502,16 @@ class MeetClassMessage(MasterBase):
     booking = relationship("MeetBooking", back_populates="chat_messages")
     sender = relationship("User", foreign_keys=[sender_id])
 
+
+class MeetDirectMessage(MasterBase):
+    __tablename__ = "meet_direct_messages"
+    id = Column(Integer, primary_key=True)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    recipient_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    message = Column(String, nullable=False)
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    sender = relationship("User", foreign_keys=[sender_id])
+    recipient = relationship("User", foreign_keys=[recipient_id])
+

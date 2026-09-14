@@ -18,6 +18,7 @@ from master_database import (
     MeetAvailability,
     MeetBooking,
     MeetClassMessage,
+    MeetDirectMessage,
     MeetLessonOption,
     MeetNotification,
     MeetTeacherProfile,
@@ -478,6 +479,38 @@ async def meet_logout(response: Response):
     return {"success": True}
 
 
+class AccountSettingsUpdateSchema(BaseModel):
+    name: Optional[str] = None
+    language: Optional[str] = None
+
+
+@router.put("/auth/account")
+async def meet_update_account(data: AccountSettingsUpdateSchema, user: User = Depends(get_meet_user)):
+    db = SessionMaster()
+    try:
+        u = db.query(User).filter(User.id == user.id).first()
+        if not u:
+            raise HTTPException(status_code=404, detail="User not found")
+        if data.name and data.name.strip():
+            u.full_name = data.name.strip()
+        db.commit()
+        db.refresh(u)
+        parts = (u.full_name or "").split(" ")
+        initials = "".join([p[0].upper() for p in parts if p])[:2] or "U"
+        return {
+            "success": True,
+            "user": {
+                "id": str(u.id),
+                "name": u.full_name,
+                "email": u.email,
+                "role": u.role,
+                "initials": initials,
+            }
+        }
+    finally:
+        db.close()
+
+
 # -------------------------------------------------------------
 # TEACHER DISCOVERY & PROFILES
 # -------------------------------------------------------------
@@ -898,5 +931,171 @@ async def mark_notifications_read(user: User = Depends(get_meet_user)):
         ).update({"read": True})
         db.commit()
         return {"success": True}
+    finally:
+        db.close()
+
+
+# -------------------------------------------------------------
+# TEACHER DASHBOARD STATS
+# -------------------------------------------------------------
+@router.get("/teacher/stats")
+async def get_teacher_stats(user: User = Depends(get_meet_user)):
+    db = SessionMaster()
+    try:
+        tp = db.query(MeetTeacherProfile).filter(MeetTeacherProfile.user_id == user.id).first()
+        if not tp:
+            return {
+                "lessonsToday": 0,
+                "thisWeek": 0,
+                "rating": 5.0,
+                "reviewsCount": 0,
+                "earnings": 0,
+            }
+
+        bookings = db.query(MeetBooking).filter(MeetBooking.teacher_id == tp.id).all()
+        todays = [b for b in bookings if b.date_str == "Today"]
+        upcoming = [b for b in bookings if b.status in ("scheduled", "starting-soon", "live")]
+        completed = [b for b in bookings if b.status == "completed"]
+        earnings = sum(b.price_uzs for b in completed)
+
+        return {
+            "lessonsToday": len(todays),
+            "thisWeek": len(upcoming) + len(todays),
+            "rating": round(tp.rating, 1),
+            "reviewsCount": tp.reviews_count,
+            "earnings": earnings,
+        }
+    finally:
+        db.close()
+
+
+# -------------------------------------------------------------
+# DIRECT MESSAGES
+# -------------------------------------------------------------
+class SendDirectMessageSchema(BaseModel):
+    recipient_id: int
+    message: str
+
+
+@router.get("/messages")
+async def list_direct_messages(user: User = Depends(get_meet_user)):
+    db = SessionMaster()
+    try:
+        # Find all users that the current user has chatted with
+        sent = db.query(MeetDirectMessage.recipient_id).filter(MeetDirectMessage.sender_id == user.id).distinct().all()
+        received = db.query(MeetDirectMessage.sender_id).filter(MeetDirectMessage.recipient_id == user.id).distinct().all()
+        contact_ids = set([r[0] for r in sent] + [r[0] for r in received])
+
+        # If empty, also pull instructors or students from bookings so they can message each other
+        if user.role == "student":
+            teacher_profiles = db.query(MeetTeacherProfile).limit(5).all()
+            for tp in teacher_profiles:
+                contact_ids.add(tp.user_id)
+        else:
+            student_users = db.query(User).filter(User.role == "student").limit(5).all()
+            for s in student_users:
+                contact_ids.add(s.id)
+
+        contacts = db.query(User).filter(User.id.in_(contact_ids)).all() if contact_ids else []
+
+        threads = []
+        for c in contacts:
+            last_msg = (
+                db.query(MeetDirectMessage)
+                .filter(
+                    ((MeetDirectMessage.sender_id == user.id) & (MeetDirectMessage.recipient_id == c.id))
+                    | ((MeetDirectMessage.sender_id == c.id) & (MeetDirectMessage.recipient_id == user.id))
+                )
+                .order_by(MeetDirectMessage.created_at.desc())
+                .first()
+            )
+
+            unread = (
+                db.query(MeetDirectMessage)
+                .filter(
+                    MeetDirectMessage.sender_id == c.id,
+                    MeetDirectMessage.recipient_id == user.id,
+                    MeetDirectMessage.is_read == False,
+                )
+                .count()
+            )
+
+            parts = (c.full_name or "User").split(" ")
+            initials = "".join([p[0].upper() for p in parts if p])[:2] or "U"
+            color = "#7B61FF" if c.role == "teacher" else "#1FAD55"
+
+            threads.append({
+                "userId": c.id,
+                "name": c.full_name,
+                "role": c.role,
+                "initials": initials,
+                "color": color,
+                "last": last_msg.message if last_msg else "Start a conversation",
+                "time": last_msg.created_at.strftime("%H:%M") if last_msg else "",
+                "unread": unread,
+            })
+
+        return threads
+    finally:
+        db.close()
+
+
+@router.get("/messages/{contact_id}")
+async def get_thread_messages(contact_id: int, user: User = Depends(get_meet_user)):
+    db = SessionMaster()
+    try:
+        # Mark as read
+        db.query(MeetDirectMessage).filter(
+            MeetDirectMessage.sender_id == contact_id,
+            MeetDirectMessage.recipient_id == user.id,
+            MeetDirectMessage.is_read == False,
+        ).update({"is_read": True})
+        db.commit()
+
+        msgs = (
+            db.query(MeetDirectMessage)
+            .filter(
+                ((MeetDirectMessage.sender_id == user.id) & (MeetDirectMessage.recipient_id == contact_id))
+                | ((MeetDirectMessage.sender_id == contact_id) & (MeetDirectMessage.recipient_id == user.id))
+            )
+            .order_by(MeetDirectMessage.created_at.asc())
+            .all()
+        )
+
+        return [
+            {
+                "id": m.id,
+                "from": "me" if m.sender_id == user.id else "them",
+                "text": m.message,
+                "time": m.created_at.strftime("%H:%M"),
+            }
+            for m in msgs
+        ]
+    finally:
+        db.close()
+
+
+@router.post("/messages")
+async def send_direct_message(data: SendDirectMessageSchema, user: User = Depends(get_meet_user)):
+    if not data.message.strip():
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+
+    db = SessionMaster()
+    try:
+        msg = MeetDirectMessage(
+            sender_id=user.id,
+            recipient_id=data.recipient_id,
+            message=data.message.strip(),
+        )
+        db.add(msg)
+        db.commit()
+        db.refresh(msg)
+
+        return {
+            "id": msg.id,
+            "from": "me",
+            "text": msg.message,
+            "time": msg.created_at.strftime("%H:%M"),
+        }
     finally:
         db.close()

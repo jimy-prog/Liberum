@@ -10,6 +10,7 @@ interface AppState {
   loginWithBackend: (email: string, password: string) => Promise<User>;
   registerWithBackend: (name: string, email: string, password: string, role: Role) => Promise<User>;
   signOut: () => Promise<void>;
+  updateUser: (name: string) => Promise<void>;
   lessons: Lesson[];
   bookLesson: (draft: BookingDraft) => Promise<Lesson>;
   completeLesson: (id: string) => Promise<void>;
@@ -125,6 +126,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("lm-user");
   };
 
+  const updateUser = async (name: string) => {
+    try {
+      const res = await meetApi.updateAccount({ name });
+      if (res.user) {
+        setUser(res.user);
+        localStorage.setItem("lm-user", JSON.stringify(res.user));
+      }
+    } catch {
+      if (user) {
+        const updated = { ...user, name };
+        setUser(updated);
+        localStorage.setItem("lm-user", JSON.stringify(updated));
+      }
+    }
+  };
+
   const bookLesson = async (draft: BookingDraft) => {
     try {
       const newLesson = await meetApi.bookLesson(draft);
@@ -181,6 +198,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     loginWithBackend,
     registerWithBackend,
     signOut,
+    updateUser,
     lessons,
     bookLesson,
     completeLesson,

@@ -55,18 +55,60 @@ export default function ClassroomPage() {
   const otherName = lesson ? (iAmTeacher ? lesson.studentName : lesson.teacherName) : "Aziza Karimova";
   const otherInitials = otherName.split(" ").map((w) => w[0]).join("").slice(0, 2);
 
+  const screenStreamRef = useRef<MediaStream | null>(null);
+
   // Real local camera when available (graceful fallback to avatar tile)
   useEffect(() => {
+    if (!camOn) {
+      streamRef.current?.getVideoTracks().forEach((t) => (t.enabled = false));
+      return;
+    }
+    if (streamRef.current) {
+      streamRef.current.getVideoTracks().forEach((t) => (t.enabled = true));
+      return;
+    }
     navigator.mediaDevices
-      ?.getUserMedia({ video: true, audio: false })
+      ?.getUserMedia({ video: true, audio: true })
       .then((stream) => {
         streamRef.current = stream;
         if (videoRef.current) videoRef.current.srcObject = stream;
         setHasStream(true);
       })
       .catch(() => setHasStream(false));
-    return () => streamRef.current?.getTracks().forEach((t) => t.stop());
-  }, []);
+    return () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, [camOn]);
+
+  const handleToggleShare = async () => {
+    if (sharing) {
+      screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+      screenStreamRef.current = null;
+      setSharing(false);
+      if (videoRef.current && streamRef.current) {
+        videoRef.current.srcObject = streamRef.current;
+      }
+    } else {
+      try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        screenStreamRef.current = screenStream;
+        setSharing(true);
+        if (videoRef.current) {
+          videoRef.current.srcObject = screenStream;
+        }
+        screenStream.getVideoTracks()[0].onended = () => {
+          setSharing(false);
+          if (videoRef.current && streamRef.current) {
+            videoRef.current.srcObject = streamRef.current;
+          }
+        };
+      } catch {
+        // User cancelled or screen sharing not permitted
+        setSharing(false);
+      }
+    }
+  };
 
   // Demo: fluctuate connection subtly
   useEffect(() => {
@@ -245,7 +287,7 @@ export default function ClassroomPage() {
           <div className="mt-3 flex shrink-0 items-center justify-center gap-2.5 sm:mt-4 sm:gap-3">
             <CtrlButton active={micOn} onClick={() => setMicOn((v) => !v)} label={micOn ? "Mute" : "Unmute"} offIcon={<MicOff size={19} />} onIcon={<Mic size={19} />} danger={!micOn} />
             <CtrlButton active={camOn} onClick={() => setCamOn((v) => !v)} label={camOn ? "Stop video" : "Start video"} offIcon={<VideoOff size={19} />} onIcon={<Video size={19} />} danger={!camOn} />
-            <CtrlButton active={sharing} onClick={() => setSharing((v) => !v)} label={sharing ? "Stop sharing" : "Share screen"} onIcon={<MonitorUp size={19} />} highlight={sharing} />
+            <CtrlButton active={sharing} onClick={handleToggleShare} label={sharing ? "Stop sharing" : "Share screen"} onIcon={<MonitorUp size={19} />} highlight={sharing} />
             <CtrlButton active={chatOpen} onClick={() => setChatOpen((v) => !v)} label="Chat" onIcon={
               <span className="relative">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg>

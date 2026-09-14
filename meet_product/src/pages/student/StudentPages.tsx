@@ -331,7 +331,7 @@ export function TeacherProfilePage() {
                   <p className="mt-0.5 text-sm text-ink-500">{t.title}</p>
                 </div>
                 <div className="flex gap-2 pb-1">
-                  <Btn variant="outline" size="md">Message</Btn>
+                  <BtnLink to="/app/messages" variant="outline" size="md">Message</BtnLink>
                   <BtnLink to={`/app/book/${t.id}`} size="md">Book a Lesson</BtnLink>
                 </div>
               </div>

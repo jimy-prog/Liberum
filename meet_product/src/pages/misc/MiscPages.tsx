@@ -1,31 +1,108 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bell, Globe, MessageSquare, Send, ShieldCheck } from "lucide-react";
 import { Avatar, Badge, Btn, Card, EmptyState, Field, Input } from "@/components/ui-kit";
 import { useApp } from "@/lib/store";
+import { meetApi } from "@/lib/api";
 import { fmtUzs, TEACHERS } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 /* ================= MESSAGES ================= */
 export function MessagesPage() {
   const { user } = useApp();
-  const threads = user?.role === "student"
-    ? [
-        { name: "Aziza Karimova", initials: "AK", color: "#7B61FF", last: "Great progress today — review the Part 3 notes I sent.", time: "18:42", unread: 1 },
-        { name: "Jamshid Mahkamov", initials: "JM", color: "#0E0F13", last: "See you on Thursday at 16:00!", time: "Yesterday", unread: 0 },
-        { name: "Madina Rahimova", initials: "MR", color: "#1FAD55", last: "Bring your last SAT practice results.", time: "Mon", unread: 0 },
-      ]
-    : [
-        { name: "Jasur Toshev", initials: "JT", color: "#1FAD55", last: "Thank you for the lesson! Homework sent.", time: "18:40", unread: 1 },
-        { name: "Madina Rahimova", initials: "MR", color: "#7B61FF", last: "Can we move Friday to 18:00?", time: "Yesterday", unread: 1 },
-        { name: "Sofia Karimova", initials: "SK", color: "#F5A623", last: "Looking forward to the trial lesson.", time: "Sun", unread: 0 },
-      ];
+  const [threads, setThreads] = useState<any[]>([]);
+  const [activeContactId, setActiveContactId] = useState<number | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [draft, setDraft] = useState("");
+  const [sending, setSending] = useState(false);
+  const chatBottomRef = useRef<HTMLDivElement>(null);
+
+  // Fetch threads list
+  useEffect(() => {
+    meetApi.listDirectMessages()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setThreads(data);
+          setActiveContactId(data[0].userId);
+        } else {
+          // fallback
+          const fallback = user?.role === "student"
+            ? [
+                { userId: 4, name: "Timur Abdullaev", initials: "TA", color: "#7B61FF", last: "Welcome to IELTS Speaking! Ready for lessons.", time: "18:42", unread: 0 },
+                { userId: 8, name: "Aziza Karimova", initials: "AK", color: "#7B61FF", last: "Review the notes before tomorrow.", time: "17:30", unread: 0 },
+              ]
+            : [
+                { userId: 6, name: "Aziza Karimova (Student)", initials: "AK", color: "#1FAD55", last: "Thank you teacher! Homework is prepared.", time: "18:40", unread: 0 },
+              ];
+          setThreads(fallback);
+          setActiveContactId(fallback[0].userId);
+        }
+      })
+      .catch(() => {});
+  }, [user]);
+
+  // Load messages for active thread
+  useEffect(() => {
+    if (!activeContactId) return;
+    meetApi.getThreadMessages(activeContactId)
+      .then((data) => {
+        setMessages(data || []);
+      })
+      .catch(() => {});
+
+    const pollInterval = setInterval(() => {
+      meetApi.getThreadMessages(activeContactId)
+        .then((data) => {
+          if (data) setMessages(data);
+        })
+        .catch(() => {});
+    }, 4000);
+
+    return () => clearInterval(pollInterval);
+  }, [activeContactId]);
+
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const sendMessage = async () => {
+    if (!draft.trim() || !activeContactId || sending) return;
+    const text = draft.trim();
+    setDraft("");
+    setSending(true);
+
+    const optimistic = {
+      id: Date.now(),
+      from: "me",
+      text,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+    setMessages(p => [...p, optimistic]);
+
+    try {
+      await meetApi.sendDirectMessage(activeContactId, text);
+    } catch {
+      // keep optimistic
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const activeThread = threads.find(t => t.userId === activeContactId) || threads[0];
+
   return (
     <div className="mx-auto max-w-4xl animate-fade-up">
       <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Messages</h1>
       <div className="mt-6 grid gap-4 md:grid-cols-[300px_1fr]">
         <Card className="overflow-hidden">
-          {threads.map((t, i) => (
-            <button key={t.name} className={cn("flex w-full items-center gap-3 border-b border-line px-4 py-3.5 text-left transition hover:bg-cloud", i === 0 && "bg-brand-50/60")}>
+          {threads.map((t) => (
+            <button
+              key={t.userId || t.name}
+              onClick={() => setActiveContactId(t.userId)}
+              className={cn(
+                "flex w-full items-center gap-3 border-b border-line px-4 py-3.5 text-left transition hover:bg-cloud",
+                t.userId === activeContactId && "bg-brand-50/60"
+              )}
+            >
               <Avatar initials={t.initials} color={t.color} size="md" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
@@ -34,28 +111,85 @@ export function MessagesPage() {
                 </div>
                 <p className="mt-0.5 truncate text-xs text-ink-400">{t.last}</p>
               </div>
-              {t.unread > 0 && <span className="flex h-4.5 w-4.5 h-[18px] w-[18px] items-center justify-center rounded-full bg-brand-500 text-[9px] font-bold text-white">{t.unread}</span>}
+              {t.unread > 0 && (
+                <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-brand-500 text-[9px] font-bold text-white">
+                  {t.unread}
+                </span>
+              )}
             </button>
           ))}
+          {threads.length === 0 && (
+            <p className="p-4 text-center text-xs text-ink-400">No conversation threads yet.</p>
+          )}
         </Card>
-        <Card className="flex min-h-[420px] flex-col">
-          <div className="flex items-center gap-3 border-b border-line px-5 py-3.5">
-            <Avatar initials={threads[0].initials} color={threads[0].color} size="sm" />
-            <p className="text-sm font-semibold text-ink">{threads[0].name}</p>
-          </div>
-          <div className="flex flex-1 items-center justify-center p-6">
-            <EmptyState
-              icon={<MessageSquare size={20} />}
-              title="Full messaging is coming soon"
-              body="For now, use the classroom chat during lessons. Booking and schedule messages arrive as notifications."
-            />
-          </div>
-          <div className="border-t border-line p-3">
-            <div className="flex items-center gap-2 rounded-full border border-line bg-cloud py-1 pl-4 pr-1">
-              <input disabled placeholder="Messaging coming soon…" className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-ink-300" />
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-mist text-ink-300"><Send size={13} /></span>
+
+        <Card className="flex min-h-[460px] flex-col">
+          {activeThread ? (
+            <>
+              <div className="flex items-center gap-3 border-b border-line px-5 py-3.5">
+                <Avatar initials={activeThread.initials} color={activeThread.color} size="sm" />
+                <div>
+                  <p className="text-sm font-semibold text-ink">{activeThread.name}</p>
+                  <p className="text-[11px] text-ink-400 capitalize">{activeThread.role || "Member"}</p>
+                </div>
+              </div>
+              <div className="flex-1 space-y-3 overflow-y-auto p-5">
+                {messages.map((m) => (
+                  <div
+                    key={m.id}
+                    className={cn(
+                      "flex flex-col max-w-[80%] rounded-2xl px-4 py-2.5 text-[13px]",
+                      m.from === "me"
+                        ? "ml-auto bg-brand-500 text-white rounded-br-sm"
+                        : "bg-cloud text-ink rounded-bl-sm ring-1 ring-line"
+                    )}
+                  >
+                    <p className="leading-relaxed">{m.text}</p>
+                    <span className={cn("mt-1 text-[10px]", m.from === "me" ? "text-brand-100 text-right" : "text-ink-400")}>
+                      {m.time}
+                    </span>
+                  </div>
+                ))}
+                {messages.length === 0 && (
+                  <div className="flex h-full items-center justify-center py-12 text-center text-xs text-ink-400">
+                    Send a message to start the conversation.
+                  </div>
+                )}
+                <div ref={chatBottomRef} />
+              </div>
+              <div className="border-t border-line p-3">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    sendMessage();
+                  }}
+                  className="flex items-center gap-2 rounded-full border border-line bg-cloud py-1 pl-4 pr-1"
+                >
+                  <input
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    placeholder="Type a message…"
+                    className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-ink-300"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!draft.trim() || sending}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-white transition hover:bg-brand-600 disabled:opacity-40"
+                  >
+                    <Send size={13} />
+                  </button>
+                </form>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-1 items-center justify-center p-6">
+              <EmptyState
+                icon={<MessageSquare size={20} />}
+                title="Select a contact"
+                body="Choose someone from the list to start messaging."
+              />
             </div>
-          </div>
+          )}
         </Card>
       </div>
     </div>
@@ -64,15 +198,35 @@ export function MessagesPage() {
 
 /* ================= SETTINGS ================= */
 export function SettingsPage() {
-  const { user, signOut } = useApp();
+  const { user, signOut, updateUser } = useApp();
+  const [name, setName] = useState(user?.name || "");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user?.name) setName(user.name);
+  }, [user?.name]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await updateUser(name);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-2xl animate-fade-up">
       <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Settings</h1>
       <Card className="mt-6 p-6">
         <h2 className="font-display text-[15px] font-semibold text-ink">Account</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Field label="Full name"><Input defaultValue={user?.name} /></Field>
+          <Field label="Full name">
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" />
+          </Field>
           <Field label="Email"><Input defaultValue={user?.email} disabled className="opacity-60" /></Field>
           <Field label="Language">
             <select className="h-11 w-full rounded-xl border border-line bg-white px-3 text-sm outline-none focus:border-brand-500">
@@ -82,7 +236,9 @@ export function SettingsPage() {
           <Field label="Timezone"><Input defaultValue="UTC+5 — Tashkent" disabled className="opacity-60" /></Field>
         </div>
         <div className="mt-5 flex items-center gap-3">
-          <Btn onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2000); }}>Save changes</Btn>
+          <Btn onClick={handleSave} disabled={saving}>
+            {saving ? "Saving..." : "Save changes"}
+          </Btn>
           {saved && <Badge tone="green">Saved</Badge>}
         </div>
       </Card>

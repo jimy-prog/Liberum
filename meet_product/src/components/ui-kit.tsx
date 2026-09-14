@@ -79,11 +79,13 @@ export function Badge({ tone = "gray", className, children }: { tone?: BadgeTone
 /* ---------------- Avatar ---------------- */
 export function Avatar({
   initials,
+  src,
   color = "#7B61FF",
   size = "md",
   className,
 }: {
   initials: string;
+  src?: string;
   color?: string;
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
@@ -94,6 +96,15 @@ export function Avatar({
     lg: "h-12 w-12 text-sm",
     xl: "h-20 w-20 text-xl",
   };
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={initials}
+        className={cn("inline-flex shrink-0 rounded-full object-cover shadow-sm", sizes[size], className)}
+      />
+    );
+  }
   return (
     <span
       className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-display font-semibold text-white", sizes[size], className)}
