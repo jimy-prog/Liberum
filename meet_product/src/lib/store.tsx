@@ -10,7 +10,7 @@ interface AppState {
   loginWithBackend: (email: string, password: string) => Promise<User>;
   registerWithBackend: (name: string, email: string, password: string, role: Role) => Promise<User>;
   signOut: () => Promise<void>;
-  updateUser: (name: string) => Promise<void>;
+  updateUser: (data: { name?: string; telegramUsername?: string }) => Promise<void>;
   lessons: Lesson[];
   bookLesson: (draft: BookingDraft) => Promise<Lesson>;
   completeLesson: (id: string) => Promise<void>;
@@ -135,16 +135,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("lm-user");
   };
 
-  const updateUser = async (name: string) => {
+  const updateUser = async (data: { name?: string; telegramUsername?: string }) => {
     try {
-      const res = await meetApi.updateAccount({ name });
+      const res = await meetApi.updateAccount(data);
       if (res.user) {
         setUser(res.user);
         localStorage.setItem("lm-user", JSON.stringify(res.user));
       }
     } catch {
       if (user) {
-        const updated = { ...user, name };
+        const updated = {
+          ...user,
+          ...(data.name ? { name: data.name } : {}),
+          ...(data.telegramUsername !== undefined ? { telegramUsername: data.telegramUsername } : {}),
+        };
         setUser(updated);
         localStorage.setItem("lm-user", JSON.stringify(updated));
       }

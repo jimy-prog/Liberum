@@ -34,6 +34,24 @@ function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/classroom/:lessonId" element={<ClassroomPage />} />
       <Route
+        path="/teachers/:id"
+        element={
+          <div className="min-h-screen bg-[#F6F7F9] p-4 sm:p-8">
+            <header className="mx-auto mb-6 flex max-w-6xl items-center justify-between">
+              <a href="/" className="font-display text-xl font-bold tracking-tight text-ink">
+                Liber<span className="text-brand-500">um</span>
+                <span className="ml-2 rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-600">Meet</span>
+              </a>
+              <div className="flex items-center gap-3">
+                <a href="/login" className="text-xs font-semibold text-ink-600 hover:text-ink">Log in</a>
+                <a href="/register" className="rounded-full bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600">Get Started</a>
+              </div>
+            </header>
+            <TeacherProfilePage />
+          </div>
+        }
+      />
+      <Route
         path="/app"
         element={
           <AppShell>

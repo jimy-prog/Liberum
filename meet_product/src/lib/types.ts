@@ -6,6 +6,8 @@ export interface User {
   email: string;
   role: Role;
   initials: string;
+  telegramUsername?: string;
+  telegramChatId?: string;
 }
 
 export interface LessonOption {

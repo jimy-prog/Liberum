@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import {
   ArrowLeft, ArrowRight, BadgeCheck, CalendarDays, Check, ChevronLeft,
-  Clock, Compass, Globe, GraduationCap, Search, Star, Video,
+  Clock, Compass, Copy, Globe, GraduationCap, Search, Share2, Star, Video,
 } from "lucide-react";
 import { BOOKABLE_TIMES, fmtUzs, SUBJECTS, TEACHERS } from "@/lib/data";
 import { useApp } from "@/lib/store";
@@ -312,11 +312,31 @@ export function TeacherProfilePage() {
     }
   }, [id]);
 
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = () => {
+    const url = `${window.location.origin}/teachers/${t.id}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-6xl animate-fade-up">
-      <Link to="/app/teachers" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-500 transition hover:text-ink">
-        <ChevronLeft size={15} /> All teachers
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link to="/app/teachers" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-500 transition hover:text-ink">
+          <ChevronLeft size={15} /> All teachers
+        </Link>
+        <button
+          onClick={handleShare}
+          className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3.5 py-1.5 text-xs font-medium text-ink transition hover:border-brand-500 hover:text-brand-600 active:scale-95"
+        >
+          {copied ? <Check size={13} className="text-emerald-500" /> : <Share2 size={13} />}
+          {copied ? "Link Copied!" : "Share Profile"}
+        </button>
+      </div>
 
       <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_360px]">
         {/* Main */}
@@ -336,6 +356,13 @@ export function TeacherProfilePage() {
                   <p className="mt-0.5 text-sm text-ink-500">{t.title}</p>
                 </div>
                 <div className="flex gap-2 pb-1">
+                  <button
+                    onClick={handleShare}
+                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-line bg-white px-3.5 text-xs font-semibold text-ink transition hover:border-brand-500 hover:text-brand-600"
+                  >
+                    {copied ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
+                    {copied ? "Copied" : "Share"}
+                  </button>
                   <BtnLink to="/app/messages" variant="outline" size="md">Message</BtnLink>
                   <BtnLink to={`/app/book/${t.id}`} size="md">Book a Lesson</BtnLink>
                 </div>

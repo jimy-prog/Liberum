@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Bell, Globe, MessageSquare, Send, ShieldCheck } from "lucide-react";
+import { Bell, Check, ExternalLink, Globe, MessageSquare, Send, ShieldCheck } from "lucide-react";
 import { Avatar, Badge, Btn, Card, EmptyState, Field, Input } from "@/components/ui-kit";
 import { useApp } from "@/lib/store";
 import { meetApi } from "@/lib/api";
@@ -200,17 +200,19 @@ export function MessagesPage() {
 export function SettingsPage() {
   const { user, signOut, updateUser } = useApp();
   const [name, setName] = useState(user?.name || "");
+  const [telegramUsername, setTelegramUsername] = useState(user?.telegramUsername || "");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (user?.name) setName(user.name);
-  }, [user?.name]);
+    if (user?.telegramUsername) setTelegramUsername(user.telegramUsername);
+  }, [user?.name, user?.telegramUsername]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await updateUser(name);
+      await updateUser({ name, telegramUsername });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } finally {
@@ -243,13 +245,61 @@ export function SettingsPage() {
         </div>
       </Card>
 
+      {/* Telegram Connector */}
+      <Card className="mt-4 p-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-[15px] font-semibold text-ink">Telegram Notifications</h2>
+              <Badge tone="brand">Uzbekistan Native</Badge>
+            </div>
+            <p className="mt-1 max-w-md text-xs leading-relaxed text-ink-500">
+              Receive real-time instant booking notifications, classroom reminders 15 minutes before, and messages directly in your Telegram.
+            </p>
+          </div>
+          <a
+            href="https://t.me/LiberumMeetBot"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1 rounded-full bg-[#24A1DE]/10 px-3 py-1.5 text-xs font-semibold text-[#24A1DE] transition hover:bg-[#24A1DE]/20"
+          >
+            Open Bot <ExternalLink size={12} />
+          </a>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1">
+            <Field label="Your Telegram @username">
+              <div className="relative">
+                <span className="absolute left-3.5 top-3 text-sm font-semibold text-ink-400">@</span>
+                <Input
+                  value={telegramUsername}
+                  onChange={(e) => setTelegramUsername(e.target.value.replace(/^@/, ""))}
+                  placeholder="username (e.g. jamshid_dev)"
+                  className="pl-8"
+                />
+              </div>
+            </Field>
+          </div>
+          <Btn onClick={handleSave} disabled={saving} size="md" className="shrink-0">
+            {user?.telegramUsername ? "Update Telegram" : "Connect Telegram"}
+          </Btn>
+        </div>
+
+        {user?.telegramUsername && (
+          <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-2 text-xs font-medium text-emerald-700">
+            <Check size={14} /> Linked to Telegram: @{user.telegramUsername} · Notifications Active
+          </div>
+        )}
+      </Card>
+
       <Card className="mt-4 p-6">
         <h2 className="font-display text-[15px] font-semibold text-ink">Notifications</h2>
         <div className="mt-3 space-y-3">
-          {["Lesson reminders (1 hour and 10 minutes before)", "New booking notifications", "Platform updates"].map((label, i) => (
+          {["Telegram instant alerts (recommended for UZ)", "Lesson reminders (1 hour and 10 minutes before)", "New booking notifications", "Platform updates"].map((label, i) => (
             <label key={label} className="flex cursor-pointer items-center justify-between rounded-xl border border-line px-4 py-3 text-sm text-ink">
               <span className="flex items-center gap-2.5"><Bell size={14} className="text-ink-400" /> {label}</span>
-              <input type="checkbox" defaultChecked={i < 2} className="h-4 w-4 accent-brand-500" />
+              <input type="checkbox" defaultChecked={i < 3} className="h-4 w-4 accent-brand-500" />
             </label>
           ))}
         </div>

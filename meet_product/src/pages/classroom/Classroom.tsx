@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import {
-  BookOpen, Eraser, Mic, MicOff, MonitorUp,
+  BookOpen, Check, Eraser, Mic, MicOff, MonitorUp,
   PenTool, PhoneOff, Plus, RotateCcw, Send,
-  Signal, Sparkles, Video, VideoOff, Wand2, X,
+  Signal, Sparkles, Star, Video, VideoOff, Wand2, X,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { meetApi } from "@/lib/api";
@@ -51,6 +51,11 @@ export default function ClassroomPage() {
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
   const [draft, setDraft] = useState("");
   const [ended, setEnded] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [conn, setConn] = useState<"excellent" | "good" | "weak">("excellent");
 
   // Lesson Superpowers State
@@ -528,15 +533,94 @@ export default function ClassroomPage() {
   };
 
   if (ended) {
+    const handleReviewSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!lessonId) return;
+      setSubmittingReview(true);
+      try {
+        await meetApi.submitReview(lessonId, rating, reviewComment);
+        setReviewSubmitted(true);
+      } catch (err) {
+        console.error("Failed to submit review:", err);
+      } finally {
+        setSubmittingReview(false);
+      }
+    };
+
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-ink px-6 text-center text-white">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-500/20 text-brand-300">
-          <Video size={26} />
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#0E0F13] px-6 text-center text-white">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-500/20 text-brand-400 ring-1 ring-brand-500/30">
+          <Video size={28} />
         </div>
-        <h1 className="mt-6 font-display text-3xl font-bold tracking-tight">Lesson completed</h1>
-        <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/60">
-          {lesson?.title ?? "Lesson"} · {lesson ? fmt(total) : "60:00"} minutes with {otherName}. The lesson is marked as completed for both of you.
+        <h1 className="mt-5 font-display text-3xl font-bold tracking-tight">Lesson completed</h1>
+        <p className="mt-2 max-w-md text-sm text-white/60">
+          {lesson?.title ?? "Lesson"} · {lesson ? fmt(total) : "60:00"} with <span className="text-white font-medium">{otherName}</span>.
         </p>
+
+        {!iAmTeacher && (
+          <div className="mt-8 w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6 text-left backdrop-blur-sm">
+            {reviewSubmitted ? (
+              <div className="flex flex-col items-center py-4 text-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+                  <Check size={22} />
+                </div>
+                <h3 className="mt-3 font-display text-lg font-semibold text-white">Thank you for your review!</h3>
+                <p className="mt-1 text-xs text-white/60">Your feedback helps other students find the right teachers on Liberum Meet.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleReviewSubmit}>
+                <h3 className="font-display text-base font-semibold text-white">Rate your lesson with {otherName.split(" ")[0]}</h3>
+                <p className="mt-1 text-xs text-white/50">How was your learning experience today?</p>
+
+                {/* Stars */}
+                <div className="mt-4 flex items-center justify-center gap-2 py-2">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const active = (hoverRating || rating) >= star;
+                    return (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        className="rounded-lg p-1.5 transition hover:scale-110"
+                      >
+                        <Star
+                          size={28}
+                          className={cn(
+                            "transition-colors",
+                            active ? "fill-[#F5A623] text-[#F5A623]" : "text-white/20 hover:text-white/40"
+                          )}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-3">
+                  <textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder="Write a brief note (e.g. helpful explanations, great pronunciation tips, etc.)..."
+                    rows={3}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white placeholder-white/30 outline-none transition focus:border-brand-500 focus:bg-white/10"
+                  />
+                </div>
+
+                <div className="mt-4 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={submittingReview}
+                    className="rounded-xl bg-brand-500 px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-600 disabled:opacity-50"
+                  >
+                    {submittingReview ? "Submitting..." : "Submit Review"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
+
         <div className="mt-8 flex gap-3">
           <Link to="/app/lessons" className="rounded-full bg-brand-500 px-6 py-3 text-sm font-medium transition hover:bg-brand-600">
             Back to My Lessons

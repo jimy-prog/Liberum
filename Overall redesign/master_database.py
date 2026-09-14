@@ -42,6 +42,8 @@ class User(MasterBase):
     is_banned = Column(Boolean, default=False)
     full_name = Column(String, default="")
     avatar_url = Column(String, nullable=True)
+    telegram_chat_id = Column(String, nullable=True, index=True)
+    telegram_username = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login_at = Column(DateTime, nullable=True)
     
@@ -537,4 +539,19 @@ class MeetWhiteboardState(MasterBase):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     booking = relationship("MeetBooking", backref="whiteboard_state", uselist=False)
+
+
+class MeetTeacherReview(MasterBase):
+    __tablename__ = "meet_teacher_reviews"
+    id = Column(Integer, primary_key=True)
+    teacher_id = Column(Integer, ForeignKey("meet_teacher_profiles.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    booking_id = Column(Integer, ForeignKey("meet_bookings.id"), nullable=True)
+    rating = Column(Integer, nullable=False)  # 1-5
+    comment = Column(String, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    teacher = relationship("MeetTeacherProfile", backref="reviews")
+    student = relationship("User", foreign_keys=[student_id])
+    booking = relationship("MeetBooking", backref="review", uselist=False)
 

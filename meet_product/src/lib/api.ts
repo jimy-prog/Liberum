@@ -53,7 +53,7 @@ export const meetApi = {
     });
   },
 
-  async updateAccount(data: { name?: string; language?: string }) {
+  async updateAccount(data: { name?: string; language?: string; telegramUsername?: string }) {
     return request<{ success: boolean; user: User }>("/auth/account", {
       method: "PUT",
       body: JSON.stringify(data),
@@ -116,6 +116,16 @@ export const meetApi = {
     return request<{ success: boolean }>(`/lessons/${id}/complete`, {
       method: "POST",
     });
+  },
+
+  async submitReview(lessonId: string, rating: number, comment?: string) {
+    return request<{ success: boolean; rating: number; reviewsCount: number }>(
+      `/lessons/${lessonId}/review`,
+      {
+        method: "POST",
+        body: JSON.stringify({ rating, comment: comment || "" }),
+      }
+    );
   },
 
   // Classroom Chat

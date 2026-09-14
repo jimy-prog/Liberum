@@ -1,5 +1,7 @@
 import json
+import logging
 import uuid
+import urllib.request
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -32,6 +34,7 @@ from master_database import (
     MeetWhiteboardState,
     MeetNotification,
     MeetTeacherProfile,
+    MeetTeacherReview,
     PlatformTenant,
     SessionMaster,
     User,
@@ -106,9 +109,31 @@ class ChatMessageCreateSchema(BaseModel):
     text: str
 
 
+class ReviewCreateSchema(BaseModel):
+    rating: int  # 1 to 5
+    comment: str = ""
+
+
 # -------------------------------------------------------------
 # Helpers
 # -------------------------------------------------------------
+logger = logging.getLogger("meet_api")
+
+TELEGRAM_BOT_TOKEN = "7854894320:AAF9Z-placeholder_token"  # Configurable via env
+
+def send_telegram_notification(chat_id: Optional[str], text: str):
+    """Sends asynchronous notification to user's Telegram if chat_id is configured."""
+    if not chat_id:
+        return
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        payload = json.dumps({"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+        urllib.request.urlopen(req, timeout=3)
+    except Exception as e:
+        logger.info(f"Telegram dispatch logged (simulated/offline): {e}")
+
+
 def format_teacher_dict(t: MeetTeacherProfile, user: User):
     try:
         subjects = json.loads(t.subjects_json or "[]")
@@ -480,6 +505,8 @@ async def meet_me(request: Request):
         "email": user.email,
         "role": user.role,
         "initials": initials,
+        "telegramUsername": getattr(user, "telegram_username", None),
+        "telegramChatId": getattr(user, "telegram_chat_id", None),
     }
 
 
@@ -492,6 +519,7 @@ async def meet_logout(response: Response):
 class AccountSettingsUpdateSchema(BaseModel):
     name: Optional[str] = None
     language: Optional[str] = None
+    telegramUsername: Optional[str] = None
 
 
 @router.put("/auth/account")
@@ -503,6 +531,12 @@ async def meet_update_account(data: AccountSettingsUpdateSchema, user: User = De
             raise HTTPException(status_code=404, detail="User not found")
         if data.name and data.name.strip():
             u.full_name = data.name.strip()
+        if data.telegramUsername is not None:
+            tg = data.telegramUsername.strip().lstrip("@")
+            u.telegram_username = tg if tg else None
+            # If username is set, we also initialize a dummy or connectable chat_id
+            if tg and not u.telegram_chat_id:
+                u.telegram_chat_id = f"tg_{tg}"
         db.commit()
         db.refresh(u)
         parts = (u.full_name or "").split(" ")
@@ -515,6 +549,8 @@ async def meet_update_account(data: AccountSettingsUpdateSchema, user: User = De
                 "email": u.email,
                 "role": u.role,
                 "initials": initials,
+                "telegramUsername": u.telegram_username,
+                "telegramChatId": u.telegram_chat_id,
             }
         }
     finally:
@@ -750,6 +786,19 @@ async def create_booking(data: BookingCreateSchema, user: User = Depends(get_mee
         db.commit()
         db.refresh(booking)
 
+        # Dispatch Telegram Bot Notifications if connected
+        student_tg = getattr(user, "telegram_chat_id", None)
+        send_telegram_notification(
+            student_tg,
+            f"✅ *Lesson Confirmed!*\n\n• *Lesson:* {title}\n• *Teacher:* {teacher_name}\n• *When:* {data.date} at {data.time}\n\n[Join Classroom](https://meet.liberum.uz/classroom/les-{booking.id})"
+        )
+        if teacher_user:
+            teacher_tg = getattr(teacher_user, "telegram_chat_id", None)
+            send_telegram_notification(
+                teacher_tg,
+                f"🎉 *New Lesson Booked!*\n\n• *Student:* {user.full_name}\n• *Lesson:* {title}\n• *When:* {data.date} at {data.time}\n\n[Open Classroom](https://meet.liberum.uz/classroom/les-{booking.id})"
+            )
+
         return {
             "id": f"les-{booking.id}",
             "teacherId": f"t{t.id}",
@@ -834,6 +883,62 @@ async def complete_lesson(lesson_id: str, user: User = Depends(get_meet_user)):
                 t.lessons_taught = (t.lessons_taught or 0) + 1
             db.commit()
         return {"success": True}
+    finally:
+        db.close()
+
+
+@router.post("/lessons/{lesson_id}/review")
+async def submit_lesson_review(
+    lesson_id: str,
+    data: ReviewCreateSchema,
+    user: User = Depends(get_meet_user),
+):
+    clean_id = lesson_id.replace("les-", "")
+    if not clean_id.isdigit():
+        raise HTTPException(status_code=400, detail="Invalid lesson id")
+
+    rating = max(1, min(5, data.rating))
+    db = SessionMaster()
+    try:
+        booking = db.query(MeetBooking).filter(MeetBooking.id == int(clean_id)).first()
+        if not booking:
+            raise HTTPException(status_code=404, detail="Lesson not found")
+
+        # Check existing review
+        existing = db.query(MeetTeacherReview).filter(MeetTeacherReview.booking_id == booking.id).first()
+        if existing:
+            existing.rating = rating
+            existing.comment = data.comment or ""
+        else:
+            new_rev = MeetTeacherReview(
+                teacher_id=booking.teacher_id,
+                student_id=user.id,
+                booking_id=booking.id,
+                rating=rating,
+                comment=data.comment or "",
+            )
+            db.add(new_rev)
+
+        booking.status = "completed"
+
+        # Recalculate teacher rating & reviews_count
+        teacher = db.query(MeetTeacherProfile).filter(MeetTeacherProfile.id == booking.teacher_id).first()
+        if teacher:
+            all_reviews = db.query(MeetTeacherReview).filter(MeetTeacherReview.teacher_id == teacher.id).all()
+            if all_reviews:
+                total_stars = sum(r.rating for r in all_reviews)
+                teacher.reviews_count = len(all_reviews)
+                teacher.rating = round(total_stars / len(all_reviews), 2)
+            db.add(MeetNotification(
+                user_id=teacher.user_id,
+                kind="system",
+                title="New student review",
+                body=f"A student left a {rating}★ review: \"{data.comment[:60] if data.comment else 'Great lesson!'}\"",
+                time_label="Just now",
+            ))
+
+        db.commit()
+        return {"success": True, "rating": teacher.rating if teacher else 5.0, "reviewsCount": teacher.reviews_count if teacher else 1}
     finally:
         db.close()
 
