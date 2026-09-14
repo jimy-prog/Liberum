@@ -98,13 +98,29 @@ export default function ClassroomPage() {
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [peerConnected, setPeerConnected] = useState(false);
 
-  // WebRTC ICE Servers Configuration (Google STUN)
+  // WebRTC ICE Servers Configuration (STUN + TURN fallback for symmetric NATs)
   const rtcConfig: RTCConfiguration = {
     iceServers: [
       { urls: "stun:stun.l.google.com:19302" },
       { urls: "stun:stun1.l.google.com:19302" },
       { urls: "stun:stun2.l.google.com:19302" },
+      { urls: "stun:stun3.l.google.com:19302" },
+      { urls: "stun:stun4.l.google.com:19302" },
+      { urls: "stun:stun.services.mozilla.com" },
+      { urls: "stun:global.stun.twilio.com:3478" },
+      // OpenRelay public WebRTC TURN server for strict corporate/mobile firewalls
+      {
+        urls: "turn:openrelay.metered.ca:80",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+      {
+        urls: "turn:openrelay.metered.ca:443",
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
     ],
+    iceCandidatePoolSize: 10,
   };
 
   // Real local camera & microphone
@@ -168,6 +184,8 @@ export default function ClassroomPage() {
         const ws = new WebSocket(wsUrl);
         wsRef.current = ws;
 
+        const candidateQueue: RTCIceCandidateInit[] = [];
+
         pc.onicecandidate = (event) => {
           if (event.candidate && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: "ice-candidate", candidate: event.candidate }));
@@ -178,23 +196,39 @@ export default function ClassroomPage() {
           try {
             const data = JSON.parse(evt.data);
             if (data.type === "peer-joined") {
-              // Create Offer
-              const offer = await pc.createOffer();
-              await pc.setLocalDescription(offer);
-              ws.send(JSON.stringify({ type: "sdp-offer", sdp: offer }));
+              // Role-deterministic initiator: Only the teacher (or caller) sends the offer to avoid glare
+              if (iAmTeacher) {
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                ws.send(JSON.stringify({ type: "sdp-offer", sdp: offer }));
+              }
             } else if (data.type === "sdp-offer") {
-              // Remote peer sent offer, create answer
+              // Remote peer sent offer, set remote description and create answer
               await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+              // Flush queued candidates
+              while (candidateQueue.length > 0) {
+                const cand = candidateQueue.shift();
+                if (cand) await pc.addIceCandidate(new RTCIceCandidate(cand));
+              }
               const answer = await pc.createAnswer();
               await pc.setLocalDescription(answer);
               ws.send(JSON.stringify({ type: "sdp-answer", sdp: answer }));
             } else if (data.type === "sdp-answer") {
               // Remote peer accepted our offer
               await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+              // Flush queued candidates
+              while (candidateQueue.length > 0) {
+                const cand = candidateQueue.shift();
+                if (cand) await pc.addIceCandidate(new RTCIceCandidate(cand));
+              }
             } else if (data.type === "ice-candidate") {
-              // Add ICE Candidate
+              // Add ICE Candidate safely
               if (data.candidate) {
-                await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+                if (pc.remoteDescription && pc.remoteDescription.type) {
+                  await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+                } else {
+                  candidateQueue.push(data.candidate);
+                }
               }
             } else if (data.type === "peer-left") {
               setPeerConnected(false);
