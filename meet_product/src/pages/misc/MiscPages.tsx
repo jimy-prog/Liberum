@@ -3,7 +3,7 @@ import { Bell, Globe, MessageSquare, Send, ShieldCheck } from "lucide-react";
 import { Avatar, Badge, Btn, Card, EmptyState, Field, Input } from "@/components/ui-kit";
 import { useApp } from "@/lib/store";
 import { meetApi } from "@/lib/api";
-import { fmtUzs, TEACHERS } from "@/lib/data";
+import { fmtUzs } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 /* ================= MESSAGES ================= */
@@ -269,11 +269,43 @@ export function SettingsPage() {
 /* ================= ADMIN ================= */
 export function AdminPage() {
   const [tab, setTab] = useState<"users" | "teachers" | "lessons">("teachers");
+  const [teachers, setTeachers] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      meetApi.getAdminTeachers().catch(() => []),
+      meetApi.getAdminUsers().catch(() => []),
+      meetApi.getAdminLessons().catch(() => []),
+    ])
+      .then(([t, u, l]) => {
+        if (t && t.length > 0) setTeachers(t);
+        if (u && u.length > 0) setUsers(u);
+        if (l && l.length > 0) setLessons(l);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleToggleUser = async (userId: number) => {
+    try {
+      const res = await meetApi.toggleUserStatus(userId);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, isActive: res.isActive } : u))
+      );
+    } catch {
+      // ignore
+    }
+  };
+
   return (
     <div className="mx-auto max-w-5xl animate-fade-up">
       <div className="flex items-center gap-3">
-        <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Admin</h1>
-        <Badge tone="ink"><ShieldCheck size={11} /> Internal</Badge>
+        <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Admin Dashboard</h1>
+        <Badge tone="ink"><ShieldCheck size={11} /> Master DB</Badge>
+        {loading && <span className="text-xs text-ink-400 animate-pulse">Syncing...</span>}
       </div>
       <div className="mt-5 inline-flex rounded-full border border-line bg-white p-1">
         {(["teachers", "users", "lessons"] as const).map((v) => (
@@ -291,29 +323,31 @@ export function AdminPage() {
                 <th className="px-5 py-3 font-medium">Teacher</th>
                 <th className="px-5 py-3 font-medium">Subjects</th>
                 <th className="px-5 py-3 font-medium">Rating</th>
-                <th className="px-5 py-3 font-medium">Lessons</th>
+                <th className="px-5 py-3 font-medium">Lessons Taught</th>
                 <th className="px-5 py-3 font-medium">Status</th>
-                <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody>
-              {TEACHERS.map((t) => (
+              {teachers.map((t) => (
                 <tr key={t.id} className="border-b border-line last:border-0 hover:bg-cloud/60">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2.5">
                       <Avatar initials={t.initials} color={t.color} size="sm" />
-                      <span className="font-semibold text-ink">{t.name}</span>
+                      <div>
+                        <span className="font-semibold text-ink">{t.name}</span>
+                        <p className="text-[11px] text-ink-400">{t.email}</p>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-ink-500">{t.subjects.join(", ")}</td>
-                  <td className="px-5 py-3 font-medium text-ink">{t.rating.toFixed(1)}</td>
-                  <td className="px-5 py-3 text-ink-500">{t.lessonsTaught.toLocaleString()}</td>
-                  <td className="px-5 py-3">{t.verified ? <Badge tone="brand">Verified</Badge> : <Badge tone="gray">Pending</Badge>}</td>
-                  <td className="px-5 py-3 text-right">
-                    <button className="text-xs font-medium text-ink-400 hover:text-danger">Deactivate</button>
-                  </td>
+                  <td className="px-5 py-3 text-ink-500">{t.subjects?.join(", ") || "General"}</td>
+                  <td className="px-5 py-3 font-medium text-ink">★ {t.rating?.toFixed(1)}</td>
+                  <td className="px-5 py-3 text-ink-500">{t.lessonsTaught?.toLocaleString()}</td>
+                  <td className="px-5 py-3">{t.verified ? <Badge tone="brand">Verified</Badge> : <Badge tone="gray">Standard</Badge>}</td>
                 </tr>
               ))}
+              {teachers.length === 0 && (
+                <tr><td colSpan={5} className="py-6 text-center text-ink-400">No teachers found in database.</td></tr>
+              )}
             </tbody>
           </table>
         </Card>
@@ -327,30 +361,37 @@ export function AdminPage() {
                 <th className="px-5 py-3 font-medium">User</th>
                 <th className="px-5 py-3 font-medium">Role</th>
                 <th className="px-5 py-3 font-medium">Email</th>
+                <th className="px-5 py-3 font-medium">Status</th>
                 <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody>
-              {[
-                ["Jasur Toshev", "Student", "jasur@student.liberum.uz", "#1FAD55"],
-                ["Aziza Karimova", "Teacher", "aziza@liberum.uz", "#7B61FF"],
-                ["Madina Rahimova", "Student", "madina@student.liberum.uz", "#F5A623"],
-                ["Bekzod Alimov", "Student", "bekzod@student.liberum.uz", "#3B82F6"],
-              ].map(([name, role, email, color]) => (
-                <tr key={email} className="border-b border-line last:border-0 hover:bg-cloud/60">
+              {users.map((u) => (
+                <tr key={u.id} className="border-b border-line last:border-0 hover:bg-cloud/60">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2.5">
-                      <Avatar initials={name.split(" ").map((w) => w[0]).join("")} color={color} size="sm" />
-                      <span className="font-semibold text-ink">{name}</span>
+                      <Avatar initials={u.initials} color={u.color} size="sm" />
+                      <span className="font-semibold text-ink">{u.name}</span>
                     </div>
                   </td>
-                  <td className="px-5 py-3"><Badge tone={role === "Teacher" ? "brand" : "gray"}>{role}</Badge></td>
-                  <td className="px-5 py-3 text-ink-500">{email}</td>
+                  <td className="px-5 py-3"><Badge tone={u.role === "teacher" ? "brand" : "gray"} className="capitalize">{u.role}</Badge></td>
+                  <td className="px-5 py-3 text-ink-500">{u.email}</td>
+                  <td className="px-5 py-3">
+                    <Badge tone={u.isActive ? "green" : "red"}>{u.isActive ? "Active" : "Deactivated"}</Badge>
+                  </td>
                   <td className="px-5 py-3 text-right">
-                    <button className="text-xs font-medium text-ink-400 hover:text-danger">Deactivate</button>
+                    <button
+                      onClick={() => handleToggleUser(u.id)}
+                      className={cn("text-xs font-medium transition", u.isActive ? "text-ink-400 hover:text-danger" : "text-brand-600 hover:underline")}
+                    >
+                      {u.isActive ? "Deactivate" : "Reactivate"}
+                    </button>
                   </td>
                 </tr>
               ))}
+              {users.length === 0 && (
+                <tr><td colSpan={5} className="py-6 text-center text-ink-400">No users found.</td></tr>
+              )}
             </tbody>
           </table>
         </Card>
@@ -366,26 +407,23 @@ export function AdminPage() {
                 <th className="px-5 py-3 font-medium">Student</th>
                 <th className="px-5 py-3 font-medium">When</th>
                 <th className="px-5 py-3 font-medium">Price</th>
-                <th className="px-5 py-3" />
+                <th className="px-5 py-3 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
-              {[
-                ["IELTS Speaking Practice", "Aziza Karimova", "Jasur Toshev", "Today · 17:30", 120000],
-                ["General English", "Jamshid Mahkamov", "Jasur Toshev", "Thu · 16:00", 90000],
-                ["SAT Math", "Madina Rahimova", "Jasur Toshev", "Sat · 14:00", 110000],
-              ].map(([title, teacher, student, when, price]) => (
-                <tr key={String(title) + String(when)} className="border-b border-line last:border-0 hover:bg-cloud/60">
-                  <td className="px-5 py-3 font-semibold text-ink">{title}</td>
-                  <td className="px-5 py-3 text-ink-500">{teacher}</td>
-                  <td className="px-5 py-3 text-ink-500">{student}</td>
-                  <td className="px-5 py-3 text-ink-500">{when}</td>
-                  <td className="px-5 py-3 font-medium text-ink">{fmtUzs(price as number)}</td>
-                  <td className="px-5 py-3 text-right">
-                    <button className="text-xs font-medium text-ink-400 hover:text-danger">Cancel</button>
-                  </td>
+              {lessons.map((l) => (
+                <tr key={l.id} className="border-b border-line last:border-0 hover:bg-cloud/60">
+                  <td className="px-5 py-3 font-semibold text-ink">{l.title}</td>
+                  <td className="px-5 py-3 text-ink-500">{l.teacher}</td>
+                  <td className="px-5 py-3 text-ink-500">{l.student}</td>
+                  <td className="px-5 py-3 text-ink-500">{l.when}</td>
+                  <td className="px-5 py-3 font-medium text-ink">{fmtUzs(l.price)}</td>
+                  <td className="px-5 py-3"><Badge tone={l.status === "completed" ? "green" : "brand"}>{l.status}</Badge></td>
                 </tr>
               ))}
+              {lessons.length === 0 && (
+                <tr><td colSpan={6} className="py-6 text-center text-ink-400">No bookings recorded yet.</td></tr>
+              )}
             </tbody>
           </table>
         </Card>

@@ -1332,3 +1332,101 @@ async def send_direct_message(data: SendDirectMessageSchema, user: User = Depend
         }
     finally:
         db.close()
+
+
+# -------------------------------------------------------------
+# ADMIN ENDPOINTS (REAL DATABASE TABLES)
+# -------------------------------------------------------------
+@router.get("/admin/teachers")
+async def get_admin_teachers():
+    db = SessionMaster()
+    try:
+        teachers = (
+            db.query(MeetTeacherProfile)
+            .options(
+                joinedload(MeetTeacherProfile.user),
+                joinedload(MeetTeacherProfile.lesson_options),
+            )
+            .all()
+        )
+        return [
+            {
+                "id": t.id,
+                "name": t.user.full_name if t.user else "Teacher",
+                "email": t.user.email if t.user else "",
+                "subjects": json.loads(t.subjects_json or "[]"),
+                "rating": round(t.rating, 1),
+                "lessonsTaught": t.lessons_taught,
+                "verified": t.verified,
+                "color": t.avatar_color,
+                "initials": "".join([w[0].upper() for w in (t.user.full_name or "T").split(" ") if w])[:2],
+            }
+            for t in teachers
+        ]
+    finally:
+        db.close()
+
+
+@router.get("/admin/users")
+async def get_admin_users():
+    db = SessionMaster()
+    try:
+        users = db.query(User).order_by(User.id.desc()).limit(100).all()
+        return [
+            {
+                "id": u.id,
+                "name": u.full_name or u.username,
+                "role": u.role,
+                "email": u.email,
+                "isActive": u.is_active,
+                "color": "#7B61FF" if u.role == "teacher" else "#1FAD55",
+                "initials": "".join([w[0].upper() for w in (u.full_name or u.username).split(" ") if w])[:2],
+            }
+            for u in users
+        ]
+    finally:
+        db.close()
+
+
+@router.get("/admin/lessons")
+async def get_admin_lessons():
+    db = SessionMaster()
+    try:
+        bookings = (
+            db.query(MeetBooking)
+            .options(
+                joinedload(MeetBooking.teacher).joinedload(MeetTeacherProfile.user),
+                joinedload(MeetBooking.student),
+            )
+            .order_by(MeetBooking.id.desc())
+            .limit(100)
+            .all()
+        )
+        return [
+            {
+                "id": b.id,
+                "title": b.title,
+                "teacher": b.teacher.user.full_name if b.teacher and b.teacher.user else "Teacher",
+                "student": b.student.full_name if b.student else "Student",
+                "when": f"{b.date_str} · {b.time_str}",
+                "price": b.price_uzs,
+                "status": b.status,
+            }
+            for b in bookings
+        ]
+    finally:
+        db.close()
+
+
+@router.post("/admin/users/{user_id}/toggle-status")
+async def toggle_user_status(user_id: int):
+    db = SessionMaster()
+    try:
+        u = db.query(User).filter(User.id == user_id).first()
+        if not u:
+            raise HTTPException(status_code=404, detail="User not found")
+        u.is_active = not u.is_active
+        db.commit()
+        return {"success": True, "isActive": u.is_active}
+    finally:
+        db.close()

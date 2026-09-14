@@ -67,11 +67,16 @@ export function StudentDashboard() {
   const completed = lessons.filter((l) => l.status === "completed");
   const next = upcoming[0];
 
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+
   return (
     <div className="mx-auto max-w-5xl animate-fade-up">
-      <p className="text-[13px] text-ink-400">Saturday · Aug 22</p>
+      <p className="text-[13px] text-ink-400">{dateStr}</p>
       <h1 className="mt-1 font-display text-[30px] font-bold tracking-tight text-ink">
-        Good afternoon, {user?.name.split(" ")[0]}
+        {greeting}, {user?.name.split(" ")[0]}
       </h1>
 
       {/* Next lesson hero */}
@@ -428,15 +433,6 @@ export function TeacherProfilePage() {
 }
 
 /* ================= BOOKING FLOW ================= */
-const BOOKING_DATES = [
-  { d: "Today", sub: "Aug 22" },
-  { d: "Tomorrow", sub: "Aug 23" },
-  { d: "Mon", sub: "Aug 24" },
-  { d: "Tue", sub: "Aug 25" },
-  { d: "Wed", sub: "Aug 26" },
-  { d: "Thu", sub: "Aug 27" },
-  { d: "Fri", sub: "Aug 28" },
-];
 
 export function BookingPage() {
   const { id } = useParams();
@@ -466,6 +462,25 @@ export function BookingPage() {
       setLessonId(t.lessons[0].id);
     }
   }, [t]);
+
+  // Dynamic rolling 14-day calendar
+  const bookingDays = useMemo(() => {
+    const list: { d: string; sub: string; full: string }[] = [];
+    const base = new Date();
+    for (let i = 0; i < 14; i++) {
+      const dt = new Date(base);
+      dt.setDate(base.getDate() + i);
+      const dayName = i === 0 ? "Today" : i === 1 ? "Tomorrow" : dt.toLocaleDateString("en-US", { weekday: "short" });
+      const monthDay = dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const dayCode = dt.toLocaleDateString("en-US", { weekday: "short" });
+      list.push({
+        d: dayName,
+        sub: monthDay,
+        full: i === 0 ? "Today" : i === 1 ? "Tomorrow" : `${dayCode}, ${monthDay}`,
+      });
+    }
+    return list;
+  }, []);
 
   const lesson = t.lessons.find((l) => l.id === lessonId) ?? t.lessons[0] ?? {
     id: "l1",
@@ -554,13 +569,13 @@ export function BookingPage() {
         {step === 1 && (
           <div className="animate-fade-up">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {BOOKING_DATES.map((d) => (
+              {bookingDays.map((d) => (
                 <button
                   key={d.sub}
-                  onClick={() => setDate(d.d === "Today" || d.d === "Tomorrow" ? d.d : `${d.d}, ${d.sub}`)}
+                  onClick={() => setDate(d.full)}
                   className={cn(
                     "rounded-xl border p-4 text-center transition active:scale-[0.97]",
-                    date.includes(d.sub) ? "border-brand-500 bg-brand-50 ring-4 ring-brand-500/10" : "border-line hover:border-ink-400"
+                    date === d.full ? "border-brand-500 bg-brand-50 ring-4 ring-brand-500/10" : "border-line hover:border-ink-400"
                   )}
                 >
                   <p className="text-sm font-semibold text-ink">{d.d}</p>
@@ -611,13 +626,37 @@ export function BookingPage() {
                 </div>
               ))}
               <div className="mt-3 flex items-center justify-between rounded-lg bg-white px-4 py-3 ring-1 ring-line">
-                <span className="text-sm font-medium text-ink">Total</span>
+                <span className="text-sm font-medium text-ink">Total to Pay</span>
                 <span className="font-display text-lg font-bold text-ink">{fmtUzs(lesson.priceUzs)}</span>
               </div>
             </div>
-            <p className="mt-3 rounded-lg bg-[#FFF6E5] px-3.5 py-2.5 text-[12px] font-medium text-[#9A6700]">
-              Payment coming soon — this booking is free to confirm during the beta.
-            </p>
+
+            {/* Payment Method Selector */}
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-400">Payment method</p>
+              <div className="grid grid-cols-3 gap-2.5">
+                {[
+                  { id: "click", name: "Click", tag: "Uzcard / Humo" },
+                  { id: "payme", name: "Payme", tag: "Instant" },
+                  { id: "balance", name: "Liberum Pay", tag: "0% Fee" },
+                ].map((pm, idx) => (
+                  <div
+                    key={pm.id}
+                    className={cn(
+                      "cursor-pointer rounded-xl border p-3 transition",
+                      idx === 0 ? "border-brand-500 bg-brand-50/50 ring-2 ring-brand-500/20" : "border-line bg-white hover:border-ink-300"
+                    )}
+                  >
+                    <p className="text-xs font-bold text-ink">{pm.name}</p>
+                    <p className="text-[10px] text-ink-400">{pm.tag}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2.5 flex items-center gap-1.5 text-[11px] text-[#157A3E]">
+                <BadgeCheck size={13} /> Escrow Protected: Teacher is paid only after lesson is successfully completed.
+              </p>
+            </div>
+
             <div className="mt-5 flex items-center justify-between">
               <Btn variant="ghost" onClick={() => setStep(2)}>Back</Btn>
               <Btn
@@ -627,7 +666,7 @@ export function BookingPage() {
                   setDone(true);
                 }}
               >
-                <Check size={15} /> Confirm Booking
+                <Check size={15} /> Confirm & Book Lesson
               </Btn>
             </div>
           </div>

@@ -63,11 +63,10 @@ function Notifications({ onClose }: { onClose: () => void }) {
 }
 
 export default function AppShell({ children }: { children: ReactNode }) {
-  const { user, signOut, signIn } = useApp();
+  const { user, signOut, signIn, lessons, notifications } = useApp();
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
-  const { notifications } = useApp();
   const unread = notifications.filter((n) => !n.read).length;
 
   const [searchParams] = useSearchParams();
@@ -202,19 +201,23 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </footer>
       </div>
 
-      {/* Floating classroom quick-join for demo */}
-      {searchParams.get("shot") !== "1" && (
-      <Link
-        to="/classroom/les-1"
-        className="fixed bottom-5 right-5 z-40 hidden items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-white shadow-[0_12px_32px_-8px_rgba(14,15,19,0.5)] transition hover:bg-ink-soft md:inline-flex"
-      >
-        <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-300 opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-400" />
-        </span>
-        Demo classroom
-      </Link>
-      )}
+      {/* Floating classroom quick-join for active / live lessons */}
+      {(() => {
+        const liveLesson = lessons.find((l) => l.status === "live" || l.status === "starting-soon");
+        if (!liveLesson) return null;
+        return (
+          <Link
+            to={`/classroom/${liveLesson.id}`}
+            className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_12px_32px_-8px_rgba(123,97,255,0.6)] transition hover:bg-brand-600"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+            </span>
+            Enter Live Classroom
+          </Link>
+        );
+      })()}
     </div>
   );
 }

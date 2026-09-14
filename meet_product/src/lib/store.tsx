@@ -66,9 +66,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (backendLessons && backendLessons.length > 0) {
         setLessons(backendLessons);
       } else {
-        // Fallback to initial seed lessons
-        const fallback = user.role === "teacher" ? TEACHER_LESSONS : STUDENT_LESSONS;
-        setLessons(fallback);
+        // Only show demo seed lessons for demo accounts
+        const isDemoUser =
+          user.email === "timur@demo.com" ||
+          user.email === "aziza@demo.com" ||
+          user.email === "jasur@student.liberum.uz" ||
+          user.id === "1" ||
+          user.id === "4";
+        if (isDemoUser) {
+          const fallback = user.role === "teacher" ? TEACHER_LESSONS : STUDENT_LESSONS;
+          setLessons(fallback);
+        } else {
+          setLessons([]);
+        }
       }
 
       const backendNotifs = await meetApi.listNotifications();
@@ -88,8 +98,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
     } catch {
       // Offline fallback
-      const fallback = user.role === "teacher" ? TEACHER_LESSONS : STUDENT_LESSONS;
-      setLessons(fallback);
+      setLessons([]);
     }
   };
 

@@ -51,11 +51,16 @@ export function TeacherDashboard() {
   const ratingVal = stats?.rating || 4.9;
   const reviewsCount = stats?.reviewsCount || 86;
 
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+
   return (
     <div className="mx-auto max-w-5xl animate-fade-up">
-      <p className="text-[13px] text-ink-400">Saturday · Aug 22</p>
+      <p className="text-[13px] text-ink-400">{dateStr}</p>
       <h1 className="mt-1 font-display text-[30px] font-bold tracking-tight text-ink">
-        Good afternoon, {user?.name.split(" ")[0]}
+        {greeting}, {user?.name.split(" ")[0]}
       </h1>
 
       {/* Stats */}

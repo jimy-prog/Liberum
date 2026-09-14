@@ -239,4 +239,49 @@ export const meetApi = {
       body: JSON.stringify({ recipient_id: recipientId, message }),
     });
   },
+
+  // Admin APIs
+  async getAdminTeachers() {
+    return request<{
+      id: number;
+      name: string;
+      email: string;
+      subjects: string[];
+      rating: number;
+      lessonsTaught: number;
+      verified: boolean;
+      color: string;
+      initials: string;
+    }[]>("/admin/teachers");
+  },
+
+  async getAdminUsers() {
+    return request<{
+      id: number;
+      name: string;
+      role: string;
+      email: string;
+      isActive: boolean;
+      color: string;
+      initials: string;
+    }[]>("/admin/users");
+  },
+
+  async getAdminLessons() {
+    return request<{
+      id: number;
+      title: string;
+      teacher: string;
+      student: string;
+      when: string;
+      price: number;
+      status: string;
+    }[]>("/admin/lessons");
+  },
+
+  async toggleUserStatus(userId: number) {
+    return request<{ success: boolean; isActive: boolean }>(`/admin/users/${userId}/toggle-status`, {
+      method: "POST",
+    });
+  },
 };

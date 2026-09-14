@@ -31,12 +31,6 @@ interface WhiteboardDrawAction {
   points: { x: number; y: number }[];
 }
 
-const seedChat: ChatMsg[] = [
-  { id: 1, from: "them", name: "Aziza", text: "Salom Jasur! Can you hear me well?", time: "17:31" },
-  { id: 2, from: "me", name: "You", text: "Yes, perfectly. Ready when you are.", time: "17:31" },
-  { id: 3, from: "them", name: "Aziza", text: "Great. Today we'll do a full Part 2 + Part 3 mock. I'll time you and note your fluency markers.", time: "17:32" },
-];
-
 function fmt(sec: number) {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
@@ -53,8 +47,8 @@ export default function ClassroomPage() {
   const [sharing, setSharing] = useState(false);
   const [activeSideTab, setActiveSideTab] = useState<"chat" | "whiteboard" | "notes" | "ai">("chat");
   const [sideOpen, setSideOpen] = useState(true);
-  const [elapsed, setElapsed] = useState(11 * 60 + 12); // mid-lesson
-  const [msgs, setMsgs] = useState<ChatMsg[]>(seedChat);
+  const [elapsed, setElapsed] = useState(0); // starts from 00:00
+  const [msgs, setMsgs] = useState<ChatMsg[]>([]);
   const [draft, setDraft] = useState("");
   const [ended, setEnded] = useState(false);
   const [conn, setConn] = useState<"excellent" | "good" | "weak">("excellent");
