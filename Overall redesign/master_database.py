@@ -515,3 +515,26 @@ class MeetDirectMessage(MasterBase):
     sender = relationship("User", foreign_keys=[sender_id])
     recipient = relationship("User", foreign_keys=[recipient_id])
 
+
+class MeetLessonNote(MasterBase):
+    __tablename__ = "meet_lesson_notes"
+    id = Column(Integer, primary_key=True)
+    booking_id = Column(Integer, ForeignKey("meet_bookings.id"), nullable=False)
+    notes_markdown = Column(String, default="")
+    vocabulary_json = Column(String, default="[]")  # [{"word": "meticulous", "definition": "showing great attention to detail", "example": "..."}]
+    homework = Column(String, default="")
+    ai_summary = Column(String, default="")
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    booking = relationship("MeetBooking", backref="lesson_notes", uselist=False)
+
+
+class MeetWhiteboardState(MasterBase):
+    __tablename__ = "meet_whiteboard_states"
+    id = Column(Integer, primary_key=True)
+    booking_id = Column(Integer, ForeignKey("meet_bookings.id"), nullable=False, unique=True)
+    elements_json = Column(String, default="[]")  # strokes, shapes, text
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    booking = relationship("MeetBooking", backref="whiteboard_state", uselist=False)
+

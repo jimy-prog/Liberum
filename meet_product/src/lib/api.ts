@@ -135,6 +135,52 @@ export const meetApi = {
     );
   },
 
+  // Classroom Superpowers: Notes, Vocabulary, Whiteboard, AI
+  async getClassroomNotes(lessonId: string) {
+    return request<{
+      bookingId: number;
+      notesMarkdown: string;
+      vocabulary: { word: string; definition: string; example: string }[];
+      homework: string;
+      aiSummary: string;
+    }>(`/classroom/${lessonId}/notes`);
+  },
+
+  async updateClassroomNotes(
+    lessonId: string,
+    data: {
+      notesMarkdown?: string;
+      vocabulary?: { word: string; definition: string; example: string }[];
+      homework?: string;
+    }
+  ) {
+    return request<{ success: boolean }>(`/classroom/${lessonId}/notes`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getClassroomWhiteboard(lessonId: string) {
+    return request<{ elements: any[] }>(`/classroom/${lessonId}/whiteboard`);
+  },
+
+  async updateClassroomWhiteboard(lessonId: string, elements: any[]) {
+    return request<{ success: boolean }>(`/classroom/${lessonId}/whiteboard`, {
+      method: "PUT",
+      body: JSON.stringify({ elements }),
+    });
+  },
+
+  async analyzeLessonAI(lessonId: string, transcriptOrNotes: string) {
+    return request<{
+      aiSummary: string;
+      suggestedVocabulary: { word: string; definition: string; example: string }[];
+    }>(`/classroom/${lessonId}/ai-analyze`, {
+      method: "POST",
+      body: JSON.stringify({ transcriptOrNotes }),
+    });
+  },
+
   // Notifications
   async listNotifications() {
     return request<{ id: string; title: string; body: string; time: string; read: boolean; kind: "booking" | "reminder" | "system" }[]>(

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import {
-  Mic, MicOff, MonitorUp, MoreVertical, PhoneOff, Send, Signal,
-  Video, VideoOff, X,
+  BookOpen, Eraser, Mic, MicOff, MonitorUp,
+  PenTool, PhoneOff, Plus, RotateCcw, Send,
+  Signal, Sparkles, Video, VideoOff, Wand2, X,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { meetApi } from "@/lib/api";
@@ -15,6 +16,19 @@ interface ChatMsg {
   name: string;
   text: string;
   time: string;
+}
+
+interface VocabItem {
+  word: string;
+  definition: string;
+  example: string;
+}
+
+interface WhiteboardDrawAction {
+  tool: "pen" | "eraser";
+  color: string;
+  size: number;
+  points: { x: number; y: number }[];
 }
 
 const seedChat: ChatMsg[] = [
@@ -37,12 +51,35 @@ export default function ClassroomPage() {
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
   const [sharing, setSharing] = useState(false);
-  const [chatOpen, setChatOpen] = useState(true);
+  const [activeSideTab, setActiveSideTab] = useState<"chat" | "whiteboard" | "notes" | "ai">("chat");
+  const [sideOpen, setSideOpen] = useState(true);
   const [elapsed, setElapsed] = useState(11 * 60 + 12); // mid-lesson
   const [msgs, setMsgs] = useState<ChatMsg[]>(seedChat);
   const [draft, setDraft] = useState("");
   const [ended, setEnded] = useState(false);
   const [conn, setConn] = useState<"excellent" | "good" | "weak">("excellent");
+
+  // Lesson Superpowers State
+  const [notesText, setNotesText] = useState("# Lesson Notes\n\n- Focus on Part 2 cue cards\n- Work on natural pauses instead of 'um' / 'uh'");
+  const [vocabulary, setVocabulary] = useState<VocabItem[]>([
+    { word: "Articulate", definition: "Able to express thoughts clearly and effectively.", example: "She gave an articulate response during the mock interview." },
+    { word: "Nuance", definition: "A subtle difference in meaning or tone.", example: "Understanding cultural nuances is vital for higher band scores." }
+  ]);
+  const [homework, setHomework] = useState("Record a 2-minute voice reply describing an impressive historical building you visited.");
+  const [aiSummary, setAiSummary] = useState("");
+  const [analyzingAi, setAnalyzingAi] = useState(false);
+  const [savingNotes, setSavingNotes] = useState(false);
+  const [newVocabWord, setNewVocabWord] = useState("");
+  const [newVocabDef, setNewVocabDef] = useState("");
+
+  // Whiteboard Canvas State
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [drawing, setDrawing] = useState(false);
+  const [penColor, setPenColor] = useState("#7B61FF");
+  const [penSize] = useState(3);
+  const [tool, setTool] = useState<"pen" | "eraser">("pen");
+  const currentPathRef = useRef<{ x: number; y: number }[]>([]);
+  const strokesRef = useRef<WhiteboardDrawAction[]>([]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -163,6 +200,23 @@ export default function ClassroomPage() {
             } else if (data.type === "peer-left") {
               setPeerConnected(false);
               setRemoteStream(null);
+            } else if (data.type === "whiteboard-stroke") {
+              // Remote peer drew on whiteboard
+              if (data.stroke) {
+                strokesRef.current.push(data.stroke);
+                redrawCanvas();
+              }
+            } else if (data.type === "whiteboard-clear") {
+              strokesRef.current = [];
+              redrawCanvas();
+            } else if (data.type === "notes-sync") {
+              if (data.notesMarkdown) setNotesText(data.notesMarkdown);
+              if (data.vocabulary) setVocabulary(data.vocabulary);
+              if (data.homework) setHomework(data.homework);
+            } else if (data.type === "vocab-add") {
+              if (data.item) {
+                setVocabulary((prev) => [...prev, data.item]);
+              }
             }
           } catch (err) {
             console.error("Signaling error:", err);
@@ -258,7 +312,7 @@ export default function ClassroomPage() {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [msgs, chatOpen]);
+  }, [msgs, sideOpen, activeSideTab]);
 
   const send = async () => {
     if (!draft.trim()) return;
@@ -283,6 +337,193 @@ export default function ClassroomPage() {
         }
       } catch {
         // keep optimistic
+      }
+    }
+  };
+
+  // Load and sync lesson notes
+  useEffect(() => {
+    if (!lessonId) return;
+    meetApi.getClassroomNotes(lessonId)
+      .then((data) => {
+        if (data) {
+          if (data.notesMarkdown) setNotesText(data.notesMarkdown);
+          if (data.vocabulary && data.vocabulary.length > 0) setVocabulary(data.vocabulary);
+          if (data.homework) setHomework(data.homework);
+          if (data.aiSummary) setAiSummary(data.aiSummary);
+        }
+      })
+      .catch(() => {});
+  }, [lessonId]);
+
+  // Load and sync whiteboard
+  useEffect(() => {
+    if (!lessonId) return;
+    meetApi.getClassroomWhiteboard(lessonId)
+      .then((data) => {
+        if (data && data.elements && data.elements.length > 0) {
+          strokesRef.current = data.elements;
+          redrawCanvas();
+        }
+      })
+      .catch(() => {});
+  }, [lessonId]);
+
+  // Redraw canvas from strokesRef
+  const redrawCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    strokesRef.current.forEach((stroke) => {
+      if (stroke.points.length < 2) return;
+      ctx.beginPath();
+      ctx.strokeStyle = stroke.tool === "eraser" ? "#14151B" : stroke.color;
+      ctx.lineWidth = stroke.size;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      for (let i = 1; i < stroke.points.length; i++) {
+        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+      }
+      ctx.stroke();
+    });
+  };
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    setDrawing(true);
+    currentPathRef.current = [{ x, y }];
+  };
+
+  const drawMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!drawing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    currentPathRef.current.push({ x, y });
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const points = currentPathRef.current;
+    if (points.length >= 2) {
+      ctx.beginPath();
+      ctx.strokeStyle = tool === "eraser" ? "#14151B" : penColor;
+      ctx.lineWidth = tool === "eraser" ? 18 : penSize;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.moveTo(points[points.length - 2].x, points[points.length - 2].y);
+      ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+      ctx.stroke();
+    }
+  };
+
+  const stopDrawing = () => {
+    if (!drawing) return;
+    setDrawing(false);
+    if (currentPathRef.current.length > 1) {
+      const newStroke: WhiteboardDrawAction = {
+        tool,
+        color: penColor,
+        size: tool === "eraser" ? 18 : penSize,
+        points: [...currentPathRef.current],
+      };
+      strokesRef.current.push(newStroke);
+      currentPathRef.current = [];
+
+      // Broadcast stroke via WebSocket
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: "whiteboard-stroke", stroke: newStroke }));
+      }
+      // Save to backend
+      if (lessonId) {
+        meetApi.updateClassroomWhiteboard(lessonId, strokesRef.current).catch(() => {});
+      }
+    }
+  };
+
+  const clearWhiteboard = () => {
+    strokesRef.current = [];
+    redrawCanvas();
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: "whiteboard-clear" }));
+    }
+    if (lessonId) {
+      meetApi.updateClassroomWhiteboard(lessonId, []).catch(() => {});
+    }
+  };
+
+  // Save lesson notes to backend
+  const handleSaveNotes = async () => {
+    if (!lessonId) return;
+    setSavingNotes(true);
+    try {
+      await meetApi.updateClassroomNotes(lessonId, {
+        notesMarkdown: notesText,
+        vocabulary,
+        homework,
+      });
+      // Broadcast notes update via WebSocket
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: "notes-sync",
+          notesMarkdown: notesText,
+          vocabulary,
+          homework,
+        }));
+      }
+    } finally {
+      setSavingNotes(false);
+    }
+  };
+
+  // Run AI Lesson Copilot Analysis
+  const handleRunAiAnalysis = async () => {
+    if (!lessonId) return;
+    setAnalyzingAi(true);
+    try {
+      const fullContext = `${notesText}\n\nChat:\n${msgs.map((m) => `${m.name}: ${m.text}`).join("\n")}`;
+      const res = await meetApi.analyzeLessonAI(lessonId, fullContext);
+      if (res && res.aiSummary) {
+        setAiSummary(res.aiSummary);
+        if (res.suggestedVocabulary && res.suggestedVocabulary.length > 0) {
+          setVocabulary((prev) => {
+            const existingWords = new Set(prev.map((v) => v.word.toLowerCase()));
+            const toAdd = res.suggestedVocabulary.filter((v) => !existingWords.has(v.word.toLowerCase()));
+            return [...prev, ...toAdd];
+          });
+        }
+      }
+    } finally {
+      setAnalyzingAi(false);
+    }
+  };
+
+  const addVocabItem = () => {
+    if (!newVocabWord.trim()) return;
+    const item: VocabItem = {
+      word: newVocabWord.trim(),
+      definition: newVocabDef.trim() || "Defined during lesson practice.",
+      example: "Used during mock dialogue.",
+    };
+    const updated = [...vocabulary, item];
+    setVocabulary(updated);
+    setNewVocabWord("");
+    setNewVocabDef("");
+    if (lessonId) {
+      meetApi.updateClassroomNotes(lessonId, { vocabulary: updated }).catch(() => {});
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: "vocab-add", item }));
       }
     }
   };
@@ -408,15 +649,69 @@ export default function ClassroomPage() {
             <CtrlButton active={micOn} onClick={() => setMicOn((v) => !v)} label={micOn ? "Mute" : "Unmute"} offIcon={<MicOff size={19} />} onIcon={<Mic size={19} />} danger={!micOn} />
             <CtrlButton active={camOn} onClick={() => setCamOn((v) => !v)} label={camOn ? "Stop video" : "Start video"} offIcon={<VideoOff size={19} />} onIcon={<Video size={19} />} danger={!camOn} />
             <CtrlButton active={sharing} onClick={handleToggleShare} label={sharing ? "Stop sharing" : "Share screen"} onIcon={<MonitorUp size={19} />} highlight={sharing} />
-            <CtrlButton active={chatOpen} onClick={() => setChatOpen((v) => !v)} label="Chat" onIcon={
-              <span className="relative">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg>
-                {msgs.some((m) => m.from === "them") && !chatOpen && <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-brand-400" />}
-              </span>
-            } highlight={chatOpen} />
-            <button className="hidden h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/80 transition hover:bg-white/20 sm:flex" aria-label="More options">
-              <MoreVertical size={18} />
-            </button>
+            {/* Superpower Control Buttons */}
+            <CtrlButton
+              active={sideOpen && activeSideTab === "whiteboard"}
+              onClick={() => {
+                if (sideOpen && activeSideTab === "whiteboard") {
+                  setSideOpen(false);
+                } else {
+                  setActiveSideTab("whiteboard");
+                  setSideOpen(true);
+                  setTimeout(redrawCanvas, 50);
+                }
+              }}
+              label="Interactive Whiteboard"
+              onIcon={<PenTool size={18} />}
+              highlight={sideOpen && activeSideTab === "whiteboard"}
+            />
+            <CtrlButton
+              active={sideOpen && activeSideTab === "notes"}
+              onClick={() => {
+                if (sideOpen && activeSideTab === "notes") {
+                  setSideOpen(false);
+                } else {
+                  setActiveSideTab("notes");
+                  setSideOpen(true);
+                }
+              }}
+              label="Lesson Notes & Vocabulary"
+              onIcon={<BookOpen size={18} />}
+              highlight={sideOpen && activeSideTab === "notes"}
+            />
+            <CtrlButton
+              active={sideOpen && activeSideTab === "ai"}
+              onClick={() => {
+                if (sideOpen && activeSideTab === "ai") {
+                  setSideOpen(false);
+                } else {
+                  setActiveSideTab("ai");
+                  setSideOpen(true);
+                }
+              }}
+              label="AI Copilot & Summary"
+              onIcon={<Sparkles size={18} className="text-brand-300" />}
+              highlight={sideOpen && activeSideTab === "ai"}
+            />
+            <CtrlButton
+              active={sideOpen && activeSideTab === "chat"}
+              onClick={() => {
+                if (sideOpen && activeSideTab === "chat") {
+                  setSideOpen(false);
+                } else {
+                  setActiveSideTab("chat");
+                  setSideOpen(true);
+                }
+              }}
+              label="Chat"
+              onIcon={
+                <span className="relative">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg>
+                  {msgs.some((m) => m.from === "them") && (!sideOpen || activeSideTab !== "chat") && <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-brand-400" />}
+                </span>
+              }
+              highlight={sideOpen && activeSideTab === "chat"}
+            />
             <button
               onClick={endLesson}
               className="ml-1 flex h-12 items-center gap-2 rounded-full bg-danger px-5 text-sm font-semibold text-white transition hover:bg-[#e04c45] active:scale-[0.97] sm:ml-3"
@@ -426,47 +721,239 @@ export default function ClassroomPage() {
           </div>
         </div>
 
-        {/* Chat panel */}
-        {chatOpen && (
-          <aside className="hidden w-[320px] shrink-0 flex-col border-l border-white/10 bg-[#14151B] md:flex">
-            <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/10 px-4">
-              <p className="font-display text-sm font-semibold">Lesson chat</p>
-              <button onClick={() => setChatOpen(false)} className="rounded-lg p-1.5 text-white/50 hover:bg-white/10 hover:text-white">
+        {/* Superpowers Panel */}
+        {sideOpen && (
+          <aside className="hidden w-[380px] shrink-0 flex-col border-l border-white/10 bg-[#14151B] md:flex">
+            {/* Tabs Header */}
+            <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/10 px-3">
+              <div className="flex items-center gap-1">
+                {(["chat", "whiteboard", "notes", "ai"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => {
+                      setActiveSideTab(tab);
+                      if (tab === "whiteboard") setTimeout(redrawCanvas, 50);
+                    }}
+                    className={cn(
+                      "rounded-lg px-2.5 py-1 text-xs font-medium capitalize transition",
+                      activeSideTab === tab ? "bg-brand-500 text-white" : "text-white/60 hover:bg-white/5 hover:text-white"
+                    )}
+                  >
+                    {tab === "ai" ? "AI Copilot" : tab}
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setSideOpen(false)} className="rounded-lg p-1.5 text-white/50 hover:bg-white/10 hover:text-white">
                 <X size={15} />
               </button>
             </div>
-            <div className="flex-1 space-y-4 overflow-y-auto p-4">
-              {msgs.map((m) => (
-                <div key={m.id} className={cn("flex flex-col", m.from === "me" && "items-end")}>
-                  <p className="mb-1 text-[10px] font-medium text-white/40">
-                    {m.name} · {m.time}
-                  </p>
-                  <div
-                    className={cn(
-                      "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed",
-                      m.from === "me" ? "rounded-br-md bg-brand-500 text-white" : "rounded-bl-md bg-white/10 text-white/90"
-                    )}
-                  >
-                    {m.text}
+
+            {/* TAB 1: CHAT */}
+            {activeSideTab === "chat" && (
+              <div className="flex min-h-0 flex-1 flex-col">
+                <div className="flex-1 space-y-4 overflow-y-auto p-4">
+                  {msgs.map((m) => (
+                    <div key={m.id} className={cn("flex flex-col", m.from === "me" && "items-end")}>
+                      <p className="mb-1 text-[10px] font-medium text-white/40">
+                        {m.name} · {m.time}
+                      </p>
+                      <div
+                        className={cn(
+                          "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed",
+                          m.from === "me" ? "rounded-br-md bg-brand-500 text-white" : "rounded-bl-md bg-white/10 text-white/90"
+                        )}
+                      >
+                        {m.text}
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={chatEndRef} />
+                </div>
+                <div className="shrink-0 border-t border-white/10 p-3">
+                  <div className="flex items-center gap-2 rounded-full bg-white/10 py-1 pl-4 pr-1">
+                    <input
+                      value={draft}
+                      onChange={(e) => setDraft(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && send()}
+                      placeholder="Message…"
+                      className="min-w-0 flex-1 bg-transparent text-[13px] text-white outline-none placeholder:text-white/40"
+                    />
+                    <button onClick={send} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-500 transition hover:bg-brand-600" aria-label="Send">
+                      <Send size={13} />
+                    </button>
                   </div>
                 </div>
-              ))}
-              <div ref={chatEndRef} />
-            </div>
-            <div className="shrink-0 border-t border-white/10 p-3">
-              <div className="flex items-center gap-2 rounded-full bg-white/10 py-1 pl-4 pr-1">
-                <input
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && send()}
-                  placeholder="Message…"
-                  className="min-w-0 flex-1 bg-transparent text-[13px] text-white outline-none placeholder:text-white/40"
-                />
-                <button onClick={send} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-500 transition hover:bg-brand-600" aria-label="Send">
-                  <Send size={13} />
-                </button>
               </div>
-            </div>
+            )}
+
+            {/* TAB 2: WHITEBOARD */}
+            {activeSideTab === "whiteboard" && (
+              <div className="flex min-h-0 flex-1 flex-col p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setTool("pen")}
+                      className={cn("rounded-lg p-1.5 transition", tool === "pen" ? "bg-brand-500 text-white" : "text-white/60 hover:bg-white/10")}
+                      title="Pen"
+                    >
+                      <PenTool size={15} />
+                    </button>
+                    <button
+                      onClick={() => setTool("eraser")}
+                      className={cn("rounded-lg p-1.5 transition", tool === "eraser" ? "bg-brand-500 text-white" : "text-white/60 hover:bg-white/10")}
+                      title="Eraser"
+                    >
+                      <Eraser size={15} />
+                    </button>
+                    <div className="mx-1 h-4 w-px bg-white/15" />
+                    {["#7B61FF", "#4ADE80", "#FBBF24", "#EF4444", "#FFFFFF"].map((c) => (
+                      <button
+                        key={c}
+                        onClick={() => { setPenColor(c); setTool("pen"); }}
+                        className={cn("h-4 w-4 rounded-full transition", penColor === c && tool === "pen" ? "ring-2 ring-white ring-offset-1 ring-offset-[#14151B]" : "opacity-80")}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={clearWhiteboard}
+                    className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-white/50 transition hover:bg-white/10 hover:text-danger"
+                    title="Clear Board"
+                  >
+                    <RotateCcw size={12} /> Clear
+                  </button>
+                </div>
+                <div className="relative min-h-0 flex-1 rounded-xl border border-white/10 bg-[#0E0F13] overflow-hidden">
+                  <canvas
+                    ref={canvasRef}
+                    width={356}
+                    height={480}
+                    onMouseDown={startDrawing}
+                    onMouseMove={drawMove}
+                    onMouseUp={stopDrawing}
+                    onMouseLeave={stopDrawing}
+                    className="h-full w-full cursor-crosshair touch-none"
+                  />
+                </div>
+                <p className="mt-2 text-center text-[11px] text-white/40">Both teacher & student can draw together in real time.</p>
+              </div>
+            )}
+
+            {/* TAB 3: NOTES & VOCABULARY */}
+            {activeSideTab === "notes" && (
+              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 space-y-4">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <p className="font-display text-xs font-semibold text-white/80">Lesson Notes</p>
+                    <button
+                      onClick={handleSaveNotes}
+                      disabled={savingNotes}
+                      className="rounded-lg bg-brand-500/20 px-2.5 py-1 text-[11px] font-medium text-brand-300 transition hover:bg-brand-500/30"
+                    >
+                      {savingNotes ? "Saving..." : "Save Notes"}
+                    </button>
+                  </div>
+                  <textarea
+                    value={notesText}
+                    onChange={(e) => setNotesText(e.target.value)}
+                    rows={6}
+                    className="mt-2 w-full rounded-xl border border-white/10 bg-white/5 p-3 text-xs leading-relaxed text-white outline-none focus:border-brand-500"
+                    placeholder="Write key lesson notes, grammar corrections..."
+                  />
+                </div>
+
+                <div>
+                  <p className="font-display text-xs font-semibold text-white/80">Vocabulary Bank ({vocabulary.length})</p>
+                  <div className="mt-2 space-y-2">
+                    {vocabulary.map((v, i) => (
+                      <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-2.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-brand-300">{v.word}</span>
+                          <button
+                            onClick={() => {
+                              const updated = vocabulary.filter((_, idx) => idx !== i);
+                              setVocabulary(updated);
+                              if (lessonId) meetApi.updateClassroomNotes(lessonId, { vocabulary: updated }).catch(() => {});
+                            }}
+                            className="text-white/30 hover:text-danger"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                        <p className="mt-1 text-white/70">{v.definition}</p>
+                        {v.example && <p className="mt-1 italic text-white/40">"{v.example}"</p>}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add Vocab Inline */}
+                  <div className="mt-3 flex gap-2">
+                    <input
+                      value={newVocabWord}
+                      onChange={(e) => setNewVocabWord(e.target.value)}
+                      placeholder="New word"
+                      className="h-8 flex-1 rounded-lg border border-white/10 bg-white/5 px-2.5 text-xs text-white outline-none focus:border-brand-500"
+                    />
+                    <input
+                      value={newVocabDef}
+                      onChange={(e) => setNewVocabDef(e.target.value)}
+                      placeholder="Definition"
+                      className="h-8 flex-1 rounded-lg border border-white/10 bg-white/5 px-2.5 text-xs text-white outline-none focus:border-brand-500"
+                    />
+                    <button
+                      onClick={addVocabItem}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-white hover:bg-brand-600"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="font-display text-xs font-semibold text-white/80">Homework Task</p>
+                  <textarea
+                    value={homework}
+                    onChange={(e) => setHomework(e.target.value)}
+                    rows={2}
+                    className="mt-2 w-full rounded-xl border border-white/10 bg-white/5 p-3 text-xs leading-relaxed text-white outline-none focus:border-brand-500"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: AI COPILOT */}
+            {activeSideTab === "ai" && (
+              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 space-y-4">
+                <div className="rounded-xl bg-gradient-to-br from-brand-600/20 to-brand-900/10 border border-brand-500/30 p-3.5">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={16} className="text-brand-400" />
+                    <span className="font-display text-xs font-bold text-white">Liberum AI Lesson Copilot</span>
+                  </div>
+                  <p className="mt-1 text-[11px] leading-relaxed text-white/70">
+                    Analyze the entire lesson conversation and notes to extract grammar assessments, fluency markers, and personalized vocabulary recommendations.
+                  </p>
+                  <button
+                    onClick={handleRunAiAnalysis}
+                    disabled={analyzingAi}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 py-2 text-xs font-semibold text-white transition hover:bg-brand-600 disabled:opacity-50"
+                  >
+                    <Wand2 size={13} />
+                    {analyzingAi ? "Analyzing session..." : "Generate AI Lesson Summary"}
+                  </button>
+                </div>
+
+                {aiSummary ? (
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3.5 text-xs leading-relaxed text-white/90 whitespace-pre-line">
+                    {aiSummary}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center text-white/40">
+                    <BookOpen size={24} className="mb-2 opacity-50" />
+                    <p className="text-xs">Click above to generate an instant lesson summary.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </aside>
         )}
       </div>
