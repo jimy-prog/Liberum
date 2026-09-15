@@ -1858,3 +1858,76 @@ async def request_teacher_payout(data: PayoutRequestSchema, user: User = Depends
     finally:
         db.close()
 
+
+@router.post("/telegram/webhook")
+async def telegram_webhook(request: Request):
+    """Receives webhook updates from Telegram Bot API and links chat_ids to Liberum Meet accounts."""
+    try:
+        data = await request.json()
+    except Exception:
+        return {"ok": True}
+
+    message = data.get("message") or data.get("edited_message")
+    if not message:
+        return {"ok": True}
+
+    chat = message.get("chat", {})
+    chat_id = str(chat.get("id", ""))
+    tg_username = (chat.get("username") or "").strip().lstrip("@")
+    text = (message.get("text") or "").strip()
+
+    if not chat_id:
+        return {"ok": True}
+
+    db = SessionMaster()
+    try:
+        # Check if user sent /start with deep link parameter (e.g., /start uid_12)
+        linked_user = None
+        if text.startswith("/start"):
+            parts = text.split(" ")
+            if len(parts) > 1 and parts[1].startswith("uid_"):
+                try:
+                    uid = int(parts[1].replace("uid_", ""))
+                    linked_user = db.query(User).filter(User.id == uid).first()
+                except Exception:
+                    pass
+
+        # If not linked by param, link by Telegram username
+        if not linked_user and tg_username:
+            linked_user = db.query(User).filter(
+                (User.telegram_username == tg_username) | (User.telegram_chat_id == f"tg_{tg_username}")
+            ).first()
+
+        if linked_user:
+            linked_user.telegram_chat_id = chat_id
+            if tg_username:
+                linked_user.telegram_username = tg_username
+            db.commit()
+
+            reply = (
+                f"👋 *Salom, {linked_user.full_name or 'Liberum User'}!*\n\n"
+                f"✅ Sizning Telegram hisobingiz **Liberum Meet** platformasiga muvaffaqiyatli ulandi!\n\n"
+                f"Endi siz bu yerda:\n"
+                f"• Dars buyurtmalari (Booking confirmation)\n"
+                f"• Dars boshlanishiga 15 daqiqa qolganida eslatmalar\n"
+                f"• To'lovlar va o'qituvchi xabarlarini darhol olasiz.\n\n"
+                f"🔗 [Platformaga o'tish](https://meet.liberum.uz)"
+            )
+            send_telegram_notification(chat_id, reply)
+        else:
+            reply = (
+                f"👋 *Salom!*\n\n"
+                f"Bu rasmiy **Liberum Meet** xabarnomalar boti.\n\n"
+                f"Hisobingizni ulash uchun [meet.liberum.uz](https://meet.liberum.uz) saytidagi profilingizga kiring "
+                f"va Telegram @username qismiga `@{tg_username}` ni kiriting.\n\n"
+                f"Yoki profilingizdagi 'Open Bot' havolasi orqali kiring."
+            )
+            send_telegram_notification(chat_id, reply)
+
+        return {"ok": True}
+    except Exception as e:
+        logger.error(f"Telegram webhook error: {e}")
+        return {"ok": True}
+    finally:
+        db.close()
+
