@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import {
   BookOpen, Check, Eraser, Mic, MicOff, MonitorUp,
-  PenTool, PhoneOff, Plus, RotateCcw, Send,
+  PenTool, PhoneOff, Plus, RefreshCw, RotateCcw, Send,
   Signal, Sparkles, Star, Video, VideoOff, Wand2, X,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
@@ -57,6 +57,8 @@ export default function ClassroomPage() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [conn, setConn] = useState<"excellent" | "good" | "weak">("excellent");
+  const [wsConnected, setWsConnected] = useState(false);
+  const [reconnectCounter, setReconnectCounter] = useState(0);
 
   // Lesson Superpowers State
   const [notesText, setNotesText] = useState("# Lesson Notes\n\n- Focus on Part 2 cue cards\n- Work on natural pauses instead of 'um' / 'uh'");
@@ -184,6 +186,20 @@ export default function ClassroomPage() {
         const ws = new WebSocket(wsUrl);
         wsRef.current = ws;
 
+        ws.onopen = () => {
+          setWsConnected(true);
+        };
+
+        ws.onclose = () => {
+          setWsConnected(false);
+          // Try auto-reconnecting after 3 seconds if session is active
+          if (active && !ended) {
+            setTimeout(() => {
+              if (active) setReconnectCounter((c) => c + 1);
+            }, 3000);
+          }
+        };
+
         const candidateQueue: RTCIceCandidateInit[] = [];
 
         pc.onicecandidate = (event) => {
@@ -270,7 +286,7 @@ export default function ClassroomPage() {
       pcRef.current?.close();
       wsRef.current?.close();
     };
-  }, [lessonId]);
+  }, [lessonId, reconnectCounter]);
 
   const handleToggleShare = async () => {
     if (sharing) {
@@ -680,6 +696,14 @@ export default function ClassroomPage() {
           {lesson?.title ?? "IELTS Speaking Practice"} · with {otherName}
         </p>
         <div className="ml-auto flex items-center gap-3">
+          {!wsConnected && (
+            <button
+              onClick={() => setReconnectCounter((c) => c + 1)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-2.5 py-1 text-[11px] font-medium text-amber-300 transition hover:bg-amber-500/30"
+            >
+              <RefreshCw size={11} className="animate-spin" /> Reconnecting tunnel...
+            </button>
+          )}
           <span
             className={cn(
               "hidden items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium sm:inline-flex",

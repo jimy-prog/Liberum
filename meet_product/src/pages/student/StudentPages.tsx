@@ -317,13 +317,23 @@ export function TeacherProfilePage() {
     if (id) {
       meetApi.getTeacher(id)
         .then((data) => {
-          if (data && data.id) setT(data);
+          if (data && data.id) {
+            setT(data);
+            document.title = `${data.name} — Liberum Meet Teacher`;
+          }
         })
-        .catch(() => {
-          // keep fallback
-        });
+        .catch(() => {});
     }
   }, [id]);
+
+  useEffect(() => {
+    if (t?.name) {
+      document.title = `${t.name} — Liberum Meet Teacher`;
+    }
+    return () => {
+      document.title = "Liberum Meet — Teach. Learn. Meet.";
+    };
+  }, [t?.name]);
 
   const [copied, setCopied] = useState(false);
 
