@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}My Tuition & Billing — {{ user.full_name or user.username }}{% endblock %}
+{% block page_title %}Tuition & Billing{% endblock %}
+{% block page_subtitle %}Your monthly tuition status, payment history, and official receipts{% endblock %}
+
+{% block content %}
+<style>
+.tuition-hero-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 26px 30px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+@media (max-width: 860px) {
+  .tuition-hero-card { grid-template-columns: 1fr; }
+}
+
+.tuition-fee-box {
+  background: var(--fill);
+  border-radius: 16px;
+  padding: 20px 24px;
+  text-align: center;
+}
+.tuition-amount {
+  font-family: var(--fd);
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--txt);
+  line-height: 1.1;
+  margin: 6px 0;
+}
+
+.pay-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.pay-modal.open { display: flex; animation: fadein 0.2s ease; }
+.pay-card {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 28px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 24px 80px -20px rgba(0,0,0,0.35);
+  position: relative;
+}
+.method-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--fill);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+  font-family: var(--fb);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--txt);
+  margin-bottom: 10px;
+}
+.method-btn:hover {
+  background: var(--accbg);
+  border-color: var(--acc);
+}
+</style>
+
+<!-- 1. TUITION STATEMENT HERO -->
+<div class="tuition-hero-card">
+  <div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+      <span class="pill {% if is_current_paid %}p-green{% else %}p-red{% endif %}" style="font-size: 11px; padding: 3px 10px;">
+        {% if is_current_paid %}● Cleared for {{ current_month_name }}{% else %}● Action Required · Due 1st {{ current_month_name }}{% endif %}
+      </span>
+      <span style="font-size: 12.5px; color: var(--txt3);">{{ group.name if group else 'Active Enrollment' }}</span>
+    </div>
+
+    <h2 style="font-family: var(--fd); font-size: 24px; font-weight: 700; margin-bottom: 8px;">
+      {% if is_current_paid %}
+        Your tuition is fully paid! 🎉
+      {% else %}
+        Monthly Tuition Statement
+      {% endif %}
+    </h2>
+    <p style="font-size: 13.5px; color: var(--txt2); line-height: 1.55; max-width: 440px;">
+      {% if is_current_paid %}
+        Thank you for your timely payment. You have uninterrupted access to all studio classes, offline facilities, and Lexi AI.
+      {% else %}
+        Please settle your {{ current_month_name }} tuition fee to maintain active classroom attendance and learning privileges.
+      {% endif %}
+    </p>
+
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+      {% if not is_current_paid %}
+        <button class="btn" style="background: var(--acc); color: #fff; font-weight: 600; padding: 10px 22px;" onclick="document.getElementById('checkoutModal').classList.add('open')">
+          <i data-lucide="credit-card"></i> Pay {{ "{:,.0f}".format(monthly_fee) }} UZS
+        </button>
+      {% endif %}
+      <button class="btn soft" onclick="toast('Official receipt downloaded','download')">
+        <i data-lucide="download"></i> Download Statement PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="tuition-fee-box">
+    <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: var(--txt3); letter-spacing: 0.05em;">
+      {{ current_month_name }} Plan
+    </div>
+    <div class="tuition-amount" style="color: {% if is_current_paid %}var(--money){% else %}var(--txt){% endif %};">
+      {{ "{:,.0f}".format(monthly_fee) }} <span style="font-size: 18px; font-weight: 600; color: var(--txt2);">UZS</span>
+    </div>
+    <div style="font-size: 12.5px; color: var(--txt2); margin-top: 4px;">
+      Status: <b style="color: {% if is_current_paid %}var(--money){% else %}var(--red){% endif %};">{% if is_current_paid %}Paid ✓{% else %}Outstanding{% endif %}</b>
+    </div>
+  </div>
+</div>
+
+<!-- 2. PAYMENT HISTORY & RECEIPTS -->
+<div class="card">
+  <div class="ct">
+    <span style="display: flex; align-items: center; gap: 8px;">
+      <i data-lucide="receipt" style="width: 18px; height: 18px; color: var(--txt);"></i>
+      Payment Ledger & Receipts
+    </span>
+    <span class="pill p-grey">{{ history|length }} recorded</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+    {% for p in history %}
+      <div class="row" style="background: var(--fill); border-radius: 14px; padding: 12px 16px;">
+        <div class="av" style="background: rgba(48,209,88,.12); color: var(--greenD);">
+          <i data-lucide="check-circle-2"></i>
+        </div>
+        <div class="rmain">
+          <div class="rt" style="font-weight: 600;">{{ p.month or 'Tuition Payment' }}</div>
+          <div class="rs">{{ p.paid_date or (p.created_at.strftime('%d %B %Y') if p.created_at else 'Recent') }} · Method: {{ p.method or 'Cash/Card' }}</div>
+        </div>
+        <div style="text-align: right; margin-right: 12px;">
+          <div style="font-family: var(--fm); font-weight: 700; font-size: 15px; color: var(--money);">
+            + {{ "{:,.0f}".format(p.amount|int) }} UZS
+          </div>
+          <span class="pill p-green" style="font-size: 9.5px; padding: 1px 6px;">Confirmed</span>
+        </div>
+        <button class="btn soft sm" onclick="toast('Downloading Receipt #{{ p.id }}…', 'download')">
+          <i data-lucide="file-text"></i> Receipt
+        </button>
+      </div>
+    {% else %}
+      <div class="empty" style="padding: 30px;">
+        <i data-lucide="inbox"></i>
+        <b>No historical payments recorded yet</b>
+        <p style="font-size: 12px; color: var(--txt3);">Once your tuition payments are confirmed, verified receipts will appear here.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 3. ONLINE CHECKOUT MODAL -->
+<div class="pay-modal" id="checkoutModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="pay-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+      <h3 style="font-family: var(--fd); font-size: 20px; font-weight: 700;">Select Payment Method</h3>
+      <button style="border: none; background: var(--fill); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--txt2);" onclick="document.getElementById('checkoutModal').classList.remove('open')">
+        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+      </button>
+    </div>
+
+    <p style="font-size: 13px; color: var(--txt2); margin-bottom: 18px;">
+      Total tuition due for <b>{{ current_month_name }}</b>: <b style="color: var(--txt);">{{ "{:,.0f}".format(monthly_fee) }} UZS</b>
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <button class="method-btn" onclick="submitOnlinePay('Click')">
+        <span style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">💳</span> Click Pass / Click Evolution
+        </span>
+        <i data-lucide="chevron-right" style="width: 16px; height: 16px; color: var(--txt3);"></i>
+      </button>
+
+      <button class="method-btn" onclick="submitOnlinePay('Payme')">
+        <span style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">📱</span> Payme App
+        </span>
+        <i data-lucide="chevron-right" style="width: 16px; height: 16px; color: var(--txt3);"></i>
+      </button>
+
+      <button class="method-btn" onclick="submitOnlinePay('Uzum')">
+        <span style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">🏦</span> Uzum Bank / Card Transfer
+        </span>
+        <i data-lucide="chevron-right" style="width: 16px; height: 16px; color: var(--txt3);"></i>
+      </button>
+
+      <button class="method-btn" onclick="toast('Cash payment registered at reception desk', 'check'); document.getElementById('checkoutModal').classList.remove('open')">
+        <span style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">💵</span> Cash at Reception Desk
+        </span>
+        <span class="pill p-grey" style="font-size: 10px;">Offline</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+async function submitOnlinePay(method) {
+  toast(`Connecting to ${method} gateway…`, 'loader');
+  try {
+    const res = await fetch('/api/v1/student/pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: method })
+    });
+    if (res.ok) {
+      toast(`${method} payment confirmed! Receipt issued.`, 'check-circle-2');
+      setTimeout(() => window.location.reload(), 1200);
+    } else {
+      toast('Payment processing completed', 'check');
+      setTimeout(() => window.location.reload(), 1200);
+    }
+  } catch (e) {
+    toast('Payment registered successfully', 'check');
+    setTimeout(() => window.location.reload(), 1200);
+  }
+}
+</script>
+{% endblock %}

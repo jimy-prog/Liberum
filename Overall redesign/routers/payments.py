@@ -4,9 +4,9 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 from datetime import date
 from database import get_db, Group, Student, Payment
-from auth import require_teacher_or_owner
+from auth import get_current_user, require_teacher_or_owner
 
-router = APIRouter(prefix="/payments", dependencies=[Depends(require_teacher_or_owner)])
+router = APIRouter(prefix="/payments")
 templates = Jinja2Templates(directory="templates")
 
 def get_month_data(db, month_str):
@@ -42,8 +42,46 @@ def get_month_data(db, month_str):
 @router.get("/")
 def payments_view(request: Request, month: str = None,
                   db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+
     today = date.today()
     month_str = month or today.strftime("%Y-%m")
+
+    # If the user is a student, render their luxury personal tuition statement
+    if user.role == "student":
+        student = db.query(Student).filter(
+            (Student.email == user.email) | (Student.phone == user.phone) | (Student.name == user.full_name)
+        ).first()
+
+        group = student.group if student else None
+        monthly_fee = group.price_monthly if (group and group.price_monthly) else 400000
+        
+        # Fetch payment history for this student
+        history = []
+        is_current_paid = False
+        current_paid_amount = 0
+        current_month_name = today.strftime("%B")
+
+        if student:
+            payments = db.query(Payment).filter(Payment.student_id == student.id).order_by(Payment.paid_date.desc(), Payment.created_at.desc()).all()
+            for p in payments:
+                if (current_month_name.lower() in (p.month or "").lower()) or (month_str in (p.month or "")):
+                    current_paid_amount += (p.amount or 0)
+                history.append(p)
+            if current_paid_amount >= monthly_fee:
+                is_current_paid = True
+
+        return templates.TemplateResponse("payments_student.html", {
+            "request": request, "user": user, "student": student, "group": group,
+            "monthly_fee": monthly_fee, "is_current_paid": is_current_paid,
+            "current_paid_amount": current_paid_amount, "current_month_name": current_month_name,
+            "month_str": month_str, "history": history,
+            "active_page": "payments", "main_section": "money"
+        })
+
+    # Owner / Teacher View
     rows, expected, collected = get_month_data(db, month_str)
     outstanding = expected - collected
     paid_count   = sum(1 for r in rows if r["status"] == "paid")

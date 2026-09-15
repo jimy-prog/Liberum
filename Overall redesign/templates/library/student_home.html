@@ -1,65 +1,448 @@
 {% extends "base.html" %}
 
-{% block page_title %}Digital Library{% endblock %}
+{% block title %}Learn — Liberum Studio{% endblock %}
+{% block page_title %}Learn{% endblock %}
+{% block page_subtitle %}Grammar · Audiobooks & Podcasts · Courses · Homework{% endblock %}
 
 {% block content %}
-<div style="max-width: 900px; margin: 0 auto;">
-  <div style="margin-bottom: 24px;">
-    
-    <p style="color: var(--txt2); font-size: 0.95rem;">Enhance your English with our curated digital resources.</p>
-  </div>
+<style>
+.tab-seg {
+  display: flex;
+  gap: 8px;
+  background: var(--card);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  margin-bottom: 24px;
+  width: fit-content;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--txt2);
+  font-family: var(--fb);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.tab-btn:hover {
+  color: var(--txt);
+  background: var(--fill);
+}
+.tab-btn.active {
+  background: var(--acc);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(123, 97, 255, 0.25);
+}
 
-  <div class="grid-2">
-    <!-- Books Card -->
-    <a href="/library/books" class="card" style="text-decoration: none; display: block;">
-        <div class="card-body">
-            <div style="width: 48px; height: 48px; background: var(--accbg); color: var(--acc); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px;">
-                📚
-            </div>
-            <h2 style="font-family: var(--font-d); font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; color: var(--txt);">The Bookshelf</h2>
-            <p style="color: var(--txt2); font-size: 0.85rem; line-height: 1.5;">Read curated e-books and graded readers tailored for your English level.</p>
-        </div>
-    </a>
+.grammar-levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.lvl-card {
+  border-radius: 16px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.lvl-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.lvl-card.done {
+  background: var(--accbg);
+  color: var(--acc2);
+}
+.lvl-card.active-now {
+  background: var(--acc);
+  color: #ffffff;
+  box-shadow: 0 8px 20px -4px rgba(123, 97, 255, 0.4);
+}
+.lvl-card.locked {
+  background: var(--fill);
+  color: var(--txt3);
+}
 
-    <!-- Grammar Engine Card -->
-    <a href="/library/grammar" class="card" style="text-decoration: none; display: block;">
-        <div class="card-body">
-            <div style="width: 48px; height: 48px; background: rgba(168, 85, 247, 0.15); color: #a855f7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px;">
-                🧠
-            </div>
-            <h2 style="font-family: var(--font-d); font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; color: var(--txt);">Universal Grammar</h2>
-            <p style="color: var(--txt2); font-size: 0.85rem; line-height: 1.5;">Master grammar from A1 to C2 with detailed explanations and interactive tests.</p>
-        </div>
-    </a>
+.audio-now-playing {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 18px;
+}
+.playbtn-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--acc);
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: none;
+  transition: transform 0.15s;
+}
+.playbtn-circle:hover {
+  transform: scale(1.05);
+}
+.wave-anim {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+}
+.wave-anim i {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--acc);
+  height: 10px;
+}
+.wave-anim i:nth-child(2n) { height: 18px; }
+.wave-anim i:nth-child(3n) { height: 24px; }
+.wave-anim i:nth-child(5n) { height: 14px; }
 
-    <!-- Audiobooks & Podcasts Card -->
-    <a href="/library/audio" class="card" style="text-decoration: none; display: block;">
-        <div class="card-body">
-            <div style="width: 48px; height: 48px; background: rgba(99, 102, 241, 0.15); color: #6366f1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px;">
-                🎧
-            </div>
-            <h2 style="font-family: var(--font-d); font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; color: var(--txt);">Audiobooks & Podcasts</h2>
-            <p style="color: var(--txt2); font-size: 0.85rem; line-height: 1.5;">Listen to professionally narrated books and podcasts to improve listening comprehension.</p>
-        </div>
-    </a>
+/* Homework submit side drawer */
+.hw-drawer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.38);
+  backdrop-filter: blur(6px);
+  z-index: 250;
+  justify-content: flex-end;
+}
+.hw-drawer.open { display: flex; animation: fadein 0.2s ease; }
+.hw-panel {
+  width: 100%;
+  max-width: 560px;
+  height: 100vh;
+  background: var(--bg);
+  padding: 30px;
+  overflow-y: auto;
+  box-shadow: -15px 0 45px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+</style>
 
-    <!-- AI Error Analysis (Coming Soon) -->
-    <a href="/library/ai" class="card" style="text-decoration: none; display: block; border: 1px solid var(--acc);">
-        <div style="position: absolute; top: 16px; right: 16px;">
-            <span class="badge" style="font-size: 0.65rem; font-weight: 700; background: var(--acc); color: white;">NEW</span>
-        </div>
-        <div class="card-body">
-            <div style="width: 48px; height: 48px; background: rgba(244, 63, 94, 0.15); color: #f43f5e; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px;">
-                🤖
-            </div>
-            <h2 style="font-family: var(--font-d); font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; color: var(--txt);">Lexi AI Tutor</h2>
-            <p style="color: var(--txt2); font-size: 0.85rem; line-height: 1.5;">Your personalized AI tutor fully synchronized with your lessons, test scores, and homework.</p>
-        </div>
-    </a>
-  </div>
-
-  
-  </div>
-
+<!-- TABS NAVIGATION (1:1 with VIEWS.s_learn) -->
+<div class="tab-seg">
+  <button class="tab-btn active" onclick="switchLearnTab('grammar', this)">
+    <i data-lucide="brain"></i> Universal Grammar
+  </button>
+  <button class="tab-btn" onclick="switchLearnTab('audio', this)">
+    <i data-lucide="headphones"></i> Audiobooks & Podcasts
+  </button>
+  <button class="tab-btn" onclick="switchLearnTab('courses', this)">
+    <i data-lucide="layers"></i> My Courses
+  </button>
+  <button class="tab-btn" onclick="switchLearnTab('homework', this)">
+    <i data-lucide="book-open"></i> Homework
+  </button>
 </div>
+
+<!-- TAB 1: GRAMMAR -->
+<div id="tab_grammar" class="learn-tab-pane">
+  <div class="card" style="margin-bottom: 20px;">
+    <div class="ct">
+      <span>Universal Grammar · A1–C2 Progression</span>
+      <span class="pill p-acc">Current: B1+ Intermediate</span>
+    </div>
+    <p style="font-size: 13px; color: var(--txt2); margin-top: 4px;">
+      Master English syntax from beginner to native fluency through bite-sized interactive rules and quizzes.
+    </p>
+
+    <div class="grammar-levels-grid">
+      {% set lvls = [('A1', 'done', '24/24 units'), ('A2', 'done', '24/24 units'), ('B1', 'done', '24/24 units'), ('B1+', 'active-now', '9/24 units'), ('B2', 'locked', 'Locked'), ('C1', 'locked', 'Locked'), ('C2', 'locked', 'Locked')] %}
+      {% for lvl, st, meta in lvls %}
+        <a href="/library/grammar?level={{ lvl }}" class="lvl-card {{ st }}">
+          {% if st == 'done' %}
+            <i data-lucide="check-circle-2" style="width: 18px; height: 18px;"></i>
+          {% elif st == 'active-now' %}
+            <i data-lucide="play-circle" style="width: 18px; height: 18px;"></i>
+          {% else %}
+            <i data-lucide="lock" style="width: 18px; height: 18px;"></i>
+          {% endif %}
+          <div style="font-size: 17px; font-weight: 700; margin-top: 6px;">{{ lvl }}</div>
+          <div style="font-size: 10.5px; opacity: 0.8; margin-top: 3px;">{{ meta }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">
+      <span>Continue Learning · B1+ Recommended Unit</span>
+      <span class="pill p-green">Up Next</span>
+    </div>
+    <div class="row" style="background: var(--fill); border-radius: 14px; padding: 14px 18px;">
+      <div class="av" style="background: var(--accbg); color: var(--acc2);">
+        <i data-lucide="book-open"></i>
+      </div>
+      <div class="rmain">
+        <div class="rt" style="font-weight: 700; font-size: 15px;">Conditionals 2 — Unreal Past & Hypotheticals</div>
+        <div class="rs">Interactive explanation + 12 practice exercises · ~15 min</div>
+      </div>
+      <a href="/library/grammar" class="btn sm" style="background: var(--acc); color: #fff;">
+        <i data-lucide="play"></i> Start Unit
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: AUDIOBOOKS & PODCASTS -->
+<div id="tab_audio" class="learn-tab-pane" style="display: none;">
+  <div class="card" style="margin-bottom: 20px;">
+    <div class="ct">
+      <span>Curated Audiobooks & Listening Series</span>
+      <a href="/library/audio" class="btn soft sm">View Full Audio Catalog</a>
+    </div>
+    
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+      {% set audio_tracks = [
+        ('The Alchemist', 'Paulo Coelho · B2 Upper Intermediate', '4h 12m', 72),
+        ('Atomic Habits', 'James Clear · C1 Advanced', '5h 40m', 15),
+        ('Margaret Thatcher — BBC Historic Archive', 'Biographical Documentary · B2', '42m', 0),
+        ('6 Minute English', 'BBC Learning English · B1', '142 episodes', 0)
+      ] %}
+
+      {% for title, meta, dur, prog in audio_tracks %}
+        <div class="row" style="background: var(--fill); border-radius: 14px; padding: 12px 18px;">
+          <div class="av" style="background: rgba(48,209,88,.12); color: var(--greenD);">
+            <i data-lucide="headphones"></i>
+          </div>
+          <div class="rmain">
+            <div class="rt" style="font-weight: 600;">{{ title }}</div>
+            <div class="rs">{{ meta }} · {{ dur }}</div>
+          </div>
+          {% if prog > 0 %}
+            <div style="width: 100px; margin-right: 12px;">
+              <div style="height: 5px; background: var(--line); border-radius: 99px; overflow: hidden;">
+                <i style="display: block; height: 100%; width: {{ prog }}%; background: var(--acc); border-radius: 99px;"></i>
+              </div>
+              <div style="font-size: 10.5px; color: var(--txt3); margin-top: 4px; text-align: right;">{{ prog }}%</div>
+            </div>
+          {% endif %}
+          <button class="btn soft sm" onclick="playAudioTrack('{{ title }}', '{{ dur }}')">
+            <i data-lucide="play"></i> Play
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="audio-now-playing" id="nowPlayingCard">
+    <button class="playbtn-circle" id="globalPlayBtn" onclick="toggleAudioPlay()">
+      <i data-lucide="play" id="playIcon"></i>
+    </button>
+    <div class="rmain">
+      <div class="rt" id="trackTitle" style="font-weight: 700; font-size: 15px;">The Alchemist · Chapter 9</div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px;">
+        <span style="font-size: 12px; color: var(--txt3);">Audio Streaming</span>
+        <div class="wave-anim">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+      </div>
+    </div>
+    <span style="font-family: var(--fm); font-size: 13px; color: var(--txt2);" id="trackTime">18:22</span>
+  </div>
+</div>
+
+<!-- TAB 3: MY COURSES -->
+<div id="tab_courses" class="learn-tab-pane" style="display: none;">
+  <div class="card">
+    <div class="ct">
+      <span>Enrolled Studio Courses</span>
+      <span class="pill p-acc">2 In Progress</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+      <div class="row" style="background: var(--fill); border-radius: 14px; padding: 14px 18px;">
+        <div class="av" style="background: var(--accbg); color: var(--acc2);">
+          <i data-lucide="layers"></i>
+        </div>
+        <div class="rmain">
+          <div class="rt" style="font-weight: 700;">IELTS Foundation Intensive</div>
+          <div class="rs">Module 3 of 6 · Academic Writing & Task 2 Mastery</div>
+          <div style="height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-top: 8px; max-width: 240px;">
+            <i style="display: block; height: 100%; width: 52%; background: var(--acc); border-radius: 99px;"></i>
+          </div>
+        </div>
+        <span style="font-family: var(--fm); font-size: 13px; font-weight: 600; color: var(--txt2);">52% completed</span>
+        <button class="btn soft sm" onclick="toast('Course curriculum opened', 'book-open')">Resume</button>
+      </div>
+
+      <div class="row" style="background: var(--fill); border-radius: 14px; padding: 14px 18px;">
+        <div class="av" style="background: rgba(48,209,88,.12); color: var(--greenD);">
+          <i data-lucide="mic"></i>
+        </div>
+        <div class="rmain">
+          <div class="rt" style="font-weight: 700;">Speaking Confidence & Fluency Lab</div>
+          <div class="rs">Module 1 of 4 · Spontaneous Discussion & Linking Words</div>
+          <div style="height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-top: 8px; max-width: 240px;">
+            <i style="display: block; height: 100%; width: 25%; background: var(--greenD); border-radius: 99px;"></i>
+          </div>
+        </div>
+        <span style="font-family: var(--fm); font-size: 13px; font-weight: 600; color: var(--txt2);">25% completed</span>
+        <button class="btn soft sm" onclick="toast('Course curriculum opened', 'book-open')">Resume</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: HOMEWORK -->
+<div id="tab_homework" class="learn-tab-pane" style="display: none;">
+  <div class="card">
+    <div class="ct">
+      <span>Class Assignments & Homework</span>
+      <span class="pill p-acc">Active</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+      <div class="row" style="background: var(--fill); border-radius: 14px; padding: 14px 18px;">
+        <div class="av" style="background: var(--accbg); color: var(--acc2);">
+          <i data-lucide="pen-line"></i>
+        </div>
+        <div class="rmain">
+          <div class="rt" style="font-weight: 700;">Essay: Technology in Modern Education</div>
+          <div class="rs">Due in 2 days · Minimum 250 words · IELTS Task 2</div>
+        </div>
+        <button class="btn sm" style="background: var(--acc); color: #fff;" onclick="openSubmitDrawer('Essay: Technology in Modern Education', 'Write at least 250 words discussing advantages and drawbacks of online learning.')">
+          Submit Work
+        </button>
+      </div>
+
+      <div class="row" style="background: var(--fill); border-radius: 14px; padding: 14px 18px;">
+        <div class="av" style="background: var(--fill2); color: var(--txt2);">
+          <i data-lucide="headphones"></i>
+        </div>
+        <div class="rmain">
+          <div class="rt" style="font-weight: 700;">Listening Practice · Unit 12 Podcast</div>
+          <div class="rs">Anytime · 20 minutes self-paced listening</div>
+        </div>
+        <a href="/library/audio" class="btn soft sm">Open Audio</a>
+      </div>
+
+      <div class="row" style="background: var(--fill); border-radius: 14px; padding: 14px 18px;">
+        <div class="av" style="background: rgba(48,209,88,.12); color: var(--greenD);">
+          <i data-lucide="check-circle-2"></i>
+        </div>
+        <div class="rmain">
+          <div class="rt" style="font-weight: 700;">Reading: The Future of Global Workspaces</div>
+          <div class="rs">Submitted on time · Graded 9/10 by Teacher Aziza</div>
+        </div>
+        <button class="btn ghost sm" onclick="toast('Teacher feedback: Excellent paragraph coherence!', 'award')">
+          View Feedback
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. INTERACTIVE HOMEWORK SUBMISSION DRAWER -->
+<div class="hw-drawer" id="hwSubmitDrawer" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="hw-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h3 style="font-family: var(--fd); font-size: 20px; font-weight: 700;" id="drawerHwTitle">Submit Assignment</h3>
+      <button style="border: none; background: var(--fill); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--txt2);" onclick="document.getElementById('hwSubmitDrawer').classList.remove('open')">
+        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+      </button>
+    </div>
+
+    <div style="background: var(--fill); border-radius: 14px; padding: 14px; font-size: 13px; color: var(--txt2); margin-bottom: 16px;" id="drawerHwDesc">
+      Write your response below. Lexi AI will perform a real-time linguistic and grammatical pre-check before your teacher reviews it.
+    </div>
+
+    <textarea id="hwTextarea" style="flex: 1; min-height: 240px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; font-family: var(--fb); font-size: 14px; line-height: 1.6; outline: none; resize: none; color: var(--txt);" placeholder="Start drafting your response here…" oninput="updateWordCount(this.value)"></textarea>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 12px 0 20px;">
+      <span style="font-size: 12.5px; color: var(--txt3);"><b id="hwWordCount" style="color: var(--txt);">0</b> words</span>
+      <span class="pill p-acc" style="font-size: 11px;"><i data-lucide="sparkles" style="width: 12px; height: 12px; display: inline-block; vertical-align: -1px;"></i> Lexi AI Pre-Check Active</span>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+      <button class="btn" style="flex: 1; background: var(--acc); color: #fff; font-weight: 600;" onclick="submitHwResponse()">
+        <i data-lucide="send"></i> Turn In to Teacher
+      </button>
+      <button class="btn soft" onclick="document.getElementById('hwSubmitDrawer').classList.remove('open')">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchLearnTab(tabId, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.learn-tab-pane').forEach(p => p.style.display = 'none');
+  const target = document.getElementById('tab_' + tabId);
+  if (target) target.style.display = 'block';
+  lucide.createIcons();
+}
+
+function playAudioTrack(title, dur) {
+  document.getElementById('trackTitle').textContent = title;
+  document.getElementById('trackTime').textContent = dur;
+  toast(`Now playing: ${title}`, 'play');
+}
+
+let isAudioPlaying = false;
+function toggleAudioPlay() {
+  isAudioPlaying = !isAudioPlaying;
+  const ic = document.getElementById('playIcon');
+  if (isAudioPlaying) {
+    ic.setAttribute('data-lucide', 'pause');
+    toast('Audio playback started', 'play');
+  } else {
+    ic.setAttribute('data-lucide', 'play');
+    toast('Audio paused', 'pause');
+  }
+  lucide.createIcons();
+}
+
+function openSubmitDrawer(title, desc) {
+  document.getElementById('drawerHwTitle').textContent = title;
+  document.getElementById('drawerHwDesc').textContent = desc;
+  document.getElementById('hwSubmitDrawer').classList.add('open');
+  lucide.createIcons();
+}
+
+function updateWordCount(txt) {
+  const words = txt.trim().split(/\s+/).filter(w => w.length > 0).length;
+  document.getElementById('hwWordCount').textContent = words;
+}
+
+function submitHwResponse() {
+  const val = document.getElementById('hwTextarea').value.trim();
+  if (!val) {
+    toast('Please enter some text before submitting', 'alert-circle');
+    return;
+  }
+  toast('Assignment submitted! Teacher Aziza has been notified.', 'check-circle-2');
+  document.getElementById('hwSubmitDrawer').classList.remove('open');
+  document.getElementById('hwTextarea').value = '';
+}
+</script>
 {% endblock %}
