@@ -218,36 +218,42 @@ body{
     btn.innerText = "Signing in...";
     
     try {
-      const emailOrUsername = document.getElementById("email").value;
+      const emailOrUsername = document.getElementById("email").value.trim();
       const pass = document.getElementById("password").value;
+      const csrfVal = document.getElementById("csrf_token") ? document.getElementById("csrf_token").value : "";
       
-      // If it looks like an email, try Firebase first
+      // 1. Authenticate with platform backend directly first (handles usernames, owner, demo accounts, and local users)
+      const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier: emailOrUsername, password: pass, csrf_token: csrfVal })
+      });
+      
+      if (res.ok) {
+          const data = await res.json();
+          window.location.href = data.redirect || "/dashboard";
+          return;
+      }
+      
+      // 2. If backend auth returned 401 and input is an email, attempt Firebase as fallback
       if (emailOrUsername.includes("@")) {
           try {
               const userCredential = await signInWithEmailAndPassword(auth, emailOrUsername, pass);
               const token = await userCredential.user.getIdToken();
               await sendTokenToServer(token);
               return;
-          } catch (err) {
-              // Only fallback if the error is not about wrong password
-              // But let's just log it and fallback anyway to classic login
-              console.warn("Firebase login failed:", err);
+          } catch (fbErr) {
+              console.warn("Firebase auth fallback also failed:", fbErr);
           }
       }
       
-      // Fallback to classic login (for usernames or if Firebase fails)
-      const res = await fetch("/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ identifier: emailOrUsername, password: pass, csrf_token: document.getElementById("csrf_token").value })
-      });
-      const data = await res.json();
-      if (res.ok) {
-          window.location.href = data.redirect || "/dashboard";
-      } else {
-          showError(data.detail || "Authentication failed.");
-          btn.innerText = "Sign In";
-      }
+      const errData = await res.json().catch(() => ({}));
+      showError(errData.detail || "Incorrect login or password. Try again.");
+      btn.innerText = "Sign In";
+    } catch (err) {
+      showError(err.message || "An error occurred during sign in.");
+      btn.innerText = "Sign In";
+    }
       
     } catch (err) {
       showError(err.message);
