@@ -8,6 +8,7 @@ import {
   FindTeachersPage,
   MyLessonsPage,
   StudentDashboard,
+  StudentProfilePage,
   TeacherProfilePage,
 } from "@/pages/student/StudentPages";
 import {
@@ -24,6 +25,11 @@ import { AdminPage, MessagesPage, SettingsPage } from "@/pages/misc/MiscPages";
 function Home() {
   const { user } = useApp();
   return user?.role === "teacher" ? <TeacherDashboard /> : <StudentDashboard />;
+}
+
+function ProfileDispatcher() {
+  const { user } = useApp();
+  return user?.role === "teacher" ? <TeacherProfileEditor /> : <StudentProfilePage />;
 }
 
 function AppRoutes() {
@@ -112,7 +118,15 @@ function AppRoutes() {
         path="/app/profile"
         element={
           <AppShell>
-            <TeacherProfileEditor />
+            <ProfileDispatcher />
+          </AppShell>
+        }
+      />
+      <Route
+        path="/app/student/profile"
+        element={
+          <AppShell>
+            <StudentProfilePage />
           </AppShell>
         }
       />

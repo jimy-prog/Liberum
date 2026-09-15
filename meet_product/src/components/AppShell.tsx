@@ -1,7 +1,7 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, NavLink, useNavigate, useSearchParams } from "react-router";
 import {
-  Bell, Calendar, CalendarDays, Compass, Home, LayoutDashboard, LogOut, Menu,
+  Bell, Calendar, CalendarDays, ChevronDown, Compass, Home, LayoutDashboard, LogOut, Menu,
   MessageSquare, Search, Settings, ShieldCheck, User, Video, Wallet,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
@@ -13,6 +13,7 @@ const studentNav = [
   { to: "/app/teachers", label: "Find Teachers", icon: Compass },
   { to: "/app/lessons", label: "My Lessons", icon: CalendarDays },
   { to: "/app/messages", label: "Messages", icon: MessageSquare },
+  { to: "/app/student/profile", label: "My Profile", icon: User },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
@@ -63,12 +64,138 @@ function Notifications({ onClose }: { onClose: () => void }) {
   );
 }
 
+function UserProfileMenu({ onClose }: { onClose: () => void }) {
+  const { user, signOut } = useApp();
+  const navigate = useNavigate();
+  if (!user) return null;
+
+  const profileUrl = user.role === "teacher" ? "/app/profile" : "/app/student/profile";
+
+  return (
+    <div className="absolute right-0 top-12 z-50 w-64 animate-fade-up rounded-2xl border border-line bg-white p-2 shadow-[0_24px_60px_-16px_rgba(14,15,19,0.25)] ring-1 ring-black/5">
+      {/* User Header */}
+      <div className="border-b border-line px-3 pb-3 pt-2">
+        <div className="flex items-center gap-2.5">
+          <Avatar initials={user.initials} color={user.role === "teacher" ? "#7B61FF" : "#1FAD55"} size="md" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-bold text-ink">{user.name}</p>
+            <p className="truncate text-xs text-ink-400">{user.email}</p>
+          </div>
+        </div>
+        <div className="mt-2.5 flex items-center justify-between">
+          <Badge tone={user.role === "teacher" ? "brand" : "green"} className="capitalize">
+            {user.role} account
+          </Badge>
+          <span className="text-[10px] font-medium text-ink-400">ID #{user.id}</span>
+        </div>
+      </div>
+
+      {/* Navigation options */}
+      <div className="mt-1 space-y-0.5">
+        <Link
+          to={profileUrl}
+          onClick={onClose}
+          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink transition hover:bg-cloud"
+        >
+          <User size={15} className="text-brand-500" />
+          My Profile
+        </Link>
+        <Link
+          to="/app/settings"
+          onClick={onClose}
+          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink transition hover:bg-cloud"
+        >
+          <Settings size={15} className="text-ink-400" />
+          Account Settings
+        </Link>
+        <Link
+          to="/app/messages"
+          onClick={onClose}
+          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink transition hover:bg-cloud"
+        >
+          <MessageSquare size={15} className="text-ink-400" />
+          Messages
+        </Link>
+        {user.role === "teacher" && (
+          <Link
+            to="/app/earnings"
+            onClick={onClose}
+            className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-ink transition hover:bg-cloud"
+          >
+            <Wallet size={15} className="text-ink-400" />
+            Earnings & Payouts
+          </Link>
+        )}
+      </div>
+
+      {/* Telegram status */}
+      <div className="mt-1 border-t border-line pt-1">
+        <Link
+          to="/app/settings"
+          onClick={onClose}
+          className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-medium text-ink-500 transition hover:bg-cloud"
+        >
+          <span className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[#24A1DE]" />
+            Telegram Alerts
+          </span>
+          <span className="text-[11px] font-semibold text-brand-600">
+            {user.telegramUsername ? `@${user.telegramUsername}` : "Connect"}
+          </span>
+        </Link>
+      </div>
+
+      {/* Logout */}
+      <div className="mt-1 border-t border-line pt-1">
+        <button
+          onClick={() => {
+            onClose();
+            signOut();
+            navigate("/");
+          }}
+          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-danger transition hover:bg-red-50"
+        >
+          <LogOut size={15} />
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut, signIn, lessons, notifications } = useApp();
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
   const unread = notifications.filter((n) => !n.read).length;
+
+  // Click outside & Escape key listeners
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setNotifOpen(false);
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const [searchParams] = useSearchParams();
   useEffect(() => {
@@ -170,9 +297,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 <Compass size={14} /> Find a teacher
               </Link>
             )}
-            <div className="relative">
+            <div ref={notifRef} className="relative">
               <button
-                onClick={() => setNotifOpen((v) => !v)}
+                onClick={() => {
+                  setNotifOpen((v) => !v);
+                  setProfileOpen(false);
+                }}
                 className="relative rounded-full p-2.5 text-ink-500 transition hover:bg-mist"
                 aria-label="Notifications"
               >
@@ -185,12 +315,27 @@ export default function AppShell({ children }: { children: ReactNode }) {
               </button>
               {notifOpen && <Notifications onClose={() => setNotifOpen(false)} />}
             </div>
-            <div className="hidden items-center gap-2.5 pl-1 sm:flex">
-              <Avatar initials={user.initials} color={roleColor} size="md" />
-              <div className="hidden xl:block">
-                <p className="text-[13px] font-semibold leading-tight text-ink">{user.name}</p>
-                <Badge tone="brand" className="mt-0.5 capitalize">{user.role}</Badge>
-              </div>
+
+            {/* Profile Dropdown Trigger */}
+            <div ref={profileRef} className="relative">
+              <button
+                onClick={() => {
+                  setProfileOpen((v) => !v);
+                  setNotifOpen(false);
+                }}
+                className="flex items-center gap-2.5 rounded-full p-1 transition hover:bg-mist/80 sm:px-2.5 sm:py-1.5"
+                aria-label="User profile menu"
+              >
+                <Avatar initials={user.initials} color={roleColor} size="md" />
+                <div className="hidden text-left xl:block">
+                  <p className="text-[13px] font-semibold leading-tight text-ink">{user.name}</p>
+                  <Badge tone={user.role === "teacher" ? "brand" : "green"} className="mt-0.5 text-[10px] capitalize">
+                    {user.role}
+                  </Badge>
+                </div>
+                <ChevronDown size={14} className={cn("hidden text-ink-400 transition sm:block", profileOpen && "rotate-180")} />
+              </button>
+              {profileOpen && <UserProfileMenu onClose={() => setProfileOpen(false)} />}
             </div>
           </div>
         </header>

@@ -7,7 +7,7 @@ import {
 import { BOOKABLE_TIMES, fmtUzs, SUBJECTS, TEACHERS } from "@/lib/data";
 import { useApp } from "@/lib/store";
 import { meetApi } from "@/lib/api";
-import { Avatar, Badge, Btn, BtnLink, Card, EmptyState } from "@/components/ui-kit";
+import { Avatar, Badge, Btn, BtnLink, Card, EmptyState, Field, Input } from "@/components/ui-kit";
 import { cn } from "@/lib/utils";
 import type { Lesson, Teacher } from "@/lib/types";
 
@@ -849,3 +849,144 @@ export function MyLessonsPage() {
     </div>
   );
 }
+
+/* ================= STUDENT PROFILE ================= */
+export function StudentProfilePage() {
+  const { user, updateUser } = useApp();
+  const [name, setName] = useState(user?.name || "");
+  const [telegramUsername, setTelegramUsername] = useState(user?.telegramUsername || "");
+  const [targetSubject, setTargetSubject] = useState("IELTS Preparation");
+  const [targetScore, setTargetScore] = useState("Band 7.5+");
+  const [bio, setBio] = useState("Focused on boosting speaking confidence and academic writing tasks.");
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user?.name) setName(user.name);
+    if (user?.telegramUsername) setTelegramUsername(user.telegramUsername);
+  }, [user]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await updateUser({ name, telegramUsername });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-3xl animate-fade-up">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Student Profile</h1>
+          <p className="mt-1 text-sm text-ink-500">Manage your learning goals, target scores, and contact information.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {saved && <Badge tone="green">Profile updated</Badge>}
+          <Btn onClick={handleSave} disabled={saving}>
+            {saving ? "Saving..." : "Save changes"}
+          </Btn>
+        </div>
+      </div>
+
+      <Card className="mt-6 p-6">
+        <div className="flex flex-wrap items-center gap-5">
+          <Avatar initials={user?.initials || "ST"} color="#1FAD55" size="xl" />
+          <div className="min-w-0 flex-1">
+            <h2 className="font-display text-xl font-bold text-ink">{user?.name}</h2>
+            <p className="text-sm text-ink-500">{user?.email}</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Badge tone="green">Active Learner</Badge>
+              <Badge tone="outline">UTC+5 Tashkent</Badge>
+            </div>
+          </div>
+          <BtnLink to="/app/teachers" variant="outline" size="sm">
+            <Compass size={14} /> Browse Mentors
+          </BtnLink>
+        </div>
+
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <Field label="Full name">
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" />
+          </Field>
+          <Field label="Account Email">
+            <Input value={user?.email || ""} disabled className="opacity-60" />
+          </Field>
+          <Field label="Target Exam / Subject">
+            <select
+              value={targetSubject}
+              onChange={(e) => setTargetSubject(e.target.value)}
+              className="h-11 w-full rounded-xl border border-line bg-white px-3 text-sm outline-none focus:border-brand-500"
+            >
+              <option>IELTS Preparation</option>
+              <option>General English</option>
+              <option>SAT Math</option>
+              <option>Academic Writing</option>
+              <option>School Mathematics</option>
+            </select>
+          </Field>
+          <Field label="Goal / Target Score">
+            <Input
+              value={targetScore}
+              onChange={(e) => setTargetScore(e.target.value)}
+              placeholder="e.g. Band 8.0 or 750+ SAT"
+            />
+          </Field>
+        </div>
+
+        <div className="mt-4">
+          <Field label="Learning Goals & Weaknesses">
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows={3}
+              placeholder="Tell teachers what you want to achieve or improve..."
+              className="w-full rounded-xl border border-line bg-white px-3.5 py-3 text-sm text-ink outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
+            />
+          </Field>
+        </div>
+      </Card>
+
+      {/* Telegram Link Card */}
+      <Card className="mt-4 p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-[15px] font-semibold text-ink">Telegram Notifications</h2>
+              <Badge tone="brand">Recommended</Badge>
+            </div>
+            <p className="mt-1 max-w-md text-xs leading-relaxed text-ink-500">
+              Get classroom links and teacher reminders sent straight to your phone 10 minutes before each lesson starts.
+            </p>
+          </div>
+          <a
+            href="https://t.me/LiberumMeetBot"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 rounded-full bg-[#24A1DE]/10 px-3.5 py-1.5 text-xs font-semibold text-[#24A1DE] transition hover:bg-[#24A1DE]/20"
+          >
+            Open @LiberumMeetBot
+          </a>
+        </div>
+
+        <div className="mt-4 max-w-md">
+          <Field label="Your Telegram @username">
+            <div className="relative">
+              <span className="absolute left-3.5 top-3 text-sm font-semibold text-ink-400">@</span>
+              <Input
+                value={telegramUsername}
+                onChange={(e) => setTelegramUsername(e.target.value.replace(/^@/, ""))}
+                placeholder="username"
+                className="pl-8"
+              />
+            </div>
+          </Field>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
