@@ -109,45 +109,8 @@
 <!-- View Payment Modal -->
 
 
-{% endblock %}
 
-{% block scripts %}
-<script>
-function openRecord(sid, name, amount, month) {
-  if (name) {
-    document.getElementById('recordTitle').textContent = `Record Payment — ${name}`;
-    let select = document.getElementById('recordStudent');
-    if (select) {
-      select.value = sid;
-      select.style.display = 'none'; // hide select if student is pre-selected
-      select.previousElementSibling.style.display = 'none'; // hide label
-    }
-    document.getElementById('recordForm').action = '/payments/record/' + sid;
-  } else {
-    document.getElementById('recordTitle').textContent = `Record Payment`;
-    let select = document.getElementById('recordStudent');
-    if (select) {
-      select.style.display = 'block';
-      select.previousElementSibling.style.display = 'block';
-    }
-    // Note: backend might not support global /payments/record/ without sid, but keeping form standard.
-  }
-  document.getElementById('recordMonth').value = month;
-  document.getElementById('recordAmount').value = amount;
-  openModal('recordModal');
-}
-
-document.getElementById('recordForm').addEventListener('submit', function(e) {
-  let select = document.getElementById('recordStudent');
-  if (select && select.style.display !== 'none') {
-    this.action = '/payments/record/' + select.value;
-  }
-});
-
-</script>
-
-<!-- View Payment Modal -->
-
+<!-- View Payment Modal inserted here by patch -->
 
 {% endblock %}
 
@@ -195,7 +158,40 @@ document.getElementById('recordForm').addEventListener('submit', function(e) {
     </div>
   </div>
 </div>
+
+
+{% block scripts %}
 <script>
+function openRecord(sid, name, amount, month) {
+  if (name) {
+    document.getElementById('recordTitle').textContent = `Record Payment — ${name}`;
+    let select = document.getElementById('recordStudent');
+    if (select) {
+      select.value = sid;
+      select.style.display = 'none'; // hide select if student is pre-selected
+      select.previousElementSibling.style.display = 'none'; // hide label
+    }
+    document.getElementById('recordForm').action = '/payments/record/' + sid;
+  } else {
+    document.getElementById('recordTitle').textContent = `Record Payment`;
+    let select = document.getElementById('recordStudent');
+    if (select) {
+      select.style.display = 'block';
+      select.previousElementSibling.style.display = 'block';
+    }
+  }
+  document.getElementById('recordMonth').value = month;
+  document.getElementById('recordAmount').value = amount;
+  openModal('recordModal');
+}
+
+document.getElementById('recordForm').addEventListener('submit', function(e) {
+  let select = document.getElementById('recordStudent');
+  if (select && select.style.display !== 'none') {
+    this.action = '/payments/record/' + select.value;
+  }
+});
+
 function viewPayment(student, amount, method, month) {
     let m = document.getElementById('viewPaymentModal');
     if(m.parentNode !== document.body) document.body.appendChild(m);
@@ -213,3 +209,4 @@ function viewPayment(student, amount, method, month) {
     m.classList.add('open');
 }
 </script>
+{% endblock %}

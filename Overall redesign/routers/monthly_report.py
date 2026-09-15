@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from datetime import date
-from database import get_db, Group, Student, Lesson, Attendance, WeeklyPerformance
+from database import get_db, Group, Student, Lesson, Attendance, WeeklyPerformance, Expense
 from finance_rules import get_group_epl
 from auth import require_teacher_or_owner
 
@@ -17,7 +17,7 @@ def nm(d):
 @router.get("/")
 def monthly_report(request: Request, month: str = None, db: Session = Depends(get_db)):
     today = date.today()
-    if month:
+    if month and month.strip():
         y, m = map(int, month.split("-"))
         ms = date(y, m, 1)
     else:
@@ -116,11 +116,33 @@ def monthly_report(request: Request, month: str = None, db: Session = Depends(ge
             "perf_data": perf_data,
         })
 
+        # Calculate missing variables for the template
+    expenses = db.query(Expense).filter(Expense.date >= ms, Expense.date < me).all()
+    total_expenses = sum(e.amount for e in expenses)
+    net_income = total_income - total_expenses
+    
+    total_lessons = sum(r["held"] for r in report_data)
+    
+    total_student_records = 0
+    total_student_countable = 0
+    for r in report_data:
+        for sd in r["student_data"]:
+            total_student_records += sd["total"]
+            total_student_countable += sd["present"]
+            
+    avg_attendance = (total_student_countable / total_student_records * 100) if total_student_records > 0 else 0.0
+
     return templates.TemplateResponse("monthly_report.html", {
         "request": request,
         "month_start": ms,
+        "month_str": ms.strftime("%Y-%m"),
         "report_data": report_data,
-        "total_income": total_income,
+        "total_collected": total_income,
+        "total_expenses": total_expenses,
+        "net_income": net_income,
+        "total_lessons": total_lessons,
+        "avg_attendance": avg_attendance,
         "generated": today,
-        "active_page": None
+        "active_page": "monthly_report",
+        "main_section": "money"
     })

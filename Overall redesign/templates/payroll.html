@@ -26,7 +26,7 @@
     <div class="av" style="background:{{ r.group.color or '#4f46e5' }}22;color:{{ r.group.color or '#4f46e5' }}">{{ r.group.name[0] }}</div>
     <div class="rmain">
       <div class="rt">{{ r.group.name }}</div>
-      <div class="rs">{{ r.countable }} countable att. · {{ int(r.teacher_pct*100) }}% teacher split</div>
+      <div class="rs">{{ r.countable }} countable att. · {{ (r.teacher_pct*100) | int }}% teacher split</div>
     </div>
     <div style="text-align:right">
       <div style="font-family:var(--fm);font-size:14px;font-weight:600;color:var(--money)">{{ "{:,.0f}".format(r.teacher_share) }}</div>

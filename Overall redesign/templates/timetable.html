@@ -238,3 +238,26 @@
 </div>
 {% endif %}
 {% endblock %}
+
+{% block scripts %}
+<script>
+async function openLessonModal(lid) {
+    try {
+        let res = await fetch(`/lessons/${lid}/modal`);
+        let html = await res.text();
+        let container = document.getElementById('modalContainer');
+        if(!container) {
+            container = document.createElement('div');
+            container.id = 'modalContainer';
+            document.body.appendChild(container);
+        }
+        container.innerHTML = html;
+        if(window.lucide) lucide.createIcons();
+        let modal = document.getElementById('lessonAttendanceModal');
+        if (modal) modal.classList.add('open');
+    } catch(e) {
+        console.error(e);
+    }
+}
+</script>
+{% endblock %}

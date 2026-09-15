@@ -101,6 +101,10 @@ async def save_lesson(lid: int, request: Request, db: Session = Depends(get_db))
             else:
                 db.add(Attendance(lesson_id=lid, student_id=sid, status=val))
     db.commit()
+    from_modal = form.get("from_modal") or request.query_params.get("from_modal")
+    if from_modal:
+        referer = request.headers.get("referer")
+        return RedirectResponse(referer or "/timetable/", status_code=303)
     return RedirectResponse(f"/lessons/{lid}", status_code=303)
 
 @router.get("/{lid}/modal")

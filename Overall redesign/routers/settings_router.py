@@ -33,7 +33,7 @@ async def update_settings(request: Request, db: Session = Depends(get_db)):
         if s: s.value = value
         else: db.add(Settings(key=key, value=value))
     db.commit()
-    return RedirectResponse("/profile/?tab=finance", status_code=303)
+    return RedirectResponse(form.get("next", "/profile/"), status_code=303)
 
 @router.post("/group/{gid}/update")
 async def update_group(gid: int, request: Request, db: Session = Depends(get_db)):

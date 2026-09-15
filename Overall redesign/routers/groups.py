@@ -58,6 +58,12 @@ async def add_group(request: Request, db: Session = Depends(get_db)):
     db.commit()
     return RedirectResponse("/groups/", status_code=303)
 
+@router.get("/api/list")
+def api_groups_list(db: Session = Depends(get_db)):
+    from fastapi.responses import JSONResponse
+    groups = db.query(Group).filter(Group.status == "active").all()
+    return JSONResponse([{"id": g.id, "name": g.name} for g in groups])
+
 @router.get("/{gid}")
 def group_detail(gid: int, request: Request, month: str = None,
                  db: Session = Depends(get_db)):

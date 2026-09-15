@@ -7,7 +7,7 @@
 .explanation-area { 
     background: var(--card); 
     padding: 40px; 
-    border-radius: 12px; 
+    border-radius: 24px; 
     border: 1px solid var(--line); 
     font-size: 1.05rem; 
     line-height: 1.7; 
@@ -69,7 +69,7 @@
 .result-card { 
     background: var(--card); 
     border: 2px solid #10b981; 
-    border-radius: 12px; 
+    border-radius: 24px; 
     padding: 20px; 
     text-align: center; 
     margin-bottom: 24px; 
@@ -82,11 +82,7 @@
 
 {% block content %}
 <div class="action-bar">
-    <a href="/library/grammar" class="btn sm" style="background: var(--fill); color: var(--txt);">&larr; Back to Topics</a>
-    
-    {% if has_questions %}
-    <a href="/library/grammar/{{ topic.id }}/test" class="btn block">Take Quiz &rarr;</a>
-    {% endif %}
+    <a href="/library/grammar" class="btn btn-ghost sm"><i data-lucide="arrow-left"></i> Back to Topics</a>
 </div>
 
 {% if request.query_params.get('result') == 'success' %}
@@ -115,7 +111,7 @@
 {% if has_questions %}
 <div style="max-width: 900px; margin: 32px auto 0 auto; text-align: center;">
     <p style="margin-bottom: 16px; color: var(--txt2);">Ready to test your knowledge?</p>
-    <a href="/library/grammar/{{ topic.id }}/test" class="btn block" style="padding: 12px 32px; font-size: 1.1rem;">Take Quiz</a>
+    <a href="/library/grammar/{{ topic.id }}/test" class="btn block" style="padding: 12px 32px; font-size: 1.1rem; background: var(--acc); color: white; border-radius: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">Take Quiz <i data-lucide="arrow-right"></i></a>
 </div>
 {% endif %}
 

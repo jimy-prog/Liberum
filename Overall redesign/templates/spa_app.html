@@ -413,6 +413,31 @@ function mTrial(n){openModal(`<div class="mt">Book trial · ${n}<button class="x
  <div class="fgroup"><label>Group</label><select>${DB.groups.map(g=>`<option>${g.n}</option>`).join('')}</select></div>
  <div class="frow"><div class="fgroup"><label>Date</label><input type="date" value="2026-08-18"></div><div class="fgroup"><label>Time</label><input value="14:00"></div></div>
  <button class="btn block" onclick="closeModal();toast('Trial booked for ${n}','calendar-check')">Book trial lesson</button>`)}
+
+async function processPayment(method) {
+    toast(`Processing ${method} payment...`, 'loader');
+    try {
+        const res = await fetch('/api/v1/student/pay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ method: method })
+        });
+        if (res.ok) {
+            toast('Payment successful!', 'check-circle-2');
+            // Update UI state
+            DB.payments.unshift({
+                n: $('#uName').textContent, g: 'IELTS A', exp: '400,000', paid: '400,000',
+                m: `${method} · Just now`, st: 'paid'
+            });
+            setTimeout(() => go('payments'), 500);
+        } else {
+            toast('Payment failed.', 'x-circle');
+        }
+    } catch (e) {
+        toast('Connection error.', 'x-circle');
+    }
+}
+
 function mAddStudent(){openModal(`<div class="mt">Add student<button class="x" onclick="closeModal()"><i data-lucide="x"></i></button></div>
  <div class="fgroup"><label>Full name</label><input id="nsName" placeholder="e.g. Sardor Aliyev"></div>
  <div class="frow"><div class="fgroup"><label>Level</label><select id="nsLvl"><option>A2</option><option>B1</option><option>B2</option><option selected>B1+</option><option>C1</option></select></div><div class="fgroup"><label>Group</label><select id="nsG">${DB.groups.map(g=>`<option>${g.n}</option>`).join('')}</select></div></div>
@@ -508,7 +533,22 @@ function exRender(){const E=$('#exam');
 function exQHTML(i,q){const [t,opts,ans]=q;return`<div style="margin-bottom:18px"><div style="font-size:14px;font-weight:500;line-height:1.5;margin-bottom:10px"><span style="color:var(--acc);font-family:var(--fm);font-size:12px;margin-right:6px">Q${i+1}</span>${t}</div>
  ${opts.map((o,j)=>`<div class="opt ${exAnswers['q'+i]===j?'sel':''}" onclick="exAnswers['q'+i]=${j};this.parentElement.querySelectorAll('.opt').forEach(e=>e.classList.remove('sel'));this.classList.add('sel')"><b>${'ABCD'[j]}</b><span>${o}</span></div>`).join('')}</div>`}
 function exStart(){clearInterval(exTimer);exTimer=setInterval(()=>{exSecs--;const el=document.getElementById('exTime');if(el){el.textContent=String(Math.floor(exSecs/60)).padStart(2,'0')+':'+String(exSecs%60).padStart(2,'0');if(exSecs<300)el.classList.add('warn')}},1000)}
-function exSubmit(){setTimeout(()=>{exStep=6;exRender()},3200)}
+async function exSubmit(){
+    try {
+        await fetch('/api/v1/student/mock_submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ answers: exAnswers })
+        });
+        setTimeout(()=>{
+            exStep=6;
+            exRender();
+            DB.history.unshift({t: 'IELTS Mock #13', d: 'Just now · Full test', b: 6.5, st: 'Reviewed'});
+        }, 3200);
+    } catch (e) {
+        setTimeout(()=>{exStep=6;exRender()},3200);
+    }
+}
 </script>
 
 <script>
@@ -622,10 +662,31 @@ VIEWS.s_lexi=()=>{$('#view').innerHTML=`
   </div>
   <div class="cinput"><button class="btn ghost sm" onclick="toast('Voice message (demo)','mic')"><i data-lucide="mic"></i></button><input id="chatIn" placeholder="Type in English…" onkeydown="if(event.key==='Enter')sendChat()"><button class="btn" onclick="sendChat()"><i data-lucide="send"></i></button></div>
  </div>`;lucide.createIcons()};
-function sendChat(){const inp=document.getElementById('chatIn');const v=inp.value.trim();if(!v)return;inp.value='';
- const c=document.getElementById('chat');c.insertAdjacentHTML('beforeend',`<div class="bub out">${esc(v)}</div>`);
- c.insertAdjacentHTML('beforeend',`<div class="bub in" id="typing"><span class="tpts"><i></i><i></i><i></i></span></div>`);c.scrollTop=c.scrollHeight;
- setTimeout(()=>{const t=document.getElementById('typing');if(t){t.innerHTML=LEXIR[Math.floor(Math.random()*LEXIR.length)];c.scrollTop=c.scrollHeight}},1400)}
+async function sendChat(){
+    const inp=document.getElementById('chatIn');const v=inp.value.trim();if(!v)return;inp.value='';
+    const c=document.getElementById('chat');
+    c.insertAdjacentHTML('beforeend',`<div class="bub out">${esc(v)}</div>`);
+    c.insertAdjacentHTML('beforeend',`<div class="bub in" id="typing"><span class="tpts"><i></i><i></i><i></i></span></div>`);
+    c.scrollTop=c.scrollHeight;
+    
+    try {
+        const res = await fetch('/ai/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: v })
+        });
+        const data = await res.json();
+        const t = document.getElementById('typing');
+        if (t) {
+            t.outerHTML = `<div class="bub in">${data.reply.replace(/
+/g, '<br>')}</div>`;
+        }
+        c.scrollTop=c.scrollHeight;
+    } catch(e) {
+        const t = document.getElementById('typing');
+        if (t) t.outerHTML = `<div class="bub in" style="color:var(--red)">Sorry, connection failed.</div>`;
+    }
+}
 const LEXIR=["Great effort! 🌟 Small fix: say “it has influenced me” instead of “it influenced to me”. Want to try the follow-up questions now?","Nice fluency! I noticed a few filler words (“um”, “like”) — try pausing silently instead. Ready for Part 3?","Good answer! One tip: add a linking phrase like “What I found fascinating was…” to raise your coherence score. Another cue card?"];
 /* ---------- PAYMENTS (student) ---------- */
 VIEWS.s_payments=()=>{$('#view').innerHTML=`
@@ -635,7 +696,7 @@ VIEWS.s_payments=()=>{$('#view').innerHTML=`
   <div class="stat"><div class="v">Sep 1</div><div class="l">Next payment due</div></div>
  </div>
  <div class="card"><div class="ct">Pay for September</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">${[['smartphone','Payme'],['credit-card','Uzcard / Humo'],['landmark','Bank transfer'],['banknote','Cash at reception']].map(([i,t])=>`<div style="background:var(--fill);border-radius:14px;padding:16px;cursor:pointer;text-align:center" onclick="toast('${t} checkout (demo)','${i}')"><i data-lucide="${i}" style="color:var(--acc)"></i><div style="font-size:13px;font-weight:600;margin-top:8px">${t}</div></div>`).join('')}</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">${[['smartphone','Payme'],['credit-card','Uzcard / Humo'],['landmark','Bank transfer'],['banknote','Cash at reception']].map(([i,t])=>`<div style="background:var(--fill);border-radius:14px;padding:16px;cursor:pointer;text-align:center" onclick="processPayment(\'${t}\')"><i data-lucide="${i}" style="color:var(--acc)"></i><div style="font-size:13px;font-weight:600;margin-top:8px">${t}</div></div>`).join('')}</div></div>
  <div class="card"><div class="ct">History</div>
   ${[['August 2026','Card','Aug 3'],['July 2026','Payme','Jul 2'],['June 2026','Cash','Jun 1']].map(([m,w,d])=>`<div class="row"><div class="av" style="background:rgba(48,209,88,.12);color:var(--greenD)"><i data-lucide="check"></i></div><div class="rmain"><div class="rt">${m}</div><div class="rs">${w} · ${d}</div></div><span class="money" style="font-weight:600">400,000 <small style="color:var(--txt3);font-weight:400">UZS</small></span></div>`).join('')}</div>`;
  lucide.createIcons()};

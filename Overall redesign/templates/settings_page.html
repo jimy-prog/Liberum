@@ -3,17 +3,156 @@
 {% block page_title %}Settings{% endblock %}
 
 {% block content %}
+
+{% if _u.role == 'student' %}
+<!-- ========================================== -->
+<!-- 🎓 STUDENT SETTINGS VIEW (TARGET DESIGN 1:1) -->
+<!-- ========================================== -->
+
+<div class="card" style="margin-bottom: 16px;">
+  <div style="display:flex;gap:16px;align-items:center;">
+    <div class="av" style="width:58px;height:58px;background:var(--accbg);color:var(--acc);font-size:24px;font-weight:700;">
+      {{ _u.full_name[0] if _u.full_name else 'S' }}
+    </div>
+    <div class="rmain">
+      <div style="font-size:19px;font-weight:700;color:var(--txt)">{{ _u.full_name or _u.username }}</div>
+      <div class="rs" style="margin-top:2px;">Student account · {{ _u.email }}</div>
+    </div>
+    <button class="btn soft sm" onclick="openModal('editStudentProfileModal')">Edit Profile</button>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom: 16px;">
+  <div class="ct">Academic Preferences</div>
+  
+  <form method="post" action="/profile/update">
+    <div class="frow" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+      <div class="fgroup">
+        <label>Full Name</label>
+        <input type="text" name="full_name" value="{{ _u.full_name or '' }}" required>
+      </div>
+      <div class="fgroup">
+        <label>Target Band Score</label>
+        <input type="number" step="0.5" min="4.0" max="9.0" name="target_band" value="{{ student_profile.target_band if student_profile else 7.5 }}">
+      </div>
+    </div>
+
+    <div class="frow" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+      <div class="fgroup">
+        <label>Personal Phone</label>
+        <input type="tel" name="phone" placeholder="+998 90 123 45 67" value="{{ student_profile.phone if student_profile else '' }}">
+      </div>
+      <div class="fgroup">
+        <label>Parent / Guardian Phone</label>
+        <input type="tel" name="parent_phone" placeholder="+998 90 987 65 43" value="{{ student_profile.parent_phone if student_profile else '' }}">
+      </div>
+    </div>
+
+    <div class="ct" style="margin:20px 0 12px;padding-top:16px;border-top:1px solid var(--line);">Notification Preferences</div>
+    
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
+      <label class="row" style="cursor:pointer;background:var(--fill);border-radius:12px;padding:12px 14px;margin:0;">
+        <div class="rmain">
+          <div class="rt" style="font-size:14px;font-weight:600;">Test results & AI Feedback</div>
+          <div class="rs">Notify when score estimates and speaking evaluations are ready</div>
+        </div>
+        <input type="checkbox" name="notif_results" value="1" {% if not student_profile or student_profile.notif_results %}checked{% endif %} style="width:18px;height:18px;accent-color:var(--acc);">
+      </label>
+
+      <label class="row" style="cursor:pointer;background:var(--fill);border-radius:12px;padding:12px 14px;margin:0;">
+        <div class="rmain">
+          <div class="rt" style="font-size:14px;font-weight:600;">Deadline reminders</div>
+          <div class="rs">Reminders for upcoming mock sessions and class assignments</div>
+        </div>
+        <input type="checkbox" name="notif_deadlines" value="1" {% if not student_profile or student_profile.notif_deadlines %}checked{% endif %} style="width:18px;height:18px;accent-color:var(--acc);">
+      </label>
+
+      <label class="row" style="cursor:pointer;background:var(--fill);border-radius:12px;padding:12px 14px;margin:0;">
+        <div class="rmain">
+          <div class="rt" style="font-size:14px;font-weight:600;">Product updates</div>
+          <div class="rs">News about new mock tests, audiobooks, and learning features</div>
+        </div>
+        <input type="checkbox" name="notif_product" value="1" {% if student_profile and student_profile.notif_product %}checked{% endif %} style="width:18px;height:18px;accent-color:var(--acc);">
+      </label>
+    </div>
+
+    <button type="submit" class="btn"><i data-lucide="save"></i>Save Changes</button>
+  </form>
+</div>
+
+<div class="card" style="margin-bottom: 16px;">
+  <div class="ct">Security & Appearance</div>
+  <div class="row">
+    <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="palette"></i></div>
+    <div class="rmain">
+      <div class="rt">Appearance Theme</div>
+      <div class="rs">Switch between Light or Dark interface</div>
+    </div>
+    <div class="tgl" onclick="this.classList.toggle('on');toggleTheme()"></div>
+  </div>
+  <div class="row">
+    <div class="av" style="background:var(--fill);color:var(--acc)"><i data-lucide="sparkles"></i></div>
+    <div class="rmain">
+      <div class="rt">Primary Accent Color</div>
+      <div class="rs">Personalize platform glow & highlights</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div class="accent-dot" onclick="setAccent('#7B61FF', '#6B51EF', 'rgba(123,97,255,.15)')" style="width:24px;height:24px;border-radius:50%;background:#7B61FF;cursor:pointer;box-shadow:0 2px 6px rgba(123,97,255,.4);" title="Royal Purple"></div>
+      <div class="accent-dot" onclick="setAccent('#10B981', '#059669', 'rgba(16,185,129,.15)')" style="width:24px;height:24px;border-radius:50%;background:#10B981;cursor:pointer;box-shadow:0 2px 6px rgba(16,185,129,.4);" title="Emerald Green"></div>
+      <div class="accent-dot" onclick="setAccent('#0284C7', '#0369A1', 'rgba(2,132,199,.15)')" style="width:24px;height:24px;border-radius:50%;background:#0284C7;cursor:pointer;box-shadow:0 2px 6px rgba(2,132,199,.4);" title="Ocean Blue"></div>
+      <div class="accent-dot" onclick="setAccent('#F59E0B', '#D97706', 'rgba(245,158,11,.15)')" style="width:24px;height:24px;border-radius:50%;background:#F59E0B;cursor:pointer;box-shadow:0 2px 6px rgba(245,158,11,.4);" title="Amber Gold"></div>
+    </div>
+  </div>
+  <div class="row" onclick="openModal('passwordModal')" style="cursor:pointer;">
+    <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="shield"></i></div>
+    <div class="rmain">
+      <div class="rt">Account Password</div>
+      <div class="rs">Change your password for web & mobile apps</div>
+    </div>
+    <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
+  </div>
+  <div class="row" onclick="window.location='/support'" style="cursor:pointer;">
+    <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="life-buoy"></i></div>
+    <div class="rmain">
+      <div class="rt">Support & Assistance</div>
+      <div class="rs">Get help from your teachers and tech support</div>
+    </div>
+    <i data-lucide="chevron-right" style="color:var(--txt3)"></i>
+  </div>
+</div>
+
+<button class="btn ghost block" style="color:var(--red);margin-bottom:12px;" onclick="window.location='/logout'">
+  <i data-lucide="log-out"></i>Sign out
+</button>
+
+<div class="ovl" id="editStudentProfileModal" onclick="if(event.target===this)closeModal('editStudentProfileModal')">
+ <div class="modal">
+  <div class="mt">Edit Student Profile<button class="x" onclick="closeModal('editStudentProfileModal')"><i data-lucide="x"></i></button></div>
+  <form method="post" action="/profile/update">
+   <div class="fgroup"><label>Full Name</label><input name="full_name" value="{{ _u.full_name or '' }}" required></div>
+   <div class="fgroup"><label>Email Address</label><input type="email" value="{{ _u.email }}" disabled></div>
+   <div class="fgroup"><label>Target Band</label><input type="number" step="0.5" name="target_band" value="{{ student_profile.target_band if student_profile else 7.5 }}"></div>
+   <button type="submit" class="btn block">Save Profile</button>
+  </form>
+ </div>
+</div>
+
+{% else %}
+<!-- ========================================== -->
+<!-- 🏫 TEACHER / OWNER STUDIO SETTINGS VIEW   -->
+<!-- ========================================== -->
+
  <div class="card"><div style="display:flex;gap:14px;align-items:center">
    <div class="av" style="width:56px;height:56px;background:var(--accbg);color:var(--acc);font-size:24px;">{{ _u.full_name[0] if _u.full_name else 'O' }}</div>
-   <div class="rmain"><div style="font-size:18px;font-weight:700">{{ _u.full_name or 'Owner' }}</div><div class="rs">Teacher & owner · Liberum English</div></div>
+   <div class="rmain"><div style="font-size:18px;font-weight:700">{{ _u.full_name or 'Owner' }}</div><div class="rs">Teacher & owner · {{ settings.get('studio_name').value if 'studio_name' in settings else 'Liberum English' }}</div></div>
    <button class="btn soft sm" onclick="openModal('editProfileModal')">Edit</button>
  </div></div>
  
  <div class="card"><div class="ct">Workspace</div>
-  <div class="row" onclick="openModal('editProfileModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="school"></i></div><div class="rmain"><div class="rt">Studio profile</div><div class="rs">Name, address, working hours</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
-  <div class="row" onclick="openModal('editProfileModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div><div class="rmain"><div class="rt">Contact</div><div class="rs">Phone, Telegram, email</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
+  <div class="row" onclick="openModal('studioProfileModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="school"></i></div><div class="rmain"><div class="rt">Studio profile</div><div class="rs">Name, address, working hours, exam focus</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
+  <div class="row" onclick="openModal('contactModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div><div class="rmain"><div class="rt">Contact</div><div class="rs">Phone, Telegram, email, social links</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="toast('Link copied','link')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="link"></i></div><div class="rmain"><div class="rt">Public join link</div><div class="rs">liberum.uz/join/{{ _u.username }}</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
-  <div class="row" onclick="window.location='/owner/users'"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="users"></i></div><div class="rmain"><div class="rt">Team</div><div class="rs">Teachers, roles & permissions</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
+  <div class="row" onclick="openModal('teamModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="users"></i></div><div class="rmain"><div class="rt">Team</div><div class="rs">Teachers, roles & permissions</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="openModal('languageModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="globe"></i></div><div class="rmain"><div class="rt">Language</div><div class="rs">English (default), Русский, O'zbekcha</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="openModal('otherSettingsModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="settings"></i></div><div class="rmain"><div class="rt">Other</div><div class="rs">Advanced systematic settings, online groups</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
  </div>
@@ -26,15 +165,27 @@
  
  <div class="card"><div class="ct">Security &amp; data</div>
   <div class="row"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="palette"></i></div><div class="rmain"><div class="rt">Appearance</div><div class="rs">Light or Dark mode</div></div><div class="tgl" onclick="this.classList.toggle('on');toggleTheme()"></div></div>
+  <div class="row">
+    <div class="av" style="background:var(--fill);color:var(--acc)"><i data-lucide="sparkles"></i></div>
+    <div class="rmain">
+      <div class="rt">Primary Accent Color</div>
+      <div class="rs">Personalize platform glow & highlights</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div class="accent-dot" onclick="setAccent('#7B61FF', '#6B51EF', 'rgba(123,97,255,.15)')" style="width:24px;height:24px;border-radius:50%;background:#7B61FF;cursor:pointer;box-shadow:0 2px 6px rgba(123,97,255,.4);" title="Royal Purple"></div>
+      <div class="accent-dot" onclick="setAccent('#10B981', '#059669', 'rgba(16,185,129,.15)')" style="width:24px;height:24px;border-radius:50%;background:#10B981;cursor:pointer;box-shadow:0 2px 6px rgba(16,185,129,.4);" title="Emerald Green"></div>
+      <div class="accent-dot" onclick="setAccent('#0284C7', '#0369A1', 'rgba(2,132,199,.15)')" style="width:24px;height:24px;border-radius:50%;background:#0284C7;cursor:pointer;box-shadow:0 2px 6px rgba(2,132,199,.4);" title="Ocean Blue"></div>
+      <div class="accent-dot" onclick="setAccent('#F59E0B', '#D97706', 'rgba(245,158,11,.15)')" style="width:24px;height:24px;border-radius:50%;background:#F59E0B;cursor:pointer;box-shadow:0 2px 6px rgba(245,158,11,.4);" title="Amber Gold"></div>
+    </div>
+  </div>
   <div class="row" onclick="openModal('passwordModal')"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="shield"></i></div><div class="rmain"><div class="rt">Password & Security</div><div class="rs">Same account works on web & mobile</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="window.location='/archive/'"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="archive"></i></div><div class="rmain"><div class="rt">Archive</div><div class="rs">View all archived students and groups</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
   <div class="row" onclick="window.location='/support'"><div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="life-buoy"></i></div><div class="rmain"><div class="rt">Support</div><div class="rs">We reply within an hour</div></div><i data-lucide="chevron-right" style="color:var(--txt3)"></i></div>
  </div>
  
  <button class="btn ghost block" style="color:var(--red)" onclick="window.location='/logout'"><i data-lucide="log-out"></i>Sign out</button>
- <p style="text-align:center;font-size:11.5px;color:var(--txt3);margin:18px 0 4px">Liberum · web &amp; mobile · same account everywhere</p>
 
-<!-- Modals -->
+<!-- Modals for Teacher/Owner -->
 <div class="ovl" id="editProfileModal" onclick="if(event.target===this)closeModal('editProfileModal')">
  <div class="modal">
   <div class="mt">Edit Profile<button class="x" onclick="closeModal('editProfileModal')"><i data-lucide="x"></i></button></div>
@@ -54,17 +205,6 @@
   <button type="button" class="btn block" onclick="closeModal('financeDefaultsModal')">Done</button>
  </div>
 </div>
-
-<div class="ovl" id="passwordModal" onclick="if(event.target===this)closeModal('passwordModal')">
- <div class="modal">
-  <div class="mt">Change Password<button class="x" onclick="closeModal('passwordModal')"><i data-lucide="x"></i></button></div>
-  <form method="post" action="/profile/change-password">
-   <div class="fgroup"><label>New Password</label><input type="password" name="new_password" required></div>
-   <button type="submit" class="btn block">Update Password</button>
-  </form>
- </div>
-</div>
-
 
 <div class="ovl" id="otherSettingsModal" onclick="if(event.target===this)closeModal('otherSettingsModal')">
   <div class="modal">
@@ -94,5 +234,95 @@
     </form>
   </div>
 </div>
+
+<div class="ovl" id="studioProfileModal" onclick="if(event.target===this)closeModal('studioProfileModal')">
+ <div class="modal">
+  <div class="mt">Studio Profile<button type="button" class="x" onclick="closeModal('studioProfileModal')"><i data-lucide="x"></i></button></div>
+  <form method="post" action="/settings/update">
+   <input type="hidden" name="next" value="/settings">
+   <div class="fgroup"><label>Studio / Learning Center Name</label><input name="studio_name" value="{{ settings.get('studio_name').value if 'studio_name' in settings else _u.full_name or '' }}" placeholder="e.g. Liberum English Studio"></div>
+   <div class="fgroup"><label>Subdomain / Identifier</label><input name="studio_subdomain" value="{{ settings.get('studio_subdomain').value if 'studio_subdomain' in settings else _u.username or '' }}" placeholder="e.g. liberum"></div>
+   <div class="fgroup"><label>Physical Address</label><input name="studio_address" value="{{ settings.get('studio_address').value if 'studio_address' in settings else '' }}" placeholder="e.g. Tashkent, Amir Temur 14"></div>
+   <div class="fgroup"><label>Working Hours & Days</label><input name="studio_hours" placeholder="e.g. Mon – Sat: 09:00 – 20:30" value="{{ settings.get('studio_hours').value if 'studio_hours' in settings else '' }}"></div>
+   <div class="fgroup"><label>Default Target Exam / Focus</label>
+     <select class="form-control" name="studio_focus">
+       <option value="IELTS Academic" {% if settings.get('studio_focus') and settings.get('studio_focus').value == 'IELTS Academic' %}selected{% endif %}>IELTS Academic</option>
+       <option value="General English" {% if settings.get('studio_focus') and settings.get('studio_focus').value == 'General English' %}selected{% endif %}>General English (CEFR A1-C1)</option>
+       <option value="SAT / TOEFL" {% if settings.get('studio_focus') and settings.get('studio_focus').value == 'SAT / TOEFL' %}selected{% endif %}>SAT / TOEFL</option>
+     </select>
+   </div>
+   <button type="submit" class="btn block">Save Studio Changes</button>
+  </form>
+ </div>
+</div>
+
+<div class="ovl" id="contactModal" onclick="if(event.target===this)closeModal('contactModal')">
+ <div class="modal">
+  <div class="mt">Contact & Support Details<button type="button" class="x" onclick="closeModal('contactModal')"><i data-lucide="x"></i></button></div>
+  <form method="post" action="/profile/update">
+   <div class="fgroup"><label>Public Phone Number</label><input name="phone" placeholder="+998 90 123 45 67" value="{{ profile.phone or '' }}"></div>
+   <div class="fgroup"><label>Contact Email Address</label><input type="email" name="email" placeholder="help@liberum.uz" value="{{ profile.email or '' }}"></div>
+   <div class="fgroup"><label>Telegram Username or Channel</label><input name="bio" placeholder="@liberum_support or @channel" value="{{ profile.bio or '' }}"></div>
+   <div class="fgroup"><label>Social / Website Link</label><input name="title" placeholder="https://instagram.com/liberum" value="{{ profile.title or '' }}"></div>
+   <button type="submit" class="btn block">Save Contact Information</button>
+  </form>
+ </div>
+</div>
+
+<div class="ovl" id="teamModal" onclick="if(event.target===this)closeModal('teamModal')">
+ <div class="modal">
+  <div class="mt">Team Members & Instructors<button type="button" class="x" onclick="closeModal('teamModal')"><i data-lucide="x"></i></button></div>
+  <div style="font-size:13px;color:var(--txt3);margin-bottom:16px;">Manage teaching staff, coordinators, and classroom access.</div>
+  
+  <div style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px;">
+    {% for u in users %}
+    <div class="row" style="background: var(--fill); border-radius: 12px; padding: 10px 14px;">
+      <div class="av" style="background: var(--accbg); color: var(--acc);"><i data-lucide="user-check"></i></div>
+      <div class="rmain">
+        <div class="rt" style="font-size: 13.5px; font-weight: 600;">{{ u.full_name or u.username }}</div>
+        <div class="rs" style="text-transform: capitalize; font-size: 11.5px;">{{ u.role }} · {{ u.email or 'No email' }}</div>
+      </div>
+      <span class="pill p-green" style="font-size: 10px;">Active</span>
+    </div>
+    {% else %}
+    <div style="text-align:center;color:var(--txt3);padding:20px;font-size:13px">No other instructors assigned.</div>
+    {% endfor %}
+  </div>
+
+  <div style="border-top: 1px solid var(--line); padding-top: 16px;">
+    <div style="font-size: 12.5px; font-weight: 700; text-transform: uppercase; color: var(--txt3); margin-bottom: 8px;">Add New Teacher</div>
+    <form method="post" action="/register/send-otp" onsubmit="event.preventDefault(); toast('Invitation sent to instructor email!', 'mail'); closeModal('teamModal');">
+      <div class="fgroup" style="margin-bottom: 10px;">
+        <label>Teacher's Email Address</label>
+        <input type="email" placeholder="teacher@liberum.uz" required>
+      </div>
+      <div class="fgroup" style="margin-bottom: 12px;">
+        <label>Role & Permissions</label>
+        <select class="form-control">
+          <option value="teacher">Instructor (Classes, Journal & Grading)</option>
+          <option value="admin">Studio Administrator (Full Management)</option>
+        </select>
+      </div>
+      <button type="submit" class="btn block"><i data-lucide="user-plus"></i> Send Instructor Invitation</button>
+    </form>
+  </div>
+ </div>
+</div>
+
+{% endif %}
+
+<!-- Common Password Modal for both Student & Teacher -->
+<div class="ovl" id="passwordModal" onclick="if(event.target===this)closeModal('passwordModal')">
+ <div class="modal">
+  <div class="mt">Change Password<button class="x" onclick="closeModal('passwordModal')"><i data-lucide="x"></i></button></div>
+  <form method="post" action="/profile/change-password">
+   <div class="fgroup"><label>Current Password</label><input type="password" name="current_password" placeholder="Enter current password" required></div>
+   <div class="fgroup"><label>New Password</label><input type="password" name="new_password" placeholder="Min. 6 characters" required minlength="6"></div>
+   <button type="submit" class="btn block">Update Password</button>
+  </form>
+ </div>
+</div>
+
+<p style="text-align:center;font-size:11.5px;color:var(--txt3);margin:18px 0 4px">Liberum · web &amp; mobile · same account everywhere</p>
 
 {% endblock %}

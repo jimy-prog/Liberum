@@ -10,6 +10,22 @@
 <script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
 <script src="https://cdn.lr-ingest.com/LogRocket.min.js" crossorigin="anonymous"></script>
 <script>window.LogRocket && window.LogRocket.init('jgqnaa/liberum');</script>
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.dataset.theme = 'dark';
+    }
+    const acc = localStorage.getItem('theme_accent');
+    const acc2 = localStorage.getItem('theme_accent2');
+    const accbg = localStorage.getItem('theme_accent_bg');
+    if (acc) {
+      document.documentElement.style.setProperty('--acc', acc);
+      if (acc2) document.documentElement.style.setProperty('--acc2', acc2);
+      if (accbg) document.documentElement.style.setProperty('--accbg', accbg);
+    }
+  })();
+</script>
 <style>
 
 /* ================= TOKENS ================= */
@@ -325,6 +341,13 @@ header.top{position:sticky;top:0;z-index:30;padding:26px 40px 0;background:linea
   }
 </script>
 
+<script>
+(function(){
+  if(localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)){
+    document.documentElement.dataset.theme = 'dark';
+  }
+})();
+</script>
 </head>
 <body>
 <div class="app">
@@ -426,8 +449,21 @@ function closeModal(id){
 }
 function openDrawer(html){$('#drawer').innerHTML=html;$('#drawer').classList.add('open');lucide.createIcons()}
 function closeDrawer(){$('#drawer').classList.remove('open')}
-function toggleTheme(){const h=document.documentElement;const d=h.dataset.theme==='dark';h.dataset.theme=d?'':'dark';$('#themeIc').setAttribute('data-lucide',d?'moon':'sun');lucide.createIcons();toast(d?'Light mode':'Dark mode',d?'sun':'moon')}
-function setAccent(c,c2){document.documentElement.style.setProperty('--acc',c);document.documentElement.style.setProperty('--acc2',c2);document.querySelectorAll('.dotsw i').forEach(d=>d.classList.toggle('on',d.dataset.c===c))}
+function toggleTheme(){const h=document.documentElement;const d=h.dataset.theme==='dark';h.dataset.theme=d?'':'dark';localStorage.setItem('theme', d?'light':'dark');$('#themeIc').setAttribute('data-lucide',d?'moon':'sun');lucide.createIcons();toast(d?'Light mode':'Dark mode',d?'sun':'moon')}
+function setAccent(c, c2, cbg){
+  c2 = c2 || c;
+  cbg = cbg || (c + '1a');
+  document.documentElement.style.setProperty('--acc', c);
+  document.documentElement.style.setProperty('--acc2', c2);
+  document.documentElement.style.setProperty('--accbg', cbg);
+  localStorage.setItem('theme_accent', c);
+  localStorage.setItem('theme_accent2', c2);
+  localStorage.setItem('theme_accent_bg', cbg);
+  document.querySelectorAll('.dotsw i, .accent-dot').forEach(d => {
+    d.classList.toggle('on', d.dataset.c === c || d.style.background === c);
+  });
+  toast('Accent updated', 'palette');
+}
 function seg(el,fn){el.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));el.classList.add('on');fn()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeDrawer()}});
 </script>

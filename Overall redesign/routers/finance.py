@@ -29,7 +29,7 @@ def calc(db, group, ms, me):
 @router.get("/")
 def finance_view(request: Request, month: str = None, db: Session = Depends(get_db)):
     today = date.today()
-    if month:
+    if month and month.strip():
         y,m = map(int,month.split("-")); ms = date(y,m,1)
     else:
         ms = today.replace(day=1)
@@ -91,7 +91,7 @@ def add_expense(
 @router.get("/payroll")
 def payroll_view(request: Request, month: str = None, db: Session = Depends(get_db)):
     today = date.today()
-    if month:
+    if month and month.strip():
         y,m = map(int,month.split("-")); ms = date(y,m,1)
     else:
         ms = today.replace(day=1)

@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block content %}
-<button class="btn ghost block" style="margin-bottom:16px;justify-content:flex-start" onclick="window.history.back()"><i data-lucide="arrow-left"></i>Go back</button>
+<button class="btn btn-ghost sm" style="margin-bottom:16px;" onclick="window.history.back()"><i data-lucide="arrow-left"></i>Go back</button>
 
 <div class="grid2">
   <div>
@@ -60,6 +60,43 @@
         <button class="btn ghost sm block" style="color:var(--red)" onclick="if(confirm('Archive this group?')) alert('To archive, please use the main Groups list edit function.')"><i data-lucide="archive"></i>Archive Group</button>
       </div>
     </div>
+    <!-- Advanced Configuration -->
+    <div class="card" style="margin-top: 16px;">
+      <div class="ct">Advanced Configuration</div>
+      
+      <div class="row" style="padding:0">
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="layers"></i></div>
+        <div class="rmain">
+          <div class="rt">Group Type</div>
+          <div class="rs" style="text-transform: capitalize;">{{ group.group_type or 'Standard Group' }}</div>
+        </div>
+      </div>
+      
+      <div class="row" style="padding:0;margin-top:10px">
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="percent"></i></div>
+        <div class="rmain">
+          <div class="rt">Teacher Share</div>
+          <div class="rs">{{ int((group.teacher_pct or 0) * 100) }}%</div>
+        </div>
+      </div>
+      
+      <div class="row" style="padding:0;margin-top:10px">
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="calendar"></i></div>
+        <div class="rmain">
+          <div class="rt">Frequency</div>
+          <div class="rs">{{ group.lessons_per_week or 3 }} lessons/week · {{ group.weeks_per_month or 4 }} weeks/month</div>
+        </div>
+      </div>
+      
+      <div class="row" style="padding:0;margin-top:10px">
+        <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="globe"></i></div>
+        <div class="rmain">
+          <div class="rt">Platform Mode</div>
+          <div class="rs">{{ 'Online Mode' if group.mode == 'Online' else 'In-Person Mode' }}</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <div>

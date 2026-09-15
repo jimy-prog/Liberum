@@ -11,10 +11,11 @@
 
 {% block content %}
 <div class="segs">
-  <button class="{% if view == 'weekly' %}on{% endif %}" onclick="window.location='/timetable/weekly'">Week</button>
-  <button class="{% if view == 'daily' %}on{% endif %}" onclick="window.location='/timetable/'">Day</button>
-  <button class="{% if view == 'online' %}on{% endif %}" onclick="window.location='/timetable/online'">Online</button>
-  <button class="on" onclick="window.location='/classes/'">Classes & invites</button>
+  <button onclick="window.location='/timetable/monthly'">Month</button>
+  <button onclick="window.location='/timetable/weekly'">Week</button>
+  <button onclick="window.location='/timetable/'">Day</button>
+  <button onclick="window.location='/timetable/online'">Online</button>
+  <button class="on" onclick="window.location='/classes'">Classes & invites</button>
 </div>
 
 

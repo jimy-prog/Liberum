@@ -20,7 +20,6 @@ templates = Jinja2Templates(directory="templates")
 def library_home(request: Request):
     user = get_current_user(request)
     if not user: return RedirectResponse("/login", status_code=303)
-    
     return templates.TemplateResponse("library/student_home.html", {
         "request": request, "user": user, "active_page": "library", "main_section": "learning"
     })

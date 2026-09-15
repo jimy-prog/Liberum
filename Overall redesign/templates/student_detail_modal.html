@@ -31,29 +31,32 @@
           </div>
         </div>
         
-        <!-- Contact -->
+        <!-- Contact & Direct Outreach -->
         <div class="card">
-          <div class="ct">Contact details</div>
+          <div class="ct">Contact & Outreach</div>
           {% if student.phone %}
-          <div class="row" style="padding:0">
+          <div class="row" style="padding:4px 0">
             <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="phone"></i></div>
             <div class="rmain">
-              <div class="rt">Student phone</div>
-              <div class="rs">{{ student.phone }}</div>
+              <div class="rt">{{ student.phone }}</div>
+              <div class="rs">Student Direct</div>
             </div>
+            <a href="tel:{{ student.phone }}" class="btn ghost sm" style="padding:6px 10px;"><i data-lucide="phone"></i> Call</a>
+            <a href="https://t.me/+{{ student.phone|replace('+', '')|replace(' ', '') }}" target="_blank" class="btn soft sm" style="padding:6px 10px; color:#229ED9;"><i data-lucide="send"></i> Telegram</a>
           </div>
           {% endif %}
           {% if student.parent_phone %}
-          <div class="row" style="padding:0;margin-top:10px">
+          <div class="row" style="padding:4px 0;margin-top:8px">
             <div class="av" style="background:var(--fill);color:var(--txt2)"><i data-lucide="users"></i></div>
             <div class="rmain">
-              <div class="rt">Parent phone</div>
-              <div class="rs">{{ student.parent_phone }}</div>
+              <div class="rt">{{ student.parent_phone }}</div>
+              <div class="rs">Parent Contact</div>
             </div>
+            <a href="tel:{{ student.parent_phone }}" class="btn ghost sm" style="padding:6px 10px;"><i data-lucide="phone"></i> Call</a>
           </div>
           {% endif %}
           {% if not student.phone and not student.parent_phone %}
-          <div style="font-size:13px;color:var(--txt3)">No contact details.</div>
+          <div style="font-size:13px;color:var(--txt3)">No contact details on file.</div>
           {% endif %}
         </div>
       </div>
