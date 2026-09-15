@@ -43,6 +43,13 @@ export const meetApi = {
     });
   },
 
+  async googleAuth(idToken: string, role?: Role) {
+    return request<{ success: boolean; user: User }>("/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ idToken, role: role || "student" }),
+    });
+  },
+
   async getMe() {
     return request<User>("/auth/me");
   },

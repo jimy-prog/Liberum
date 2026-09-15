@@ -4,6 +4,7 @@ import { ArrowLeft, Check, GraduationCap, Presentation } from "lucide-react";
 import { LiberumLogo, MeetMark } from "@/components/brand";
 import { Btn, BtnLink, Field, GoogleButton, Input } from "@/components/ui-kit";
 import { useApp } from "@/lib/store";
+import { signInWithGooglePopup } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/lib/types";
 
@@ -66,12 +67,29 @@ function AuthLayout({ children, title, subtitle }: { children: ReactNode; title:
 }
 
 export function LoginPage() {
-  const { loginWithBackend } = useApp();
+  const { loginWithBackend, loginWithGoogle } = useApp();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogle = async () => {
+    setError("");
+    setGoogleLoading(true);
+    try {
+      const idToken = await signInWithGooglePopup();
+      await loginWithGoogle(idToken);
+      navigate("/app");
+    } catch (err: any) {
+      if (err.code !== "auth/popup-closed-by-user") {
+        setError(err.message || "Google sign-in failed. Please try again.");
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -89,7 +107,7 @@ export function LoginPage() {
 
   return (
     <AuthLayout title="Welcome back" subtitle="Log in with your Liberum account to continue to Meet.">
-      <GoogleButton />
+      <GoogleButton onClick={handleGoogle} loading={googleLoading} disabled={submitting} />
       <div className="my-6 flex items-center gap-4">
         <span className="h-px flex-1 bg-line" />
         <span className="text-[11px] font-semibold uppercase tracking-widest text-ink-400">or</span>
@@ -129,7 +147,7 @@ export function LoginPage() {
 }
 
 export function RegisterPage() {
-  const { registerWithBackend } = useApp();
+  const { registerWithBackend, loginWithGoogle } = useApp();
   const navigate = useNavigate();
   const [role, setRole] = useState<Role>("student");
   const [name, setName] = useState("");
@@ -137,6 +155,23 @@ export function RegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogle = async () => {
+    setError("");
+    setGoogleLoading(true);
+    try {
+      const idToken = await signInWithGooglePopup();
+      await loginWithGoogle(idToken, role);
+      navigate("/app");
+    } catch (err: any) {
+      if (err.code !== "auth/popup-closed-by-user") {
+        setError(err.message || "Google sign-up failed. Please try again.");
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -154,7 +189,7 @@ export function RegisterPage() {
 
   return (
     <AuthLayout title="Create your account" subtitle="One Liberum account for Meet, Studio, Mock, and AI.">
-      <GoogleButton />
+      <GoogleButton onClick={handleGoogle} loading={googleLoading} disabled={submitting} text="Sign up with Google" />
       <div className="my-6 flex items-center gap-4">
         <span className="h-px flex-1 bg-line" />
         <span className="text-[11px] font-semibold uppercase tracking-widest text-ink-400">or</span>

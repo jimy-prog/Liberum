@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import uuid
@@ -70,6 +71,11 @@ class LoginMeetRequest(BaseModel):
     password: str
 
 
+class GoogleAuthMeetRequest(BaseModel):
+    idToken: str
+    role: Optional[str] = "student"  # "student" or "teacher"
+
+
 class LessonOptionSchema(BaseModel):
     id: Optional[str] = None
     title: str
@@ -129,7 +135,7 @@ class PayoutRequestSchema(BaseModel):
 # -------------------------------------------------------------
 logger = logging.getLogger("meet_api")
 
-TELEGRAM_BOT_TOKEN = "7854894320:AAF9Z-placeholder_token"  # Configurable via env
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "7854894320:AAF9Z-placeholder_token").strip()
 
 def send_telegram_notification(chat_id: Optional[str], text: str):
     """Sends asynchronous notification to user's Telegram if chat_id is configured."""
@@ -507,6 +513,124 @@ async def meet_login(req: LoginMeetRequest, response: Response):
             "initials": initials,
         }
     }
+
+
+@router.post("/auth/google")
+async def meet_google_auth(req: GoogleAuthMeetRequest, response: Response):
+    """Verifies Firebase Google ID token and logs in or creates user for Liberum Meet."""
+    import secrets
+    try:
+        import firebase_admin.auth as firebase_auth
+        decoded = firebase_auth.verify_id_token(req.idToken, clock_skew_seconds=60)
+    except Exception as e:
+        logger.warning(f"Firebase token verification failed: {e}")
+        raise HTTPException(status_code=401, detail="Invalid or expired Google authentication token.")
+
+    email = decoded.get("email", "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="Google account has no associated email address.")
+
+    name = decoded.get("name", "").strip() or email.split("@")[0].capitalize()
+    avatar_url = decoded.get("picture", "")
+
+    db = SessionMaster()
+    try:
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            # Create user on the fly
+            tenant = db.query(PlatformTenant).first()
+            if not tenant:
+                tenant = PlatformTenant(slug="meet_default", db_filename="tenant_meet.db")
+                db.add(tenant)
+                db.flush()
+
+            role = req.role if req.role in ["student", "teacher"] else "student"
+            user = User(
+                tenant_id=tenant.id,
+                username=email,
+                email=email,
+                full_name=name,
+                role=role,
+                avatar_url=avatar_url,
+                password_hash=hash_pw(secrets.token_urlsafe(16)),
+                is_active=True,
+            )
+            db.add(user)
+            db.flush()
+
+            if role == "teacher":
+                tp = MeetTeacherProfile(
+                    user_id=user.id,
+                    headline="Independent Teacher",
+                    bio="Welcome to my teaching profile on Liberum Meet.",
+                    subjects_json=json.dumps(["English"]),
+                    specializations_json=json.dumps(["General English"]),
+                    languages_json=json.dumps(["English", "O‘zbek"]),
+                    experience_years=2,
+                    rating=5.0,
+                    avatar_color="#7B61FF",
+                )
+                db.add(tp)
+                db.flush()
+
+                db.add(MeetLessonOption(
+                    teacher_id=tp.id,
+                    title="Trial Lesson",
+                    duration_min=30,
+                    price_uzs=50000,
+                    description="Introduction session to evaluate level and establish goals.",
+                ))
+
+                for day_name in ["Mon", "Tue", "Wed", "Thu", "Fri"]:
+                    db.add(MeetAvailability(
+                        teacher_id=tp.id,
+                        day=day_name,
+                        enabled=True,
+                        ranges_json=json.dumps([{"start": "10:00", "end": "18:00"}]),
+                    ))
+                for day_name in ["Sat", "Sun"]:
+                    db.add(MeetAvailability(
+                        teacher_id=tp.id,
+                        day=day_name,
+                        enabled=False,
+                        ranges_json=json.dumps([]),
+                    ))
+
+            db.add(MeetNotification(
+                user_id=user.id,
+                kind="system",
+                title="Welcome to Liberum Meet",
+                body="You signed in with Google successfully. Explore verified teachers or prepare your lessons.",
+                time_label="Just now",
+            ))
+
+            db.commit()
+            db.refresh(user)
+        else:
+            if avatar_url and not user.avatar_url:
+                user.avatar_url = avatar_url
+                db.commit()
+
+        token = create_session(user.id)
+        response.set_cookie(SESSION_KEY, token, httponly=True, max_age=60*60*24*30, samesite="lax", path="/")
+
+        parts = (user.full_name or "").split(" ")
+        initials = "".join([p[0].upper() for p in parts if p])[:2] or "U"
+
+        return {
+            "success": True,
+            "user": {
+                "id": str(user.id),
+                "name": user.full_name,
+                "email": user.email,
+                "role": user.role,
+                "initials": initials,
+                "telegramUsername": getattr(user, "telegram_username", None),
+                "telegramChatId": getattr(user, "telegram_chat_id", None),
+            }
+        }
+    finally:
+        db.close()
 
 
 @router.get("/auth/me")

@@ -8,6 +8,7 @@ interface AppState {
   loading: boolean;
   signIn: (role: Role) => void;
   loginWithBackend: (email: string, password: string) => Promise<User>;
+  loginWithGoogle: (idToken: string, role?: Role) => Promise<User>;
   registerWithBackend: (name: string, email: string, password: string, role: Role) => Promise<User>;
   signOut: () => Promise<void>;
   updateUser: (data: { name?: string; telegramUsername?: string }) => Promise<void>;
@@ -119,6 +120,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return res.user;
   };
 
+  const loginWithGoogle = async (idToken: string, role?: Role) => {
+    const res = await meetApi.googleAuth(idToken, role);
+    setUser(res.user);
+    return res.user;
+  };
+
   const registerWithBackend = async (name: string, email: string, password: string, role: Role) => {
     const res = await meetApi.register(name, email, password, role);
     setUser(res.user);
@@ -209,6 +216,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setUser(demo);
     },
     loginWithBackend,
+    loginWithGoogle,
     registerWithBackend,
     signOut,
     updateUser,
