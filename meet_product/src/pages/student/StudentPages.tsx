@@ -97,7 +97,7 @@ export function StudentDashboard() {
         <Card className="relative mt-6 overflow-hidden p-6 sm:p-7">
           <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-brand-400 to-brand-600" />
           <div className="flex flex-wrap items-center gap-5">
-            <Avatar initials="AK" color="#7B61FF" size="xl" />
+            <Avatar initials={(next.teacherName || "Teacher").split(" ").map(w => w[0]).join("").slice(0, 2)} color="#7B61FF" size="xl" />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone="amber">Next lesson</Badge>

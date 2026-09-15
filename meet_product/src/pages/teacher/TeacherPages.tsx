@@ -48,8 +48,8 @@ export function TeacherDashboard() {
   }, [lessons]);
 
   const earnings = stats ? stats.earnings : lessons.filter(l => l.status === "completed").reduce((acc, l) => acc + (l.priceUzs || 0), 0);
-  const ratingVal = stats?.rating || 4.9;
-  const reviewsCount = stats?.reviewsCount || 86;
+  const ratingVal = stats?.rating ?? 5.0;
+  const reviewsCount = stats?.reviewsCount ?? 0;
 
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
