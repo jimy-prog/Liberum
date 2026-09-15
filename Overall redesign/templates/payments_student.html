@@ -158,9 +158,9 @@
           </div>
           <span class="pill p-green" style="font-size: 9.5px; padding: 1px 6px;">Confirmed</span>
         </div>
-        <button class="btn soft sm" onclick="toast('Downloading Receipt #{{ p.id }}…', 'download')">
+        <a href="/payments/receipt/{{ p.id }}" target="_blank" class="btn soft sm" style="text-decoration:none;">
           <i data-lucide="file-text"></i> Receipt
-        </button>
+        </a>
       </div>
     {% else %}
       <div class="empty" style="padding: 30px;">
@@ -222,7 +222,7 @@
 async function submitOnlinePay(method) {
   toast(`Connecting to ${method} gateway…`, 'loader');
   try {
-    const res = await fetch('/api/v1/student/pay', {
+    const res = await fetch('/payments/api/v1/student/pay', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ method: method })

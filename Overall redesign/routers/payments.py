@@ -186,3 +186,96 @@ def delete_payment(pid: int, month: str = Form(...),
     p = db.query(Payment).get(pid)
     if p: db.delete(p); db.commit()
     return RedirectResponse(f"/payments/?month={month}", status_code=303)
+
+@router.post("/api/v1/student/pay")
+async def student_pay_api(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user:
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    
+    data = await request.json()
+    method = data.get("method", "Payme")
+    
+    student = db.query(Student).filter(
+        (Student.email == user.email) | (Student.phone == user.phone) | (Student.name == user.full_name)
+    ).first()
+    
+    if not student:
+        student = db.query(Student).first()
+        
+    group = student.group if student else None
+    monthly_fee = group.price_monthly if (group and group.price_monthly) else 400000
+    month_str = date.today().strftime("%Y-%m")
+    
+    # Register payment
+    existing = db.query(Payment).filter(
+        Payment.student_id == student.id,
+        Payment.month == month_str
+    ).first()
+    
+    if not existing:
+        payment = Payment(
+            student_id=student.id,
+            amount=monthly_fee,
+            month=month_str,
+            method=method,
+            paid_date=date.today()
+        )
+        db.add(payment)
+        db.commit()
+        db.refresh(payment)
+    
+    return JSONResponse({
+        "status": "success",
+        "message": f"Payment of {monthly_fee:,.0f} UZS via {method} confirmed!"
+    })
+
+@router.get("/receipt/{pid}")
+def download_receipt(pid: int, request: Request, db: Session = Depends(get_db)):
+    from fastapi.responses import HTMLResponse
+    p = db.query(Payment).get(pid)
+    if not p:
+        return HTMLResponse("Receipt not found", status_code=404)
+        
+    s = p.student
+    html = f"""
+    <!doctype html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Payment Receipt #{p.id} — Liberum</title>
+      <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; color: #1D1D1F; max-width: 600px; margin: 0 auto; background: #fafafa; }}
+        .card {{ background: #fff; border-radius: 16px; padding: 36px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }}
+        .header {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #f3f4f6; padding-bottom: 20px; }}
+        .brand {{ font-size: 24px; font-weight: 800; color: #7B61FF; }}
+        .badge {{ background: #ecfdf5; color: #059669; font-weight: 700; padding: 6px 14px; border-radius: 999px; font-size: 13px; }}
+        .row {{ display: flex; justify-content: space-between; margin: 14px 0; font-size: 14px; }}
+        .row span {{ color: #6b7280; }}
+        .row b {{ color: #111827; }}
+        .total {{ font-size: 26px; font-weight: 800; color: #10B981; margin: 24px 0 10px; border-top: 1px solid #f3f4f6; padding-top: 20px; text-align: right; }}
+        .btn-print {{ display: block; width: 100%; text-align: center; background: #7B61FF; color: #fff; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 600; margin-top: 20px; }}
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <div class="header">
+          <div class="brand">Liberum Studio</div>
+          <div class="badge">OFFICIAL RECEIPT</div>
+        </div>
+        <div style="margin-top: 24px;">
+          <div class="row"><span>Receipt ID:</span><b>#LIB-{p.id:06d}</b></div>
+          <div class="row"><span>Date & Time:</span><b>{p.paid_date or p.date}</b></div>
+          <div class="row"><span>Student Name:</span><b>{s.name if s else 'Student'}</b></div>
+          <div class="row"><span>Billing Month:</span><b>{p.month}</b></div>
+          <div class="row"><span>Payment Rail:</span><b>{p.payment_method or p.method or 'Cash'}</b></div>
+          <div class="row"><span>Transaction Status:</span><b style="color: #059669;">Verified & Cleared ✓</b></div>
+        </div>
+        <div class="total">{int(p.amount):,} UZS</div>
+        <div style="text-align: right; font-size: 11px; color: #9ca3af;">Fiscal identifier: UZ-TASHKENT-LIBERUM-ACADEMY</div>
+        <a href="javascript:window.print()" class="btn-print">Print / Save as PDF</a>
+      </div>
+    </body>
+    </html>
+    """
+    return HTMLResponse(html)

@@ -233,6 +233,12 @@
   </div>
 
   <div class="hero-actions">
+    {% if group and (group.mode == 'Online' or group.zoom_link) %}
+      <a href="{{ group.zoom_link or 'https://meet.google.com' }}" target="_blank" class="btn-hero-white" style="background:#10B981;color:#ffffff;box-shadow:0 6px 20px rgba(16,185,129,.4);">
+        <i data-lucide="video" style="width: 16px; height: 16px;"></i>
+        Join Live Class
+      </a>
+    {% endif %}
     <a href="/library/" class="btn-hero-white">
       <i data-lucide="book-open" style="width: 16px; height: 16px;"></i>
       Open Learning Hub
@@ -264,13 +270,13 @@
   </div>
 
   <!-- Stat 2: Daily Study Streak -->
-  <div class="stat-card-luxury">
+  <div class="stat-card-luxury" style="cursor: pointer; transition: transform 0.2s;" onclick="celebrateStreak({{ streak_days }})" title="Click to view streak rewards">
     <div>
-      <div class="v">{{ streak_days }} <span style="font-size: 20px;">🔥</span></div>
+      <div class="v">{{ streak_days }} <span style="font-size: 22px; display: inline-block; animation: pulseFlame 1.8s infinite ease-in-out;">🔥</span></div>
       <div class="l">Day Study Streak</div>
     </div>
     <div class="sub-badge" style="color: var(--acc2);">
-      <i data-lucide="flame" style="width: 13px; height: 13px;"></i> Daily habit active
+      <i data-lucide="flame" style="width: 13px; height: 13px;"></i> Active · Tap to view perks
     </div>
   </div>
 
@@ -476,5 +482,34 @@
     </div>
   </div>
 </div>
+
+<!-- Streak Celebration Modal -->
+<div class="ovl" id="streakModal" onclick="if(event.target===this)closeModal('streakModal')">
+  <div class="modal" style="text-align: center; max-width: 380px; padding: 32px 24px;">
+    <div style="font-size: 54px; margin-bottom: 12px; animation: pulseFlame 1.2s infinite ease-in-out;">🔥</div>
+    <h2 style="font-family: var(--fd); font-size: 24px; font-weight: 800; margin-bottom: 6px;"><span id="streakDaysCount">{{ streak_days }}</span>-Day Streak!</h2>
+    <p style="font-size: 13.5px; color: var(--txt2); line-height: 1.5; margin-bottom: 20px;">
+      You have consistently practiced daily! Maintaining your streak unlocks premium Lexi AI essay reviews and classroom badges.
+    </p>
+    <div style="background: var(--fill); border-radius: 14px; padding: 14px; text-align: left; margin-bottom: 20px;">
+      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--txt3); margin-bottom: 8px;">Active Perks</div>
+      <div style="font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+        <i data-lucide="check" style="width: 15px; height: 15px; color: var(--greenD);"></i> 2x Lexi AI Practice Quotas
+      </div>
+      <div style="font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+        <i data-lucide="check" style="width: 15px; height: 15px; color: var(--greenD);"></i> Priority Teacher Homework Feedback
+      </div>
+    </div>
+    <button class="btn block" onclick="closeModal('streakModal')">Keep Going!</button>
+  </div>
+</div>
+
+<script>
+function celebrateStreak(days) {
+  document.getElementById('streakDaysCount').textContent = days;
+  openModal('streakModal');
+  toast(`${days}-Day Streak active! 🔥`, 'flame');
+}
+</script>
 {% endblock %}
 

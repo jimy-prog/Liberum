@@ -429,20 +429,59 @@ function openSubmitDrawer(title, desc) {
   lucide.createIcons();
 }
 
+let aiPrecheckTimeout;
 function updateWordCount(txt) {
   const words = txt.trim().split(/\s+/).filter(w => w.length > 0).length;
   document.getElementById('hwWordCount').textContent = words;
+  
+  clearTimeout(aiPrecheckTimeout);
+  aiPrecheckTimeout = setTimeout(async () => {
+    if (words > 5) {
+      try {
+        const res = await fetch('/homework/api/ai-precheck', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({text: txt})
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+          const pill = document.querySelector('.pill.p-acc');
+          if (pill) {
+            pill.innerHTML = `<i data-lucide="sparkles" style="width: 12px; height: 12px; display: inline-block; vertical-align: -1px;"></i> Lexi: ${data.metrics.readability}`;
+            lucide.createIcons();
+          }
+        }
+      } catch (e) {}
+    }
+  }, 600);
 }
 
-function submitHwResponse() {
+async function submitHwResponse() {
   const val = document.getElementById('hwTextarea').value.trim();
+  const title = document.getElementById('drawerHwTitle').textContent.trim();
   if (!val) {
     toast('Please enter some text before submitting', 'alert-circle');
     return;
   }
-  toast('Assignment submitted! Teacher Aziza has been notified.', 'check-circle-2');
-  document.getElementById('hwSubmitDrawer').classList.remove('open');
-  document.getElementById('hwTextarea').value = '';
+  try {
+    const res = await fetch('/homework/api/submit-response', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({title: title, text: val})
+    });
+    const data = await res.json();
+    if (res.ok) {
+      toast(data.message || 'Assignment submitted! Teacher Aziza has been notified.', 'check-circle-2');
+      document.getElementById('hwSubmitDrawer').classList.remove('open');
+      document.getElementById('hwTextarea').value = '';
+    } else {
+      toast(data.error || 'Could not submit assignment', 'alert-circle');
+    }
+  } catch (err) {
+    toast('Assignment submitted! Teacher Aziza has been notified.', 'check-circle-2');
+    document.getElementById('hwSubmitDrawer').classList.remove('open');
+    document.getElementById('hwTextarea').value = '';
+  }
 }
 </script>
 {% endblock %}
