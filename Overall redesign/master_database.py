@@ -423,6 +423,8 @@ class MeetTeacherProfile(MasterBase):
     verified = Column(Boolean, default=True)
     online = Column(Boolean, default=True)
     avatar_color = Column(String, default="#7B61FF")
+    video_url = Column(String, nullable=True)  # YouTube / Loom / MP4 video intro URL
+    badges_json = Column(String, default="[]")  # Credential badges e.g. ["IELTS 8.0+", "Top Rated"]
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", foreign_keys=[user_id])

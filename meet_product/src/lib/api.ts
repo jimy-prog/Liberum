@@ -80,6 +80,8 @@ export const meetApi = {
     specializations: string[];
     languages: string[];
     experienceYears: number;
+    videoUrl?: string;
+    badges?: string[];
     lessons: { id?: string; title: string; durationMin: number; priceUzs: number; description: string }[];
   }) {
     return request<{ success: boolean }>("/teacher/my-profile", {

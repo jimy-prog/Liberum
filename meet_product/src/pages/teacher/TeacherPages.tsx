@@ -317,6 +317,8 @@ export function TeacherProfileEditor() {
   const [specializations, setSpecializations] = useState(ME.specializations.join(", "));
   const [languages, setLanguages] = useState(ME.languages.join(", "));
   const [bio, setBio] = useState(ME.bio);
+  const [videoUrl, setVideoUrl] = useState(ME.videoUrl || "");
+  const [badges, setBadges] = useState(ME.badges ? ME.badges.join(", ") : "IELTS 8.0+, Verified Mentor");
   const [lessons, setLessons] = useState(ME.lessons);
 
   useEffect(() => {
@@ -328,6 +330,8 @@ export function TeacherProfileEditor() {
           setSpecializations(data.specializations.join(", "));
           setLanguages(data.languages.join(", "));
           setBio(data.bio);
+          if (data.videoUrl) setVideoUrl(data.videoUrl);
+          if (data.badges && data.badges.length > 0) setBadges(data.badges.join(", "));
           if (data.lessons && data.lessons.length > 0) {
             setLessons(data.lessons);
           }
@@ -346,6 +350,8 @@ export function TeacherProfileEditor() {
         specializations: specializations.split(",").map(s => s.trim()).filter(Boolean),
         languages: languages.split(",").map(s => s.trim()).filter(Boolean),
         experienceYears: profile.experienceYears,
+        videoUrl: videoUrl.trim() || undefined,
+        badges: badges.split(",").map(b => b.trim()).filter(Boolean),
         lessons: lessons.map(l => ({
           title: l.title,
           durationMin: l.durationMin,
@@ -419,8 +425,22 @@ export function TeacherProfileEditor() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Field label="Full name"><Input defaultValue={profile.name} disabled className="opacity-80" /></Field>
           <Field label="Headline"><Input value={headline} onChange={e => setHeadline(e.target.value)} /></Field>
-          <Field label="Specializations"><Input value={specializations} onChange={e => setSpecializations(e.target.value)} /></Field>
-          <Field label="Languages"><Input value={languages} onChange={e => setLanguages(e.target.value)} /></Field>
+          <Field label="Specializations"><Input value={specializations} onChange={e => setSpecializations(e.target.value)} placeholder="e.g. IELTS 8.0, Academic Writing" /></Field>
+          <Field label="Languages"><Input value={languages} onChange={e => setLanguages(e.target.value)} placeholder="e.g. English, Uzbek, Russian" /></Field>
+          <Field label="1-Minute Video Intro URL">
+            <Input
+              value={videoUrl}
+              onChange={e => setVideoUrl(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=... or Loom embed"
+            />
+          </Field>
+          <Field label="Credential Badges (comma separated)">
+            <Input
+              value={badges}
+              onChange={e => setBadges(e.target.value)}
+              placeholder="e.g. IELTS 8.0+, Verified Mentor, SAT Specialist"
+            />
+          </Field>
         </div>
         <div className="mt-4">
           <Field label="Bio">

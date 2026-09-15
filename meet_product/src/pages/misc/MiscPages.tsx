@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Bell, Check, ExternalLink, Globe, MessageSquare, Send, ShieldCheck } from "lucide-react";
+import { Link, useSearchParams } from "react-router";
+import { Bell, Calendar, Check, ExternalLink, Globe, MessageSquare, Send, Sparkles, ShieldCheck } from "lucide-react";
 import { Avatar, Badge, Btn, Card, EmptyState, Field, Input } from "@/components/ui-kit";
 import { useApp } from "@/lib/store";
 import { meetApi } from "@/lib/api";
@@ -9,12 +10,22 @@ import { cn } from "@/lib/utils";
 /* ================= MESSAGES ================= */
 export function MessagesPage() {
   const { user } = useApp();
+  const [searchParams] = useSearchParams();
+  const initialUserId = searchParams.get("user") ? Number(searchParams.get("user")) : null;
+
   const [threads, setThreads] = useState<any[]>([]);
-  const [activeContactId, setActiveContactId] = useState<number | null>(null);
+  const [activeContactId, setActiveContactId] = useState<number | null>(initialUserId);
   const [messages, setMessages] = useState<any[]>([]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
+
+  const QUICK_INQUIRIES = [
+    "Hi! Do you offer trial sessions?",
+    "What is your schedule for weekend classes?",
+    "Can you help me prepare for IELTS Task 2?",
+    "Do you provide custom study materials?",
+  ];
 
   // Fetch threads list
   useEffect(() => {
@@ -22,7 +33,11 @@ export function MessagesPage() {
       .then((data) => {
         if (data && data.length > 0) {
           setThreads(data);
-          setActiveContactId(data[0].userId);
+          if (initialUserId) {
+            setActiveContactId(initialUserId);
+          } else if (!activeContactId) {
+            setActiveContactId(data[0].userId);
+          }
         } else {
           // fallback
           const fallback = user?.role === "student"
@@ -34,11 +49,15 @@ export function MessagesPage() {
                 { userId: 6, name: "Aziza Karimova (Student)", initials: "AK", color: "#1FAD55", last: "Thank you teacher! Homework is prepared.", time: "18:40", unread: 0 },
               ];
           setThreads(fallback);
-          setActiveContactId(fallback[0].userId);
+          if (initialUserId) {
+            setActiveContactId(initialUserId);
+          } else if (!activeContactId) {
+            setActiveContactId(fallback[0].userId);
+          }
         }
       })
       .catch(() => {});
-  }, [user]);
+  }, [user, initialUserId]);
 
   // Load messages for active thread
   useEffect(() => {
@@ -64,22 +83,22 @@ export function MessagesPage() {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!draft.trim() || !activeContactId || sending) return;
-    const text = draft.trim();
-    setDraft("");
+  const sendMessage = async (customText?: string) => {
+    const textToSend = (customText || draft).trim();
+    if (!textToSend || !activeContactId || sending) return;
+    if (!customText) setDraft("");
     setSending(true);
 
     const optimistic = {
       id: Date.now(),
       from: "me",
-      text,
+      text: textToSend,
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
     setMessages(p => [...p, optimistic]);
 
     try {
-      await meetApi.sendDirectMessage(activeContactId, text);
+      await meetApi.sendDirectMessage(activeContactId, textToSend);
     } catch {
       // keep optimistic
     } finally {
@@ -87,13 +106,34 @@ export function MessagesPage() {
     }
   };
 
-  const activeThread = threads.find(t => t.userId === activeContactId) || threads[0];
+  const activeThread = threads.find(t => t.userId === activeContactId) || (initialUserId && activeContactId === initialUserId ? {
+    userId: initialUserId,
+    name: "Teacher",
+    initials: "T",
+    color: "#7B61FF",
+    role: "teacher",
+    time: "Now",
+    unread: 0,
+    last: "Direct Inquiry"
+  } : threads[0]);
 
   return (
-    <div className="mx-auto max-w-4xl animate-fade-up">
-      <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Messages</h1>
-      <div className="mt-6 grid gap-4 md:grid-cols-[300px_1fr]">
+    <div className="mx-auto max-w-5xl animate-fade-up">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Messages</h1>
+          <p className="mt-1 text-sm text-ink-500">Ask questions, discuss study goals, and book verified lessons directly.</p>
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs text-ink-500">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /> Telegram Mirroring Active
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-[320px_1fr]">
         <Card className="overflow-hidden">
+          <div className="border-b border-line bg-cloud/60 px-4 py-2.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-400">Conversations</span>
+          </div>
           {threads.map((t) => (
             <button
               key={t.userId || t.name}
@@ -123,16 +163,47 @@ export function MessagesPage() {
           )}
         </Card>
 
-        <Card className="flex min-h-[460px] flex-col">
+        <Card className="flex min-h-[500px] flex-col">
           {activeThread ? (
             <>
-              <div className="flex items-center gap-3 border-b border-line px-5 py-3.5">
-                <Avatar initials={activeThread.initials} color={activeThread.color} size="sm" />
-                <div>
-                  <p className="text-sm font-semibold text-ink">{activeThread.name}</p>
-                  <p className="text-[11px] text-ink-400 capitalize">{activeThread.role || "Member"}</p>
+              <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+                <div className="flex items-center gap-3">
+                  <Avatar initials={activeThread.initials} color={activeThread.color} size="sm" />
+                  <div>
+                    <p className="text-sm font-semibold text-ink">{activeThread.name}</p>
+                    <p className="text-[11px] text-ink-400 capitalize">{activeThread.role || "Teacher"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/app/teachers"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink transition hover:border-brand-500 hover:text-brand-600"
+                  >
+                    <Calendar size={13} /> Book Lesson
+                  </Link>
                 </div>
               </div>
+
+              {/* Pre-booking Quick Inquiry Suggestions */}
+              {messages.length === 0 && (
+                <div className="border-b border-line/60 bg-brand-50/40 p-4">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-brand-700">
+                    <Sparkles size={13} /> Pre-Booking Quick Inquiries:
+                  </div>
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    {QUICK_INQUIRIES.map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => sendMessage(q)}
+                        className="rounded-lg border border-brand-200 bg-white px-2.5 py-1.5 text-xs font-medium text-brand-900 transition hover:bg-brand-50 hover:border-brand-300 active:scale-95 text-left"
+                      >
+                        “{q}”
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex-1 space-y-3 overflow-y-auto p-5">
                 {messages.map((m) => (
                   <div
@@ -152,23 +223,24 @@ export function MessagesPage() {
                 ))}
                 {messages.length === 0 && (
                   <div className="flex h-full items-center justify-center py-12 text-center text-xs text-ink-400">
-                    Send a message to start the conversation.
+                    Send a message or select a prompt above to start the conversation.
                   </div>
                 )}
                 <div ref={chatBottomRef} />
               </div>
+
               <div className="border-t border-line p-3">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     sendMessage();
                   }}
-                  className="flex items-center gap-2 rounded-full border border-line bg-cloud py-1 pl-4 pr-1"
+                  className="flex items-center gap-2 rounded-full border border-line bg-cloud py-1 pl-4 pr-1 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/10 transition"
                 >
                   <input
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
-                    placeholder="Type a message…"
+                    placeholder="Type an inquiry message…"
                     className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-ink-300"
                   />
                   <button

@@ -96,6 +96,8 @@ class TeacherProfileUpdateSchema(BaseModel):
     specializations: List[str]
     languages: List[str]
     experienceYears: int
+    videoUrl: Optional[str] = None
+    badges: Optional[List[str]] = None
     lessons: List[LessonOptionSchema]
 
 
@@ -184,6 +186,13 @@ def format_teacher_dict(t: MeetTeacherProfile, user: User):
     parts = (user.full_name or "Teacher").strip().split(" ")
     initials = "".join([p[0].upper() for p in parts if p])[:2] or "T"
 
+    try:
+        badges = json.loads(getattr(t, "badges_json", "[]") or "[]")
+    except Exception:
+        badges = []
+
+    video_url = getattr(t, "video_url", None)
+
     return {
         "id": f"t{t.id}",
         "userId": user.id,
@@ -202,6 +211,8 @@ def format_teacher_dict(t: MeetTeacherProfile, user: User):
         "verified": t.verified,
         "online": t.online,
         "color": t.avatar_color or "#7B61FF",
+        "videoUrl": video_url,
+        "badges": badges,
         "nextAvailable": "Today · 17:30",
         "lessons": lessons,
         "availability": availability,
@@ -660,6 +671,10 @@ async def update_my_teacher_profile(data: TeacherProfileUpdateSchema, user: User
         t.specializations_json = json.dumps(data.specializations)
         t.languages_json = json.dumps(data.languages)
         t.experience_years = data.experienceYears
+        if data.videoUrl is not None:
+            t.video_url = data.videoUrl.strip() or None
+        if data.badges is not None:
+            t.badges_json = json.dumps(data.badges)
 
         # Update lesson options
         db.query(MeetLessonOption).filter(MeetLessonOption.teacher_id == t.id).delete()
@@ -1450,6 +1465,10 @@ async def send_direct_message(data: SendDirectMessageSchema, user: User = Depend
 
     db = SessionMaster()
     try:
+        recipient = db.query(User).filter(User.id == data.recipient_id).first()
+        if not recipient:
+            raise HTTPException(status_code=404, detail="Recipient not found")
+
         msg = MeetDirectMessage(
             sender_id=user.id,
             recipient_id=data.recipient_id,
@@ -1458,6 +1477,16 @@ async def send_direct_message(data: SendDirectMessageSchema, user: User = Depend
         db.add(msg)
         db.commit()
         db.refresh(msg)
+
+        # Telegram Instant Mirroring for pre-booking inquiries
+        if getattr(recipient, "telegram_chat_id", None):
+            tg_text = (
+                f"💬 *New inquiry on Liberum Meet!*\n\n"
+                f"From: *{user.full_name or 'Student'}*\n"
+                f"\"{data.message.strip()[:140]}\"\n\n"
+                f"👉 [Open Messages](https://meet.liberum.uz/app/messages)"
+            )
+            send_telegram_notification(recipient.telegram_chat_id, tg_text)
 
         return {
             "id": msg.id,

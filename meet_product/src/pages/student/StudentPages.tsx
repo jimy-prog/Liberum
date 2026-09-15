@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import {
-  ArrowLeft, ArrowRight, BadgeCheck, CalendarDays, Check, ChevronLeft,
-  Clock, Compass, Copy, Globe, GraduationCap, Search, Share2, Star, Video,
+  ArrowLeft, ArrowRight, Award, BadgeCheck, CalendarDays, Check, ChevronLeft,
+  Clock, Compass, Copy, Globe, GraduationCap, MessageSquare, Play, Search, Share2, Star, Video,
 } from "lucide-react";
 import { BOOKABLE_TIMES, fmtUzs, SUBJECTS, TEACHERS } from "@/lib/data";
 import { useApp } from "@/lib/store";
@@ -263,6 +263,7 @@ export function FindTeachersPage() {
 
 function TeacherCard({ teacher: t, style }: { teacher: Teacher; style?: React.CSSProperties }) {
   const from = Math.min(...t.lessons.map((l) => l.priceUzs));
+  const contactUserId = t.userId || (t.id ? Number(t.id.replace("t", "")) : undefined);
   return (
     <Card className="group flex animate-fade-up flex-col p-5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_-20px_rgba(14,15,19,0.22)]" >
       <div className="flex items-start gap-3.5" style={style}>
@@ -270,7 +271,7 @@ function TeacherCard({ teacher: t, style }: { teacher: Teacher; style?: React.CS
           <Avatar initials={t.initials} color={t.color} size="lg" />
           {t.online && <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#1FAD55]" />}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <p className="truncate font-display text-[15px] font-semibold text-ink">{t.name}</p>
             {t.verified && <BadgeCheck size={15} className="shrink-0 text-brand-500" />}
@@ -284,12 +285,30 @@ function TeacherCard({ teacher: t, style }: { teacher: Teacher; style?: React.CS
             <span className="text-ink-400">{t.experienceYears} yrs</span>
           </div>
         </div>
+        {t.videoUrl && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-600 ring-1 ring-brand-100">
+            <Play size={9} className="fill-brand-600" /> Video
+          </span>
+        )}
       </div>
-      <div className="mt-4 flex flex-wrap gap-1.5">
+
+      {/* Credential Badges */}
+      {t.badges && t.badges.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {t.badges.slice(0, 2).map((b) => (
+            <span key={b} className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-500/20">
+              <Award size={11} /> {b}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
         {t.specializations.slice(0, 3).map((s) => (
           <Badge key={s} tone="gray">{s}</Badge>
         ))}
       </div>
+
       <div className="mt-4 flex items-center justify-between border-t border-line pt-4">
         <div>
           <p className="text-[11px] uppercase tracking-wide text-ink-400">from</p>
@@ -300,9 +319,21 @@ function TeacherCard({ teacher: t, style }: { teacher: Teacher; style?: React.CS
           <p className="text-[13px] font-semibold text-[#157A3E]">{t.nextAvailable}</p>
         </div>
       </div>
-      <BtnLink to={`/app/teachers/${t.id}`} variant="outline" className="mt-4 w-full group-hover:border-brand-500 group-hover:text-brand-600">
-        View Profile <ArrowRight size={14} />
-      </BtnLink>
+
+      <div className="mt-4 flex items-center gap-2">
+        <BtnLink to={`/app/teachers/${t.id}`} variant="outline" className="flex-1 group-hover:border-brand-500 group-hover:text-brand-600">
+          View Profile <ArrowRight size={14} />
+        </BtnLink>
+        {contactUserId && (
+          <Link
+            to={`/app/messages?user=${contactUserId}`}
+            title="Send pre-booking inquiry"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-white text-ink-500 transition hover:border-brand-500 hover:text-brand-600 hover:bg-brand-50/50"
+          >
+            <MessageSquare size={15} />
+          </Link>
+        )}
+      </div>
     </Card>
   );
 }
@@ -386,10 +417,22 @@ export function TeacherProfilePage() {
                     {copied ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
                     {copied ? "Copied" : "Share"}
                   </button>
-                  <BtnLink to="/app/messages" variant="outline" size="md">Message</BtnLink>
+                  <BtnLink to={`/app/messages?user=${t.userId || (t.id ? Number(t.id.replace("t", "")) : 1)}`} variant="outline" size="md">Message</BtnLink>
                   <BtnLink to={`/app/book/${t.id}`} size="md">Book a Lesson</BtnLink>
                 </div>
               </div>
+
+              {/* Credential Badges Showcase */}
+              {t.badges && t.badges.length > 0 && (
+                <div className="mt-5 flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-50/40 px-4 py-2.5">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-amber-800">Verified Credentials:</span>
+                  {t.badges.map((b) => (
+                    <span key={b} className="inline-flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-xs font-semibold text-amber-900 shadow-sm ring-1 ring-amber-500/20">
+                      <Award size={13} className="text-amber-600" /> {b}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
@@ -405,6 +448,29 @@ export function TeacherProfilePage() {
                   </div>
                 ))}
               </div>
+
+              {/* 1-Minute Video Introduction Showcase */}
+              {t.videoUrl ? (
+                <div className="mt-7">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-display text-[15px] font-semibold text-ink flex items-center gap-1.5">
+                      <Play size={15} className="text-brand-500 fill-brand-500" /> 1-Minute Video Introduction
+                    </h2>
+                    <span className="text-xs text-ink-400">Watch teacher pitch & accent</span>
+                  </div>
+                  <div className="mt-3 overflow-hidden rounded-2xl border border-line bg-ink/5 shadow-inner">
+                    <div className="relative aspect-video w-full">
+                      <iframe
+                        src={t.videoUrl.includes("youtube.com/watch?v=") ? t.videoUrl.replace("watch?v=", "embed/") : t.videoUrl}
+                        title={`${t.name} Video Introduction`}
+                        className="h-full w-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
               <h2 className="mt-7 font-display text-[15px] font-semibold text-ink">About</h2>
               <p className="mt-2 text-sm leading-relaxed text-ink-600">{t.bio}</p>
