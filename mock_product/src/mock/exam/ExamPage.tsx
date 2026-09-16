@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight,
   Flag, HelpCircle, Loader2, Mic, PenLine, Play, Save, Square, X,
@@ -522,7 +522,7 @@ function SpeakingSection() {
           </div>
         </div>
         <p className="mt-4 text-center text-[12px] leading-relaxed text-ink-400">
-          Recordings stay in your browser in this demo. In production they are submitted for AI estimated scoring.
+          Audio recordings are securely processed for detailed diagnostic evaluation and band estimation.
         </p>
       </div>
     </div>
@@ -596,18 +596,15 @@ function ReviewScreen({
 export default function ExamPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { user, signIn, addAttempt } = useMock();
+  const { user, addAttempt } = useMock();
   const test = MOCK_TESTS.find((t) => t.id === id) ?? MOCK_TESTS[1];
   const sections = EXAM_SECTIONS.filter((s) => test.sections.includes(s.id));
 
   useEffect(() => {
     if (!user) {
-      const demo = searchParams.get("demo");
-      if (demo === "student" || demo === "teacher") signIn(demo);
+      navigate("/login");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, navigate]);
 
   const [session, setSession] = useState<ExamSession>(() => {
     const s = loadSession();

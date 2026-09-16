@@ -90,53 +90,59 @@ export function MockLoginPage() {
           const fbRes = await fetch("/api/auth/firebase", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idToken, role: "student" }) // role ignored for existing users
+            body: JSON.stringify({ idToken, role: "student" })
           });
           
           if (fbRes.ok) {
             success = true;
-          } else {
-             console.warn("Firebase token rejected by backend");
           }
-        } catch (err: any) {
-          console.warn("Firebase login failed, falling back to classic", err);
+        } catch {
+          // Firebase fallback to backend
         }
       }
 
-      // 2. Fallback to Classic Backend Login
+      // 2. Direct backend login endpoint
       if (!success) {
-        const getRes = await fetch("/login");
-        const html = await getRes.text();
-        const match = html.match(/id="csrf_token"\s+value="([^"]+)"/);
-        const csrfToken = match ? match[1] : "";
-
-        const res = await fetch("/login", {
+        const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ identifier: email, password: password, csrf_token: csrfToken })
+          body: JSON.stringify({ identifier: email.trim(), password: password })
         });
-        
-        const contentType = res.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-           const data = await res.json();
-           if (res.ok) {
-              success = true;
-           } else {
-              throw new Error(data.detail || "Invalid credentials");
-           }
+
+        if (res.ok) {
+          const data = await res.json();
+          backendUser = data.user;
+          success = true;
         } else {
-           throw new Error("Invalid response from backend (Check CORS or CSRF)");
+          // Fallback to form-based /login
+          const getRes = await fetch("/login");
+          const html = await getRes.text();
+          const match = html.match(/id="csrf_token"\s+value="([^"]+)"/);
+          const csrfToken = match ? match[1] : "";
+
+          const formRes = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ identifier: email.trim(), password: password, csrf_token: csrfToken })
+          });
+          if (formRes.ok) {
+            success = true;
+          } else {
+            const errData = await formRes.json().catch(() => ({}));
+            throw new Error(errData.detail || "Invalid credentials. Please check your username and password.");
+          }
         }
       }
 
-      // 3. Fetch synced profile info from /api/auth/me
+      // 3. Fetch synced profile info from /api/auth/me if not already set
       if (success) {
-        const meRes = await fetch("/api/auth/me");
-        if (meRes.ok) {
-           backendUser = await meRes.json();
-        } else {
-           // Fallback to minimal profile if /me fails for some reason
-           backendUser = { id: "user", username: email, email: email, full_name: email.split("@")[0], role: "student" };
+        if (!backendUser) {
+          const meRes = await fetch("/api/auth/me");
+          if (meRes.ok) {
+            backendUser = await meRes.json();
+          } else {
+            backendUser = { id: "user", username: email, email: email, full_name: email.split("@")[0], role: "student" };
+          }
         }
         
         // Map roles: owner/admin -> teacher view in Mock app
@@ -232,11 +238,9 @@ export function MockLoginPage() {
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <Btn type="submit" className="w-full" size="lg" disabled={loading}>{loading ? "Logging in..." : "Log in"}</Btn>
       </form>
-      <div className="mt-6 rounded-xl border border-line bg-white p-3.5 text-center">
-        <p className="text-[13px] text-ink-500">
-          Exploring?{" "}
-          <button className="font-semibold text-brand-600 hover:underline" onClick={() => { signIn("student"); navigate("/app"); }}>Demo as Student</button>{" · "}
-          <button className="font-semibold text-brand-600 hover:underline" onClick={() => { signIn("teacher"); navigate("/app"); }}>Demo as Teacher</button>
+      <div className="mt-6 rounded-xl border border-line/60 bg-white/70 p-4 text-center">
+        <p className="text-[12px] font-medium text-ink-400">
+          Liberum Single Sign-On · Same account across Meet, Studio & Mock
         </p>
       </div>
       <p className="mt-6 text-center text-[13px] text-ink-500">

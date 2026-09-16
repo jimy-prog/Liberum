@@ -184,7 +184,7 @@ export function TestInfoPage() {
                   <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600"><Icon size={16} /></span>
                   <div>
                     <p className="text-sm font-semibold capitalize text-ink">{s}</p>
-                    <p className="text-xs text-ink-400">~{mins} min · demo length</p>
+                    <p className="text-xs text-ink-400">~{mins} min · exam duration</p>
                   </div>
                 </div>
               );

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link, NavLink, useNavigate, useSearchParams } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import {
   BarChart3, Bell, BookOpen, ClipboardList, FilePlus2, History, LayoutDashboard,
   Library, LogOut, Menu, Settings, Users,
@@ -37,9 +37,8 @@ function NotifIcon({ kind }: { kind: AppNotification["kind"] }) {
 }
 
 export default function MockShell({ children }: { children: ReactNode }) {
-  const { user, signIn, signOut, notifications, markAllRead } = useMock();
+  const { user, signOut, notifications, markAllRead } = useMock();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [notifOpen, setNotifOpen] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
   const unread = notifications.filter((n) => !n.read).length;
@@ -47,11 +46,9 @@ export default function MockShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.title = "Liberum Mock — Practice IELTS like the real thing.";
     if (!user) {
-      const demo = searchParams.get("demo");
-      if (demo === "student" || demo === "teacher") signIn(demo);
-      else navigate("/login");
+      navigate("/login");
     }
-  }, [user]);
+  }, [user, navigate]);
 
   if (!user) return null;
 
