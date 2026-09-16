@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Liberum design tokens */
+    --background: 0 0% 100%;
+    --foreground: 240 14% 5%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 14% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 14% 5%;
+    --primary: 249 100% 69%;            /* #7B61FF */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 250 100% 98%;          /* #F6F4FF */
+    --secondary-foreground: 249 69% 50%;
+    --muted: 240 20% 97%;               /* #F4F4F8 */
+    --muted-foreground: 229 8% 57%;     /* #8A8E99 */
+    --accent: 250 100% 98%;
+    --accent-foreground: 249 69% 50%;
+    --destructive: 4 100% 67%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 11% 91%;              /* #E5E5EB */
+    --input: 240 11% 91%;
+    --ring: 249 100% 69%;
+    --radius: 0.75rem;
+    --sidebar-background: 250 60% 16%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 250 60% 20%;
+    --sidebar-accent: 250 60% 22%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 250 50% 26%;
+    --sidebar-ring: 249 100% 69%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: #7b61ff;
+    color: #fff;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: "Space Grotesk", "Inter", sans-serif;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .eyebrow {
+    @apply font-display text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-500;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- Motion ---------- */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(123, 97, 255, 0.35); }
+  70% { box-shadow: 0 0 0 12px rgba(123, 97, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(123, 97, 255, 0); }
+}
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@keyframes eq-bar {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+
+.animate-float-y { animation: float-y 7s ease-in-out infinite; }
+.animate-fade-up { animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-fade-in { animation: fade-in 0.5s ease both; }
+.animate-pulse-ring { animation: pulse-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f4f4f8 25%, #eceaf6 37%, #f4f4f8 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+/* Classroom audio equalizer */
+.eq-bar {
+  transform-origin: bottom;
+  animation: eq-bar 1s ease-in-out infinite;
+}
+
+/* Subtle grid backdrop used on dark sections */
+.bg-grid-dark {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+.bg-grid-light {
+  background-image: linear-gradient(rgba(14, 15, 19, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 15, 19, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+}

@@ -49,6 +49,7 @@ from routers import join
 from routers import library
 from routers import ai
 from routers import meet_api
+from routers import mock_api
 
 app = FastAPI(title=APP_NAME)
 
@@ -240,6 +241,7 @@ PUBLIC_PREFIXES = (
     "/auth",
     "/join",
     "/api/meet",
+    "/api/mock",
 )
 
 
@@ -640,6 +642,7 @@ for r in [dashboard.router, students.router, groups.router, lessons.router,
     app.include_router(r)
 app.include_router(api_auth.router, prefix="/api")
 app.include_router(meet_api.router)
+app.include_router(mock_api.router)
 
 def repair_teacher_tenant_mappings():
     import random
