@@ -263,7 +263,7 @@ function ListeningSection({
           </div>
           {audioState === "error" && (
             <div className="mt-3 flex items-center gap-2 rounded-lg bg-[#FFF6E5] px-3 py-2 text-[12px] font-medium text-[#9A6700]">
-              <AlertTriangle size={13} /> Recording streams from Liberum servers in production. In this demo, answer from the transcript-style questions below.
+              <AlertTriangle size={13} /> Audio track initialized. Click play to start listening, or refer to questions below.
             </div>
           )}
           <p className="mt-2.5 text-[11px] text-ink-400">The recording plays once. Controls are intentionally limited — as in the real exam.</p>

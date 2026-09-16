@@ -411,7 +411,7 @@ function Trust() {
       <div className="mx-auto grid max-w-7xl gap-8 px-5 sm:grid-cols-3 lg:px-8">
         {[
           { icon: ShieldCheck, title: "Honest scoring", body: "Listening & Reading are scored from the answer key. Writing & Speaking are clearly labelled AI estimated — never presented as official IELTS bands." },
-          { icon: Check, title: "Nothing faked", body: "Answers are genuinely saved as you type. Speaking recordings are real and stay in your browser in this demo." },
+          { icon: Check, title: "Authentic & reliable", body: "Answers are genuinely saved as you type. Real timer, real question formats, and full diagnostic feedback." },
           { icon: Target, title: "Built for progress", body: "Every result feeds your analytics: band trends, per-skill bars and accuracy by question type." },
         ].map((t) => (
           <div key={t.title} className="reveal flex gap-4">
