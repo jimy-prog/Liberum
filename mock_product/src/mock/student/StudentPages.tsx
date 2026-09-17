@@ -15,9 +15,9 @@ const sectionIcons = { listening: Headphones, reading: BookOpen, writing: PenLin
 
 /* ================= DASHBOARD ================= */
 export function MockDashboard() {
-  const { user, attempts } = useMock();
+  const { user, attempts, tests } = useMock();
   const latest = attempts[0];
-  const recommended = MOCK_TESTS.find((t) => t.status === "new");
+  const recommended = tests.find((t) => t.status === "new") ?? tests[0];
 
   return (
     <div className="mx-auto max-w-5xl animate-fade-up">
@@ -82,7 +82,7 @@ export function MockDashboard() {
         <Link to="/app/tests" className="text-[13px] font-medium text-brand-600 hover:underline">View all</Link>
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        {MOCK_TESTS.slice(0, 4).map((t) => (
+        {tests.slice(0, 4).map((t) => (
           <TestCard key={t.id} test={t} />
         ))}
       </div>
@@ -96,7 +96,7 @@ export function TestCard({ test: t }: { test: MockTest }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           {t.sections.map((s) => {
-            const Icon = sectionIcons[s];
+            const Icon = sectionIcons[s] || BookOpen;
             return (
               <span key={s} className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-50 text-brand-600" title={s}>
                 <Icon size={13} />
@@ -127,9 +127,16 @@ export function TestCard({ test: t }: { test: MockTest }) {
 
 /* ================= TEST LIBRARY ================= */
 export function TestLibraryPage() {
+  const { tests } = useMock();
   const [filter, setFilter] = useState("All");
   const types = ["All", "Full Mock", "Reading", "Listening", "Writing", "Speaking"];
-  const list = MOCK_TESTS.filter((t) => filter === "All" || t.type === filter);
+  const list = tests.filter((t) => {
+    if (filter === "All") return true;
+    const filterLower = filter.toLowerCase();
+    const typeLower = t.type.toLowerCase();
+    const titleLower = t.title.toLowerCase();
+    return typeLower.includes(filterLower) || titleLower.includes(filterLower);
+  });
   return (
     <div className="mx-auto max-w-5xl animate-fade-up">
       <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Mock tests</h1>
@@ -157,7 +164,8 @@ export function TestLibraryPage() {
 /* ================= TEST INFO ================= */
 export function TestInfoPage() {
   const { id } = useParams();
-  const t = MOCK_TESTS.find((x) => x.id === id) ?? MOCK_TESTS[0];
+  const { tests } = useMock();
+  const t = tests.find((x) => x.id === id) ?? MOCK_TESTS.find((x) => x.id === id) ?? tests[0] ?? MOCK_TESTS[0];
   return (
     <div className="mx-auto max-w-3xl animate-fade-up">
       <Link to="/app/tests" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-500 transition hover:text-ink">
@@ -177,8 +185,8 @@ export function TestInfoPage() {
           <h2 className="font-display text-[15px] font-semibold text-ink">Sections</h2>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {t.sections.map((s) => {
-              const Icon = sectionIcons[s];
-              const mins = { listening: 10, reading: 20, writing: 60, speaking: 14 }[s];
+              const Icon = sectionIcons[s] || BookOpen;
+              const mins = { listening: 10, reading: 20, writing: 60, speaking: 14 }[s] ?? 30;
               return (
                 <div key={s} className="flex items-center gap-3 rounded-xl border border-line p-3.5">
                   <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600"><Icon size={16} /></span>
@@ -217,7 +225,8 @@ export function TestInfoPage() {
 export function TestInstructionsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const t = MOCK_TESTS.find((x) => x.id === id) ?? MOCK_TESTS[0];
+  const { tests } = useMock();
+  const t = tests.find((x) => x.id === id) ?? MOCK_TESTS.find((x) => x.id === id) ?? tests[0] ?? MOCK_TESTS[0];
   const [agreed, setAgreed] = useState(false);
   return (
     <div className="mx-auto max-w-2xl animate-fade-up">

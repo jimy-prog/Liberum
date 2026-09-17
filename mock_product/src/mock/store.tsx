@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { HISTORY, type AttemptResult } from "./data";
+import { HISTORY, MOCK_TESTS, type AttemptResult, type MockTest } from "./data";
 import type { AppNotification, Role, User } from "@/lib/types";
 
 /* ---------- Mock account store (same identity pattern as Meet) ---------- */
@@ -12,6 +12,8 @@ interface MockState {
   markAllRead: () => void;
   attempts: AttemptResult[];
   addAttempt: (a: AttemptResult) => void;
+  refreshAttempts: () => Promise<void>;
+  tests: MockTest[];
 }
 
 const Ctx = createContext<MockState | null>(null);
@@ -48,6 +50,56 @@ export function MockProvider({ children }: { children: ReactNode }) {
       return HISTORY;
     }
   });
+
+  const [tests, setTests] = useState<MockTest[]>(() => {
+    try {
+      const cached = localStorage.getItem("mock-tests");
+      return cached ? JSON.parse(cached) : MOCK_TESTS;
+    } catch {
+      return MOCK_TESTS;
+    }
+  });
+
+  const refreshTests = async () => {
+    try {
+      const res = await fetch("/api/mock/tests");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.tests && data.tests.length > 0) {
+          setTests(data.tests);
+          localStorage.setItem("mock-tests", JSON.stringify(data.tests));
+        }
+      }
+    } catch (e) {
+      console.warn("Could not fetch backend tests:", e);
+    }
+  };
+
+  const refreshAttempts = async () => {
+    try {
+      const res = await fetch("/api/mock/attempts/history");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.history && Array.isArray(data.history) && data.history.length > 0) {
+          setAttempts(data.history);
+          localStorage.setItem("mock-attempts", JSON.stringify(data.history));
+        }
+      }
+    } catch (e) {
+      console.warn("Could not fetch backend history:", e);
+    }
+  };
+
+  // Sync tests and attempts on mount and user change
+  useEffect(() => {
+    refreshTests();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      refreshAttempts();
+    }
+  }, [user]);
 
   // Verify / sync user session from backend on mount
   useEffect(() => {
@@ -109,8 +161,10 @@ export function MockProvider({ children }: { children: ReactNode }) {
       markAllRead: () => setNotifications((p) => p.map((n) => ({ ...n, read: true }))),
       attempts,
       addAttempt: (a) => setAttempts((p) => [a, ...p]),
+      refreshAttempts,
+      tests,
     }),
-    [user, notifications, attempts]
+    [user, notifications, attempts, tests]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

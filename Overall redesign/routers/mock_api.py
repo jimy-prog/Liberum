@@ -122,7 +122,19 @@ async def list_tests(request: Request, db: SessionMaster = Depends(get_mdb)):
 
     result = []
     for ex in exams:
-        sections = [s.section_type.lower() for s in ex.sections] if ex.sections else ["listening", "reading", "writing", "speaking"]
+        scope = (ex.test_scope or "").lower()
+        title_lower = ex.title.lower()
+        if "reading" in scope or "reading" in title_lower:
+            sec_types = ["reading"]
+        elif "listening" in scope or "listening" in title_lower:
+            sec_types = ["listening"]
+        elif "writing" in scope or "writing" in title_lower:
+            sec_types = ["writing"]
+        elif "speaking" in scope or "speaking" in title_lower:
+            sec_types = ["speaking"]
+        else:
+            sec_types = ["listening", "reading", "writing", "speaking"]
+
         q_count = (
             db.query(Question)
             .join(QuestionBlock)
@@ -153,7 +165,7 @@ async def list_tests(request: Request, db: SessionMaster = Depends(get_mdb)):
             "difficulty": "Upper-Intermediate",
             "durationMin": sum((s.time_limit_minutes or 60) for s in ex.sections) if ex.sections else 165,
             "questionsCount": q_count,
-            "sections": sections,
+            "sections": sec_types,
             "status": "completed" if attempts_count > 0 else "new",
             "attempts": attempts_count,
             "bestBand": best_band,
@@ -169,6 +181,9 @@ async def get_test_details(test_id: int, request: Request, db: SessionMaster = D
     exam = db.query(MockExam).filter(MockExam.id == test_id).first()
     if not exam:
         raise HTTPException(status_code=404, detail="Test not found")
+
+    scope = (exam.test_scope or "").lower()
+    title_lower = exam.title.lower()
 
     sections_out = []
     for sec in sorted(exam.sections, key=lambda s: s.order or s.id):
@@ -187,13 +202,15 @@ async def get_test_details(test_id: int, request: Request, db: SessionMaster = D
             questions_out = []
             for q in blk.questions:
                 opts = [o.text for o in sorted(q.options, key=lambda x: x.order or x.id)] if q.options else []
-                q_type_mapped = "mcq"
-                if q.q_type.upper() in ("MCQ", "MULTIPLE_CHOICE"):
+                q_type_upper = q.q_type.upper()
+                if q_type_upper in ("MCQ", "MULTIPLE_CHOICE", "MATCHING"):
                     q_type_mapped = "mcq"
-                elif q.q_type.upper() in ("TFNG", "TRUE_FALSE_NOT_GIVEN"):
+                elif q_type_upper in ("TFNG", "TRUE_FALSE_NOT_GIVEN"):
                     q_type_mapped = "tfng"
-                elif q.q_type.upper() in ("COMPLETION", "FILL_BLANK"):
+                elif q_type_upper in ("COMPLETION", "FILL_BLANK", "GAP_FILL"):
                     q_type_mapped = "completion"
+                else:
+                    q_type_mapped = "mcq"
 
                 questions_out.append({
                     "id": f"q{q.id}",
@@ -209,23 +226,26 @@ async def get_test_details(test_id: int, request: Request, db: SessionMaster = D
                     "id": f"b{blk.id}",
                     "title": f"Questions {questions_out[0]['number']}–{questions_out[-1]['number']}",
                     "instruction": blk.instructions or "",
+                    "mediaUrl": blk.media_url or "",
                     "questions": questions_out,
                 })
 
         sec_type_clean = sec.section_type.lower()
-        if "listening" in sec_type_clean:
+        if "listening" in sec_type_clean or "listening" in scope or "listening" in title_lower:
             mapped_sec_id = "listening"
-        elif "reading" in sec_type_clean:
+        elif "reading" in sec_type_clean or "reading" in scope or "reading" in title_lower:
             mapped_sec_id = "reading"
-        elif "writing" in sec_type_clean:
+        elif "writing" in sec_type_clean or "writing" in scope or "writing" in title_lower:
             mapped_sec_id = "writing"
-        else:
+        elif "speaking" in sec_type_clean or "speaking" in scope or "speaking" in title_lower:
             mapped_sec_id = "speaking"
+        else:
+            mapped_sec_id = "reading"
 
         sections_out.append({
             "id": mapped_sec_id,
             "name": sec.section_type,
-            "durationMin": sec.time_limit_minutes or 60,
+            "durationMin": sec.time_limit_minutes or 30,
             "passage": passage_out,
             "groups": groups_out,
         })
@@ -378,12 +398,52 @@ async def submit_attempt(
             ans.text_response = str(val)
             ans.is_correct = is_correct
 
-    reading_band = calculate_band(correct_count, total_auto_questions or 40)
-    listening_band = reading_band
-    writing_band = 6.5
-    speaking_band = 7.0
+        # Determine section type for this question
+        sec_name = (q.block.section.section_type if q.block and q.block.section else "").lower()
+        if "listening" in sec_name:
+            # Listening question
+            pass
 
-    overall = round(((reading_band + listening_band + writing_band + speaking_band) / 4) * 2) / 2
+    exam_scope = (attempt.exam.test_scope if attempt.exam else "").lower()
+    exam_title = (attempt.exam.title if attempt.exam else "").lower()
+    is_listening = "listening" in exam_scope or "listening" in exam_title
+    is_reading = "reading" in exam_scope or "reading" in exam_title
+    is_writing = "writing" in exam_scope or "writing" in exam_title
+    is_speaking = "speaking" in exam_scope or "speaking" in exam_title
+
+    computed_band = calculate_band(correct_count, total_auto_questions or 40)
+
+    if is_listening:
+        listening_band = computed_band
+        reading_band = 0.0
+        writing_band = 0.0
+        speaking_band = 0.0
+        overall = listening_band
+    elif is_reading:
+        reading_band = computed_band
+        listening_band = 0.0
+        writing_band = 0.0
+        speaking_band = 0.0
+        overall = reading_band
+    elif is_writing:
+        writing_band = 6.5
+        listening_band = 0.0
+        reading_band = 0.0
+        speaking_band = 0.0
+        overall = writing_band
+    elif is_speaking:
+        speaking_band = 7.0
+        listening_band = 0.0
+        reading_band = 0.0
+        writing_band = 0.0
+        overall = speaking_band
+    else:
+        # Full mock
+        reading_band = computed_band
+        listening_band = computed_band
+        writing_band = 6.5
+        speaking_band = 7.0
+        overall = round(((reading_band + listening_band + writing_band + speaking_band) / 4) * 2) / 2
 
     attempt.status = "completed"
     attempt.completed_at = datetime.utcnow()
@@ -416,17 +476,31 @@ async def get_student_history(request: Request, db: SessionMaster = Depends(get_
     history = []
     for att in attempts:
         ex = att.exam
+        scope = (ex.test_scope or "").lower() if ex else ""
+        title = (ex.title or "").lower() if ex else ""
+        band = att.band_score or 6.5
+        
+        is_l = "listening" in scope or "listening" in title
+        is_r = "reading" in scope or "reading" in title
+        is_w = "writing" in scope or "writing" in title
+        is_s = "speaking" in scope or "speaking" in title
+        
+        l_band = band if is_l else (band if not (is_r or is_w or is_s) else 0.0)
+        r_band = band if is_r else (band if not (is_l or is_w or is_s) else 0.0)
+        w_band = 6.5 if is_w else (6.5 if not (is_l or is_r or is_s) else 0.0)
+        s_band = 7.0 if is_s else (7.0 if not (is_l or is_r or is_w) else 0.0)
+
         history.append({
             "id": f"a{att.id}",
             "attemptId": att.id,
             "testId": str(att.exam_id),
             "testTitle": ex.title if ex else "IELTS Mock Test",
             "date": att.completed_at.strftime("%b %d, %Y") if att.completed_at else "Recently",
-            "overall": att.band_score or 6.5,
-            "listening": att.band_score or 6.5,
-            "reading": att.band_score or 6.5,
-            "writing": 6.5,
-            "speaking": 7.0,
+            "overall": band,
+            "listening": l_band,
+            "reading": r_band,
+            "writing": w_band,
+            "speaking": s_band,
             "timeSpentMin": 155,
             "correctCount": att.total_score or 28,
             "totalCount": 40,
@@ -558,3 +632,139 @@ async def mock_register(
             "initials": initials,
         },
     }
+
+
+@router.get("/attempts/{attempt_id}/details")
+async def get_attempt_details(
+    attempt_id: int,
+    request: Request,
+    db: SessionMaster = Depends(get_mdb),
+):
+    """Fetch complete diagnostic results for a specific attempt."""
+    user = get_mock_user(request)
+    attempt = (
+        db.query(MockAttempt)
+        .filter(MockAttempt.id == attempt_id)
+        .first()
+    )
+    if not attempt:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+
+    # If student, verify they own this attempt; if teacher/owner, allow
+    if user.role == "student" and attempt.student_id != user.id:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    exam = attempt.exam
+    scope = (exam.test_scope or "").lower() if exam else ""
+    title = (exam.title or "").lower() if exam else ""
+
+    # Fetch stored answers
+    user_answers = {}
+    for a in attempt.answers:
+        user_answers[f"q{a.question_id}"] = a.text_response
+
+    # Question review list
+    review_sections = []
+    if exam:
+        for sec in sorted(exam.sections, key=lambda s: s.order or s.id):
+            groups = []
+            for blk in sec.blocks:
+                questions = []
+                for q in blk.questions:
+                    user_val = user_answers.get(f"q{q.id}", "")
+                    ans_norm = normalize_text(user_val)
+                    cor_norm = normalize_text(q.correct_answer_text)
+                    is_corr = bool(ans_norm and ans_norm == cor_norm)
+
+                    questions.append({
+                        "id": f"q{q.id}",
+                        "number": q.question_number,
+                        "type": "completion" if "completion" in q.q_type.lower() else "mcq",
+                        "text": q.prompt,
+                        "userAnswer": user_val,
+                        "correct": q.correct_answer_text or "",
+                        "isCorrect": is_corr,
+                    })
+
+                if questions:
+                    groups.append({
+                        "id": f"b{blk.id}",
+                        "title": f"Questions {questions[0]['number']}–{questions[-1]['number']}",
+                        "instruction": blk.instructions or "",
+                        "questions": questions,
+                    })
+
+            if groups:
+                review_sections.append({
+                    "id": sec.section_type.lower(),
+                    "name": sec.section_type,
+                    "groups": groups,
+                })
+
+    is_l = "listening" in scope or "listening" in title
+    is_r = "reading" in scope or "reading" in title
+    is_w = "writing" in scope or "writing" in title
+    is_s = "speaking" in scope or "speaking" in title
+
+    band = attempt.band_score or 6.5
+    l_band = band if is_l else (band if not (is_r or is_w or is_s) else 0.0)
+    r_band = band if is_r else (band if not (is_l or is_w or is_s) else 0.0)
+    w_band = 6.5 if is_w else (6.5 if not (is_l or is_r or is_s) else 0.0)
+    s_band = 7.0 if is_s else (7.0 if not (is_l or is_r or is_w) else 0.0)
+
+    return {
+        "id": str(attempt.id),
+        "testTitle": exam.title if exam else "IELTS Mock Test",
+        "date": attempt.completed_at.strftime("%b %d, %Y") if attempt.completed_at else "Recently",
+        "overall": band,
+        "listening": l_band,
+        "reading": r_band,
+        "writing": w_band,
+        "speaking": s_band,
+        "status": "AI estimated" if (w_band or s_band) else "Scored",
+        "userAnswers": user_answers,
+        "reviewSections": review_sections,
+    }
+
+
+@router.get("/teacher/results")
+async def get_teacher_student_results(request: Request, db: SessionMaster = Depends(get_mdb)):
+    """Fetch completed student exam attempts for teacher dashboard and reviews."""
+    user = get_mock_user(request)
+    
+    attempts = (
+        db.query(MockAttempt)
+        .filter(MockAttempt.status == "completed")
+        .order_by(MockAttempt.completed_at.desc())
+        .all()
+    )
+
+    results = []
+    for att in attempts:
+        student = db.query(User).filter(User.id == att.student_id).first()
+        ex = att.exam
+        scope = (ex.test_scope or "").lower() if ex else ""
+        title = (ex.title or "").lower() if ex else ""
+        band = att.band_score or 6.5
+        
+        is_l = "listening" in scope or "listening" in title
+        is_r = "reading" in scope or "reading" in title
+        is_w = "writing" in scope or "writing" in title
+        is_s = "speaking" in scope or "speaking" in title
+
+        results.append({
+            "id": att.id,
+            "student": student.full_name if student else "Student",
+            "studentEmail": student.email if student else "",
+            "test": ex.title if ex else "IELTS Mock Test",
+            "date": att.completed_at.strftime("%b %d, %Y") if att.completed_at else "Recently",
+            "overall": band,
+            "l": band if is_l else (band if not (is_r or is_w or is_s) else 0.0),
+            "r": band if is_r else (band if not (is_l or is_w or is_s) else 0.0),
+            "w": 6.5 if is_w else (6.5 if not (is_l or is_r or is_s) else 0.0),
+            "s": 7.0 if is_s else (7.0 if not (is_l or is_r or is_w) else 0.0),
+            "status": "AI estimated" if (is_w or is_s or att.reviewer_type == "ai") else "Scored",
+            "reviewer": att.reviewer_type or "ai",
+        })
+
+    return {"results": results}

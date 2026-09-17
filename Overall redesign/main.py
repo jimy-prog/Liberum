@@ -242,6 +242,7 @@ PUBLIC_PREFIXES = (
     "/join",
     "/api/meet",
     "/api/mock",
+    "/uploads",
 )
 
 

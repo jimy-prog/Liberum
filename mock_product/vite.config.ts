@@ -11,7 +11,8 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/login': 'http://localhost:8000',
-      '/api': 'http://localhost:8000'
+      '/api': 'http://localhost:8000',
+      '/uploads': 'http://localhost:8000'
     }
   },
   resolve: {

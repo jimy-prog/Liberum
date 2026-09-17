@@ -589,8 +589,21 @@ export function StudentsPage() {
 
 /* ================= RESULTS (teacher) ================= */
 export function TeacherResultsPage() {
+  const [resultsList, setResultsList] = useState(TEACHER_RESULTS);
   const [selected, setSelected] = useState<number | null>(null);
-  const r = selected !== null ? TEACHER_RESULTS[selected] : null;
+
+  useEffect(() => {
+    fetch("/api/mock/teacher/results")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.results && data.results.length > 0) {
+          setResultsList(data.results);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const r = selected !== null ? resultsList[selected] : null;
 
   const bands = useMemo(
     () => (r ? [
@@ -667,7 +680,7 @@ export function TeacherResultsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {TEACHER_RESULTS.map((row, i) => (
+              {resultsList.map((row, i) => (
                 <tr key={i} onClick={() => setSelected(i)} className="cursor-pointer transition hover:bg-cloud/60">
                   <td className="px-5 py-3.5 font-semibold text-ink">{row.student}</td>
                   <td className="px-5 py-3.5 text-ink-500">{row.test}</td>

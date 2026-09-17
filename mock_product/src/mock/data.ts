@@ -19,6 +19,7 @@ export interface QuestionGroup {
   id: string;
   title: string; // instruction line, e.g. "Questions 1–5 · True / False / Not Given"
   instruction: string;
+  mediaUrl?: string;
   questions: Question[];
 }
 
