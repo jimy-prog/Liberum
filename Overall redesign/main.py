@@ -68,6 +68,7 @@ app.add_middleware(
         "http://127.0.0.1:3030",
         "https://meet.liberum.uz",
         "https://liberum.uz",
+        "https://mock.liberum.uz",
     ],
     allow_credentials=True,
     allow_methods=["*"],

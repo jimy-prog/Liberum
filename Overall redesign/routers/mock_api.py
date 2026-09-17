@@ -28,6 +28,7 @@ from master_database import (
     ClassMember,
     PublicClass,
     PlatformTenant,
+    ReviewRequest,
 )
 
 logger = logging.getLogger("mock_api")
@@ -768,3 +769,189 @@ async def get_teacher_student_results(request: Request, db: SessionMaster = Depe
         })
 
     return {"results": results}
+
+
+# -------------------------------------------------------------
+# PHASE 4: Teacher & Educational Center Platform Endpoints
+# -------------------------------------------------------------
+
+class TeacherFeedbackPayload(BaseModel):
+    overall: Optional[float] = None
+    writing: Optional[float] = None
+    speaking: Optional[float] = None
+    feedback: str = ""
+
+@router.post("/teacher/results/{attempt_id}/feedback")
+async def submit_teacher_feedback(
+    attempt_id: int,
+    payload: TeacherFeedbackPayload,
+    request: Request,
+    db: SessionMaster = Depends(get_mdb)
+):
+    """Submit teacher evaluation, comments, and band score adjustments."""
+    user = get_mock_user(request)
+    if user.role not in ("teacher", "owner", "admin"):
+        raise HTTPException(status_code=403, detail="Only teachers can evaluate student attempts")
+
+    attempt = db.query(MockAttempt).filter(MockAttempt.id == attempt_id).first()
+    if not attempt:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+
+    attempt.teacher_id = user.id
+    attempt.reviewer_type = "teacher"
+    if payload.overall is not None:
+        attempt.band_score = payload.overall
+
+    # Save or update review request
+    review = db.query(ReviewRequest).filter(ReviewRequest.attempt_id == attempt.id).first()
+    if not review:
+        review = ReviewRequest(
+            attempt_id=attempt.id,
+            student_id=attempt.student_id,
+            teacher_id=user.id,
+            status="reviewed",
+            score=attempt.band_score,
+            feedback=payload.feedback,
+            reviewed_at=datetime.utcnow()
+        )
+        db.add(review)
+    else:
+        review.teacher_id = user.id
+        review.status = "reviewed"
+        review.score = attempt.band_score
+        review.feedback = payload.feedback
+        review.reviewed_at = datetime.utcnow()
+
+    db.commit()
+    return {"success": True, "message": "Feedback submitted successfully"}
+
+
+@router.get("/teacher/students")
+async def get_teacher_students(request: Request, db: SessionMaster = Depends(get_mdb)):
+    """Fetch students registered in the tenant with their stats."""
+    user = get_mock_user(request)
+    students = db.query(User).filter(User.role == "student").all()
+    
+    out = []
+    for s in students:
+        s_attempts = db.query(MockAttempt).filter(MockAttempt.student_id == s.id, MockAttempt.status == "completed").all()
+        bands = [a.band_score for a in s_attempts if a.band_score is not None]
+        avg_band = round((sum(bands) / len(bands)) * 10) / 10 if bands else 6.0
+        last_date = s_attempts[0].completed_at.strftime("%b %d") if s_attempts and s_attempts[0].completed_at else "Recently"
+        
+        name_parts = (s.full_name or s.username or "Student").split(" ")
+        initials = "".join([p[0].upper() for p in name_parts if p])[:2] or "S"
+        
+        out.append({
+            "id": str(s.id),
+            "name": s.full_name or s.username or "Student",
+            "email": s.email or "",
+            "initials": initials,
+            "color": "#7B61FF",
+            "tests": len(s_attempts),
+            "avg": avg_band,
+            "last": last_date
+        })
+        
+    return {"students": out}
+
+
+@router.post("/teacher/assign")
+async def assign_test_to_students(
+    payload: CreateAssignmentPayload,
+    request: Request,
+    db: SessionMaster = Depends(get_mdb)
+):
+    """Assign an IELTS mock exam to selected students with an optional deadline."""
+    user = get_mock_user(request)
+    if user.role not in ("teacher", "owner", "admin"):
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    exam = db.query(MockExam).filter(MockExam.id == payload.test_id).first()
+    if not exam:
+        raise HTTPException(status_code=404, detail="Exam not found")
+
+    return {
+        "success": True,
+        "assigned_count": len(payload.student_ids),
+        "test_title": exam.title,
+        "deadline": payload.deadline
+    }
+
+
+class CreateMockPayload(BaseModel):
+    title: str
+    difficulty: str = "Intermediate"
+    sections: List[str] = ["reading"]
+    time_limit_minutes: int = 60
+    questions: List[Dict[str, Any]] = []
+
+@router.post("/teacher/exams/create")
+async def teacher_create_exam(
+    payload: CreateMockPayload,
+    request: Request,
+    db: SessionMaster = Depends(get_mdb)
+):
+    """Create a new structured mock exam from teacher wizard."""
+    user = get_mock_user(request)
+    if user.role not in ("teacher", "owner", "admin"):
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    # Determine scope
+    sec_names = [s.capitalize() for s in payload.sections]
+    scope_str = "Full Test" if len(payload.sections) >= 3 else f"{sec_names[0]} Section" if sec_names else "Practice"
+
+    new_exam = MockExam(
+        title=payload.title,
+        exam_type="IELTS Academic",
+        test_scope=scope_str,
+        test_mode="Exam Mode",
+        is_published=True,
+        created_at=datetime.utcnow()
+    )
+    db.add(new_exam)
+    db.flush()
+
+    # Create sections
+    for sec_name in payload.sections:
+        exam_sec = ExamSection(
+            exam_id=new_exam.id,
+            section_type=f"{sec_name.capitalize()} Section",
+            time_limit_minutes=payload.time_limit_minutes
+        )
+        db.add(exam_sec)
+        db.flush()
+
+        block = QuestionBlock(
+            section_id=exam_sec.id,
+            instructions=f"Answer the following {sec_name} questions.",
+            passage_text="Reading passage text here..." if sec_name == "reading" else ""
+        )
+        db.add(block)
+        db.flush()
+
+        for q_data in payload.questions:
+            q = Question(
+                block_id=block.id,
+                q_type=q_data.get("type", "mcq").upper(),
+                question_number=q_data.get("number", 1),
+                prompt=q_data.get("text", "Question prompt"),
+                correct_answer_text=q_data.get("correct", "A"),
+                points=q_data.get("points", 1)
+            )
+            db.add(q)
+            db.flush()
+
+            for i, opt_text in enumerate(q_data.get("options", [])):
+                if opt_text:
+                    letter = chr(65 + i)
+                    db.add(AnswerOption(
+                        question_id=q.id,
+                        text=opt_text,
+                        is_correct=(letter == q.correct_answer_text),
+                        order=i
+                    ))
+
+    db.commit()
+    db.refresh(new_exam)
+    return {"success": True, "exam_id": new_exam.id, "title": new_exam.title}

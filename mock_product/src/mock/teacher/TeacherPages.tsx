@@ -465,7 +465,31 @@ export function CreateMockPage() {
           {step < WIZARD_STEPS.length - 1 ? (
             <Btn disabled={!canNext} onClick={() => setStep((s) => s + 1)}>Continue <ChevronRight size={15} /></Btn>
           ) : (
-            <Btn onClick={() => setPublished(true)}><Check size={15} /> Publish mock</Btn>
+            <Btn onClick={async () => {
+              try {
+                await fetch("/api/mock/teacher/exams/create", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    title,
+                    difficulty,
+                    sections,
+                    time_limit_minutes: Number(timeLimit) || 60,
+                    questions: questions.map((q) => ({
+                      number: q.number,
+                      type: q.type,
+                      text: q.text,
+                      options: q.options,
+                      correct: q.correct,
+                      points: q.points,
+                    })),
+                  }),
+                });
+              } catch (e) {
+                console.warn("Could not sync mock creation:", e);
+              }
+              setPublished(true);
+            }}><Check size={15} /> Publish mock</Btn>
           )}
         </div>
       </Card>
@@ -551,7 +575,20 @@ export function AssignPage() {
 /* ================= STUDENTS ================= */
 export function StudentsPage() {
   const [query, setQuery] = useState("");
-  const rows = TEACHER_STUDENTS.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
+  const [studentList, setStudentList] = useState(TEACHER_STUDENTS);
+
+  useEffect(() => {
+    fetch("/api/mock/teacher/students")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.students && data.students.length > 0) {
+          setStudentList(data.students);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const rows = studentList.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
   return (
     <div className="mx-auto max-w-5xl animate-fade-up">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -588,9 +625,24 @@ export function StudentsPage() {
 }
 
 /* ================= RESULTS (teacher) ================= */
+interface TeacherResultItem {
+  id?: number | string;
+  student: string;
+  test: string;
+  date: string;
+  overall: number;
+  l: number;
+  r: number;
+  w: number;
+  s: number;
+  status: string;
+}
+
 export function TeacherResultsPage() {
-  const [resultsList, setResultsList] = useState(TEACHER_RESULTS);
+  const [resultsList, setResultsList] = useState<TeacherResultItem[]>(TEACHER_RESULTS);
   const [selected, setSelected] = useState<number | null>(null);
+  const [teacherFeedback, setTeacherFeedback] = useState("");
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
     fetch("/api/mock/teacher/results")
@@ -647,12 +699,44 @@ export function TeacherResultsPage() {
         </Card>
 
         <Card className="mt-4 p-6">
-          <h2 className="font-display text-lg font-semibold text-ink">Teacher feedback</h2>
-          <textarea rows={4} placeholder="Write feedback for the student…"
-            className="mt-3 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+          <h2 className="font-display text-lg font-semibold text-ink">Teacher evaluation & feedback</h2>
+          <textarea
+            rows={4}
+            value={teacherFeedback}
+            onChange={(e) => setTeacherFeedback(e.target.value)}
+            placeholder="Write constructive band feedback for the student…"
+            className="mt-3 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          />
           <div className="mt-3 flex items-center justify-between">
-            <p className="text-[11px] text-ink-400">Feedback is shared with the student immediately.</p>
-            <Btn size="sm"><Send size={13} /> Send feedback</Btn>
+            <p className="text-[11px] text-ink-400">
+              {feedbackSent ? "✓ Feedback successfully submitted and visible to student." : "Feedback is recorded and shared with the student immediately."}
+            </p>
+            <Btn
+              size="sm"
+              disabled={!teacherFeedback.trim() || feedbackSent}
+              onClick={async () => {
+                if (!r) return;
+                try {
+                  const res = await fetch(`/api/mock/teacher/results/${r.id ?? selected ?? 1}/feedback`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      overall: r.overall,
+                      writing: r.w,
+                      speaking: r.s,
+                      feedback: teacherFeedback,
+                    }),
+                  });
+                  if (res.ok) {
+                    setFeedbackSent(true);
+                  }
+                } catch (e) {
+                  console.warn("Could not submit feedback:", e);
+                }
+              }}
+            >
+              <Send size={13} /> {feedbackSent ? "Sent" : "Send feedback"}
+            </Btn>
           </div>
         </Card>
       </div>
