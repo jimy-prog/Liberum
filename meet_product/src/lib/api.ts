@@ -60,11 +60,30 @@ export const meetApi = {
     });
   },
 
-  async updateAccount(data: { name?: string; language?: string; telegramUsername?: string }) {
+  async updateAccount(data: { name?: string; language?: string; telegramUsername?: string; avatarUrl?: string }) {
     return request<{ success: boolean; user: User }>("/auth/account", {
       method: "PUT",
       body: JSON.stringify(data),
     });
+  },
+
+  async uploadAvatar(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/meet/upload/avatar", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+    if (!res.ok) {
+      let errorMsg = "Avatar upload failed";
+      try {
+        const data = await res.json();
+        errorMsg = data.detail || data.message || errorMsg;
+      } catch {}
+      throw new Error(errorMsg);
+    }
+    return res.json() as Promise<{ success: boolean; avatarUrl: string; user: User }>;
   },
 
   // Teachers
@@ -119,6 +138,10 @@ export const meetApi = {
 
   async listLessons() {
     return request<Lesson[]>("/lessons");
+  },
+
+  async getLesson(id: string) {
+    return request<Lesson>(`/lessons/${id}`);
   },
 
   async completeLesson(id: string) {

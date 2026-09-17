@@ -6,6 +6,7 @@ export interface User {
   email: string;
   role: Role;
   initials: string;
+  avatarUrl?: string;
   telegramUsername?: string;
   telegramChatId?: string;
 }

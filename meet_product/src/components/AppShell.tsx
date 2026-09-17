@@ -76,7 +76,7 @@ function UserProfileMenu({ onClose }: { onClose: () => void }) {
       {/* User Header */}
       <div className="border-b border-line px-3 pb-3 pt-2">
         <div className="flex items-center gap-2.5">
-          <Avatar initials={user.initials} color={user.role === "teacher" ? "#7B61FF" : "#1FAD55"} size="md" />
+          <Avatar src={user.avatarUrl} initials={user.initials} color={user.role === "teacher" ? "#7B61FF" : "#1FAD55"} size="md" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-bold text-ink">{user.name}</p>
             <p className="truncate text-xs text-ink-400">{user.email}</p>
@@ -242,7 +242,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </nav>
       <div className="p-3">
         <div className="flex items-center gap-3 rounded-xl bg-white/10 p-3">
-          <Avatar initials={user.initials} color={roleColor} size="md" className="ring-2 ring-white/30" />
+          <Avatar src={user.avatarUrl} initials={user.initials} color={roleColor} size="md" className="ring-2 ring-white/30" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-semibold">{user.name}</p>
             <p className="text-[11px] capitalize text-white/60">{user.role}</p>
@@ -326,7 +326,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 className="flex items-center gap-2.5 rounded-full p-1 transition hover:bg-mist/80 sm:px-2.5 sm:py-1.5"
                 aria-label="User profile menu"
               >
-                <Avatar initials={user.initials} color={roleColor} size="md" />
+                <Avatar src={user.avatarUrl} initials={user.initials} color={roleColor} size="md" />
                 <div className="hidden text-left xl:block">
                   <p className="text-[13px] font-semibold leading-tight text-ink">{user.name}</p>
                   <Badge tone={user.role === "teacher" ? "brand" : "green"} className="mt-0.5 text-[10px] capitalize">

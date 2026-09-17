@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 import {
-  ArrowLeft, ArrowRight, Award, BadgeCheck, CalendarDays, Check, ChevronLeft,
-  Clock, Compass, Copy, Globe, GraduationCap, MessageSquare, Play, Search, Share2, Star, Video,
+  ArrowLeft, ArrowRight, Award, BadgeCheck, CalendarDays, Camera, Check, ChevronLeft,
+  Clock, Compass, Copy, Globe, GraduationCap, MessageSquare, Play, Search, Share2, Star, Upload, Video,
 } from "lucide-react";
 import { BOOKABLE_TIMES, fmtUzs, SUBJECTS, TEACHERS } from "@/lib/data";
 import { useApp } from "@/lib/store";
@@ -582,7 +582,7 @@ export function BookingPage() {
 
   // Dynamic rolling 14-day calendar
   const bookingDays = useMemo(() => {
-    const list: { d: string; sub: string; full: string }[] = [];
+    const list: { d: string; sub: string; full: string; iso: string }[] = [];
     const base = new Date();
     for (let i = 0; i < 14; i++) {
       const dt = new Date(base);
@@ -590,10 +590,12 @@ export function BookingPage() {
       const dayName = i === 0 ? "Today" : i === 1 ? "Tomorrow" : dt.toLocaleDateString("en-US", { weekday: "short" });
       const monthDay = dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
       const dayCode = dt.toLocaleDateString("en-US", { weekday: "short" });
+      const iso = dt.toISOString().split("T")[0];
       list.push({
         d: dayName,
         sub: monthDay,
         full: i === 0 ? "Today" : i === 1 ? "Tomorrow" : `${dayCode}, ${monthDay}`,
+        iso,
       });
     }
     return list;
@@ -852,7 +854,7 @@ export function MyLessonsPage() {
 
 /* ================= STUDENT PROFILE ================= */
 export function StudentProfilePage() {
-  const { user, updateUser } = useApp();
+  const { user, updateUser, uploadUserAvatar } = useApp();
   const [name, setName] = useState(user?.name || "");
   const [telegramUsername, setTelegramUsername] = useState(user?.telegramUsername || "");
   const [targetSubject, setTargetSubject] = useState("IELTS Preparation");
@@ -860,6 +862,8 @@ export function StudentProfilePage() {
   const [bio, setBio] = useState("Focused on boosting speaking confidence and academic writing tasks.");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user?.name) setName(user.name);
@@ -874,6 +878,21 @@ export function StudentProfilePage() {
       setTimeout(() => setSaved(false), 2500);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      await uploadUserAvatar(file);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err: any) {
+      alert(err?.message || "Failed to upload avatar");
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -894,11 +913,43 @@ export function StudentProfilePage() {
 
       <Card className="mt-6 p-6">
         <div className="flex flex-wrap items-center gap-5">
-          <Avatar initials={user?.initials || "ST"} color="#1FAD55" size="xl" />
+          <div className="relative group">
+            <Avatar
+              src={user?.avatarUrl}
+              initials={user?.initials || "ST"}
+              color="#1FAD55"
+              size="xl"
+              className="h-20 w-20 ring-4 ring-mist shadow-sm"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="absolute inset-0 flex items-center justify-center rounded-full bg-ink/50 text-white opacity-0 transition group-hover:opacity-100"
+              title="Upload photo"
+            >
+              <Camera size={20} />
+            </button>
+          </div>
           <div className="min-w-0 flex-1">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleAvatarFile}
+              accept="image/*"
+              className="hidden"
+            />
             <h2 className="font-display text-xl font-bold text-ink">{user?.name}</h2>
             <p className="text-sm text-ink-500">{user?.email}</p>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Btn
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+              >
+                <Upload size={13} /> {uploadingAvatar ? "Uploading..." : "Change photo"}
+              </Btn>
               <Badge tone="green">Active Learner</Badge>
               <Badge tone="outline">UTC+5 Tashkent</Badge>
             </div>

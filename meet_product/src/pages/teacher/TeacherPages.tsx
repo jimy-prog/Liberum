@@ -11,7 +11,15 @@ import { LessonCard, LessonStatusBadge } from "../student/StudentPages";
 import { cn } from "@/lib/utils";
 import type { DayAvailability, Teacher } from "@/lib/types";
 
-const ME = TEACHERS[0]; // Aziza — demo teacher
+const DEFAULT_DAYS: DayAvailability[] = [
+  { day: "Mon", enabled: true, ranges: [{ start: "10:00", end: "18:00" }] },
+  { day: "Tue", enabled: true, ranges: [{ start: "10:00", end: "18:00" }] },
+  { day: "Wed", enabled: true, ranges: [{ start: "10:00", end: "18:00" }] },
+  { day: "Thu", enabled: true, ranges: [{ start: "10:00", end: "18:00" }] },
+  { day: "Fri", enabled: true, ranges: [{ start: "10:00", end: "18:00" }] },
+  { day: "Sat", enabled: false, ranges: [] },
+  { day: "Sun", enabled: false, ranges: [] },
+];
 
 const TIME_OPTIONS = Array.from({ length: 33 }, (_, i) => {
   const h = Math.floor(i / 2) + 6;
@@ -144,7 +152,7 @@ export function TeacherDashboard() {
 
 /* ================= AVAILABILITY ================= */
 export function AvailabilityPage() {
-  const [days, setDays] = useState<DayAvailability[]>(ME.availability);
+  const [days, setDays] = useState<DayAvailability[]>(DEFAULT_DAYS);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -309,27 +317,38 @@ export function TeacherLessonsPage() {
 
 /* ================= TEACHER PROFILE EDITOR ================= */
 export function TeacherProfileEditor() {
-  const [profile, setProfile] = useState<Teacher>(ME);
+  const { user, uploadUserAvatar } = useApp();
+  const [profile, setProfile] = useState<Teacher | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
-  const [headline, setHeadline] = useState(ME.title);
-  const [specializations, setSpecializations] = useState(ME.specializations.join(", "));
-  const [languages, setLanguages] = useState(ME.languages.join(", "));
-  const [bio, setBio] = useState(ME.bio);
-  const [videoUrl, setVideoUrl] = useState(ME.videoUrl || "");
-  const [badges, setBadges] = useState(ME.badges ? ME.badges.join(", ") : "IELTS 8.0+, Verified Mentor");
-  const [lessons, setLessons] = useState(ME.lessons);
+  const [headline, setHeadline] = useState("");
+  const [specializations, setSpecializations] = useState("");
+  const [languages, setLanguages] = useState("English, O‘zbek");
+  const [bio, setBio] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [badges, setBadges] = useState("");
+  const [lessons, setLessons] = useState<{ id: string; title: string; durationMin: number; priceUzs: number; description: string }[]>([
+    { id: "l1", title: "1-on-1 Tutoring", durationMin: 60, priceUzs: 100000, description: "Personal tutoring session." }
+  ]);
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(user?.avatarUrl);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (user?.avatarUrl) setAvatarUrl(user.avatarUrl);
+  }, [user?.avatarUrl]);
 
   useEffect(() => {
     meetApi.getMyTeacherProfile()
       .then((data) => {
         if (data && data.id) {
           setProfile(data);
-          setHeadline(data.title);
-          setSpecializations(data.specializations.join(", "));
-          setLanguages(data.languages.join(", "));
-          setBio(data.bio);
+          setHeadline(data.title || "Independent Teacher");
+          setSpecializations((data.specializations || []).join(", "));
+          setLanguages((data.languages || []).join(", "));
+          setBio(data.bio || "");
+          if (data.avatarUrl) setAvatarUrl(data.avatarUrl);
           if (data.videoUrl) setVideoUrl(data.videoUrl);
           if (data.badges && data.badges.length > 0) setBadges(data.badges.join(", "));
           if (data.lessons && data.lessons.length > 0) {
@@ -346,10 +365,10 @@ export function TeacherProfileEditor() {
       await meetApi.updateMyTeacherProfile({
         headline,
         bio,
-        subjects: profile.subjects,
+        subjects: profile?.subjects || ["English"],
         specializations: specializations.split(",").map(s => s.trim()).filter(Boolean),
         languages: languages.split(",").map(s => s.trim()).filter(Boolean),
-        experienceYears: profile.experienceYears,
+        experienceYears: profile?.experienceYears || 2,
         videoUrl: videoUrl.trim() || undefined,
         badges: badges.split(",").map(b => b.trim()).filter(Boolean),
         lessons: lessons.map(l => ({
@@ -374,20 +393,25 @@ export function TeacherProfileEditor() {
     setLessons(p => p.map(l => l.id === id ? { ...l, priceUzs: newPrice } : l));
   };
 
-  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(profile.avatarUrl);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result as string;
-        setAvatarUrl(result);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      const url = await uploadUserAvatar(file);
+      setAvatarUrl(url);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err: any) {
+      alert(err?.message || "Failed to upload photo");
+    } finally {
+      setUploadingPhoto(false);
     }
   };
+
+  const teacherName = profile?.name || user?.name || "Teacher";
+  const teacherInitials = profile?.initials || user?.initials || "T";
+  const teacherColor = profile?.color || "#7B61FF";
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-up">
@@ -397,7 +421,9 @@ export function TeacherProfileEditor() {
           <p className="mt-1.5 text-sm text-ink-500">This is what students see when they discover you.</p>
         </div>
         <div className="flex gap-2">
-          <BtnLink to={`/app/teachers/${profile.id}`} variant="outline"><Eye size={14} /> View public profile</BtnLink>
+          {profile?.id && (
+            <BtnLink to={`/app/teachers/${profile.id}`} variant="outline"><Eye size={14} /> View public profile</BtnLink>
+          )}
           <Btn onClick={saveProfile} disabled={saving}>
             {saving ? "Saving..." : "Save changes"}
           </Btn>
@@ -407,7 +433,7 @@ export function TeacherProfileEditor() {
 
       <Card className="mt-6 p-6">
         <div className="flex items-center gap-5">
-          <Avatar initials={profile.initials} src={avatarUrl} color={profile.color} size="xl" />
+          <Avatar initials={teacherInitials} src={avatarUrl} color={teacherColor} size="xl" />
           <div>
             <input
               type="file"
@@ -416,14 +442,14 @@ export function TeacherProfileEditor() {
               className="hidden"
               onChange={handlePhotoUpload}
             />
-            <Btn variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-              Change photo
+            <Btn variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploadingPhoto}>
+              {uploadingPhoto ? "Uploading..." : "Change photo"}
             </Btn>
             <p className="mt-2 text-xs text-ink-400">Square photo, at least 400×400. Friendly and professional works best.</p>
           </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <Field label="Full name"><Input defaultValue={profile.name} disabled className="opacity-80" /></Field>
+          <Field label="Full name"><Input defaultValue={teacherName} disabled className="opacity-80" /></Field>
           <Field label="Headline"><Input value={headline} onChange={e => setHeadline(e.target.value)} /></Field>
           <Field label="Specializations"><Input value={specializations} onChange={e => setSpecializations(e.target.value)} placeholder="e.g. IELTS 8.0, Academic Writing" /></Field>
           <Field label="Languages"><Input value={languages} onChange={e => setLanguages(e.target.value)} placeholder="e.g. English, Uzbek, Russian" /></Field>

@@ -9,15 +9,18 @@ from typing import Dict, List, Optional
 from fastapi import (
     APIRouter,
     Depends,
+    File,
     HTTPException,
     Request,
     Response,
+    UploadFile,
     WebSocket,
     WebSocketDisconnect,
 )
 from pydantic import BaseModel
 from sqlalchemy.orm import joinedload
 
+from config import UPLOADS_DIR
 from auth import (
     SESSION_KEY,
     authenticate_user,
@@ -217,6 +220,7 @@ def format_teacher_dict(t: MeetTeacherProfile, user: User):
         "verified": t.verified,
         "online": t.online,
         "color": t.avatar_color or "#7B61FF",
+        "avatarUrl": user.avatar_url,
         "videoUrl": video_url,
         "badges": badges,
         "nextAvailable": "Today · 17:30",
@@ -482,6 +486,9 @@ async def meet_register(req: RegisterMeetRequest, response: Response):
                 "email": user.email,
                 "role": user.role,
                 "initials": initials,
+                "avatarUrl": user.avatar_url,
+                "telegramUsername": getattr(user, "telegram_username", None),
+                "telegramChatId": getattr(user, "telegram_chat_id", None),
             }
         }
     finally:
@@ -511,6 +518,9 @@ async def meet_login(req: LoginMeetRequest, response: Response):
             "email": user.email,
             "role": user.role,
             "initials": initials,
+            "avatarUrl": user.avatar_url,
+            "telegramUsername": getattr(user, "telegram_username", None),
+            "telegramChatId": getattr(user, "telegram_chat_id", None),
         }
     }
 
@@ -625,6 +635,7 @@ async def meet_google_auth(req: GoogleAuthMeetRequest, response: Response):
                 "email": user.email,
                 "role": user.role,
                 "initials": initials,
+                "avatarUrl": user.avatar_url,
                 "telegramUsername": getattr(user, "telegram_username", None),
                 "telegramChatId": getattr(user, "telegram_chat_id", None),
             }
@@ -648,6 +659,7 @@ async def meet_me(request: Request):
         "email": user.email,
         "role": user.role,
         "initials": initials,
+        "avatarUrl": user.avatar_url,
         "telegramUsername": getattr(user, "telegram_username", None),
         "telegramChatId": getattr(user, "telegram_chat_id", None),
     }
@@ -663,6 +675,7 @@ class AccountSettingsUpdateSchema(BaseModel):
     name: Optional[str] = None
     language: Optional[str] = None
     telegramUsername: Optional[str] = None
+    avatarUrl: Optional[str] = None
 
 
 @router.put("/auth/account")
@@ -674,6 +687,8 @@ async def meet_update_account(data: AccountSettingsUpdateSchema, user: User = De
             raise HTTPException(status_code=404, detail="User not found")
         if data.name and data.name.strip():
             u.full_name = data.name.strip()
+        if data.avatarUrl is not None:
+            u.avatar_url = data.avatarUrl.strip() or None
         if data.telegramUsername is not None:
             tg = data.telegramUsername.strip().lstrip("@")
             u.telegram_username = tg if tg else None
@@ -692,8 +707,68 @@ async def meet_update_account(data: AccountSettingsUpdateSchema, user: User = De
                 "email": u.email,
                 "role": u.role,
                 "initials": initials,
+                "avatarUrl": u.avatar_url,
                 "telegramUsername": u.telegram_username,
                 "telegramChatId": u.telegram_chat_id,
+            }
+        }
+    finally:
+        db.close()
+
+
+@router.post("/upload/avatar")
+async def meet_upload_avatar(
+    file: UploadFile = File(...),
+    user: User = Depends(get_meet_user),
+):
+    """Upload user profile avatar photo and save persistently."""
+    # Validate content type
+    allowed_types = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/jpg"]
+    if file.content_type and file.content_type.lower() not in allowed_types:
+        raise HTTPException(status_code=400, detail="Only JPG, PNG, WEBP, and GIF images are allowed.")
+
+    ext = ".jpg"
+    if file.filename and "." in file.filename:
+        ext = f".{file.filename.rsplit('.', 1)[-1].lower()}"
+    if ext not in [".jpg", ".jpeg", ".png", ".webp", ".gif"]:
+        ext = ".jpg"
+
+    avatars_dir = UPLOADS_DIR / "avatars"
+    avatars_dir.mkdir(parents=True, exist_ok=True)
+
+    filename = f"avatar_{user.id}_{uuid.uuid4().hex[:8]}{ext}"
+    dest_path = avatars_dir / filename
+
+    content = await file.read()
+    if len(content) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Image size exceeds 10MB limit.")
+
+    with open(dest_path, "wb") as f:
+        f.write(content)
+
+    avatar_url = f"/uploads/avatars/{filename}"
+
+    db = SessionMaster()
+    try:
+        u = db.query(User).filter(User.id == user.id).first()
+        if u:
+            u.avatar_url = avatar_url
+            db.commit()
+            db.refresh(u)
+        parts = ((u.full_name if u else user.full_name) or "").split(" ")
+        initials = "".join([p[0].upper() for p in parts if p])[:2] or "U"
+        return {
+            "success": True,
+            "avatarUrl": avatar_url,
+            "user": {
+                "id": str(user.id),
+                "name": u.full_name if u else user.full_name,
+                "email": u.email if u else user.email,
+                "role": u.role if u else user.role,
+                "initials": initials,
+                "avatarUrl": avatar_url,
+                "telegramUsername": getattr(u, "telegram_username", None),
+                "telegramChatId": getattr(u, "telegram_chat_id", None),
             }
         }
     finally:
@@ -1017,6 +1092,51 @@ async def list_lessons(user: User = Depends(get_meet_user)):
                 "roomId": b.room_id,
             })
         return results
+    finally:
+        db.close()
+
+
+@router.get("/lessons/{lesson_id}")
+async def get_lesson(lesson_id: str, user: User = Depends(get_meet_user)):
+    clean_id = lesson_id.replace("les-", "")
+    if not clean_id.isdigit():
+        raise HTTPException(status_code=404, detail="Lesson not found")
+
+    db = SessionMaster()
+    try:
+        b = (
+            db.query(MeetBooking)
+            .filter(MeetBooking.id == int(clean_id))
+            .options(
+                joinedload(MeetBooking.student),
+                joinedload(MeetBooking.teacher).joinedload(MeetTeacherProfile.user),
+            )
+            .first()
+        )
+        if not b:
+            raise HTTPException(status_code=404, detail="Lesson not found")
+
+        teacher_user = b.teacher.user if b.teacher and b.teacher.user else None
+        teacher_name = teacher_user.full_name if teacher_user else "Teacher"
+        student_name = b.student.full_name if b.student else "Student"
+
+        return {
+            "id": f"les-{b.id}",
+            "teacherId": f"t{b.teacher_id}",
+            "studentId": str(b.student_id),
+            "teacherName": teacher_name,
+            "studentName": student_name,
+            "title": b.title,
+            "date": b.date_str,
+            "time": b.time_str,
+            "durationMin": b.duration_min,
+            "priceUzs": b.price_uzs,
+            "paymentMethod": getattr(b, "payment_method", "click") or "click",
+            "escrowStatus": getattr(b, "escrow_status", "held") or "held",
+            "paymentReference": getattr(b, "payment_reference", "") or "",
+            "status": b.status,
+            "roomId": b.room_id,
+        }
     finally:
         db.close()
 

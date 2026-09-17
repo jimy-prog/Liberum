@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import { Bell, Calendar, Check, ExternalLink, Globe, MessageSquare, Send, Sparkles, ShieldCheck } from "lucide-react";
+import { Bell, Calendar, Camera, Check, ExternalLink, Globe, MessageSquare, Send, Sparkles, ShieldCheck, Upload } from "lucide-react";
 import { Avatar, Badge, Btn, Card, EmptyState, Field, Input } from "@/components/ui-kit";
 import { useApp } from "@/lib/store";
 import { meetApi } from "@/lib/api";
@@ -270,11 +270,13 @@ export function MessagesPage() {
 
 /* ================= SETTINGS ================= */
 export function SettingsPage() {
-  const { user, signOut, updateUser } = useApp();
+  const { user, signOut, updateUser, uploadUserAvatar } = useApp();
   const [name, setName] = useState(user?.name || "");
   const [telegramUsername, setTelegramUsername] = useState(user?.telegramUsername || "");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user?.name) setName(user.name);
@@ -292,10 +294,81 @@ export function SettingsPage() {
     }
   };
 
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      await uploadUserAvatar(file);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err: any) {
+      alert(err?.message || "Failed to upload avatar");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-2xl animate-fade-up">
       <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Settings</h1>
+      
+      {/* Profile Photo Card */}
       <Card className="mt-6 p-6">
+        <h2 className="font-display text-[15px] font-semibold text-ink">Profile Photo</h2>
+        <p className="mt-1 text-xs text-ink-400">Your avatar is displayed across the platform, live classrooms, and messaging.</p>
+        <div className="mt-4 flex items-center gap-5">
+          <div className="relative group">
+            <Avatar
+              src={user?.avatarUrl}
+              initials={user?.initials || "U"}
+              color={user?.role === "teacher" ? "#7B61FF" : "#1FAD55"}
+              size="xl"
+              className="h-20 w-20 ring-4 ring-mist shadow-sm"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="absolute inset-0 flex items-center justify-center rounded-full bg-ink/50 text-white opacity-0 transition group-hover:opacity-100"
+              title="Upload photo"
+            >
+              <Camera size={20} />
+            </button>
+          </div>
+          <div className="space-y-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleAvatarFile}
+              accept="image/*"
+              className="hidden"
+            />
+            <div className="flex items-center gap-2.5">
+              <Btn
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+              >
+                <Upload size={13} /> {uploadingAvatar ? "Uploading..." : "Upload photo"}
+              </Btn>
+              {user?.avatarUrl && (
+                <button
+                  type="button"
+                  onClick={() => updateUser({ avatarUrl: "" })}
+                  className="text-xs text-ink-400 transition hover:text-danger"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <p className="text-[11px] text-ink-400">JPG, PNG or WEBP. Maximum 10MB.</p>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-4 p-6">
         <h2 className="font-display text-[15px] font-semibold text-ink">Account</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Field label="Full name">

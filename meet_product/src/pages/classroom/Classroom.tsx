@@ -40,7 +40,26 @@ function fmt(sec: number) {
 export default function ClassroomPage() {
   const { lessonId } = useParams();
   const { user, lessons, completeLesson } = useApp();
-  const lesson = lessons.find((l) => l.id === lessonId) ?? lessons[0];
+  const [activeLesson, setActiveLesson] = useState<any>(() => {
+    return lessons.find((l) => l.id === lessonId) ?? (lessons.length > 0 ? lessons[0] : null);
+  });
+
+  useEffect(() => {
+    if (lessonId) {
+      const found = lessons.find((l) => l.id === lessonId);
+      if (found) {
+        setActiveLesson(found);
+      } else {
+        meetApi.getLesson(lessonId)
+          .then((l) => {
+            if (l) setActiveLesson(l);
+          })
+          .catch(() => {});
+      }
+    }
+  }, [lessonId, lessons]);
+
+  const lesson = activeLesson;
 
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
@@ -99,6 +118,13 @@ export default function ClassroomPage() {
   const wsRef = useRef<WebSocket | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [peerConnected, setPeerConnected] = useState(false);
+
+  // Reliably attach remote stream whenever it updates or remote video element mounts
+  useEffect(() => {
+    if (remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteStream, peerConnected]);
 
   // WebRTC ICE Servers Configuration (STUN + TURN fallback for symmetric NATs)
   const rtcConfig: RTCConfiguration = {
@@ -188,6 +214,8 @@ export default function ClassroomPage() {
 
         ws.onopen = () => {
           setWsConnected(true);
+          // Broadcast hello presence to room so anyone already waiting knows we joined
+          ws.send(JSON.stringify({ type: "hello", role: user?.role || "student", userId: user?.id }));
         };
 
         ws.onclose = () => {
@@ -211,12 +239,17 @@ export default function ClassroomPage() {
         ws.onmessage = async (evt) => {
           try {
             const data = JSON.parse(evt.data);
-            if (data.type === "peer-joined") {
-              // Role-deterministic initiator: Only the teacher (or caller) sends the offer to avoid glare
-              if (iAmTeacher) {
-                const offer = await pc.createOffer();
-                await pc.setLocalDescription(offer);
-                ws.send(JSON.stringify({ type: "sdp-offer", sdp: offer }));
+            if (data.type === "peer-joined" || data.type === "hello") {
+              // Deterministic initiator: Teacher initiates, or if peers have same role/role unknown, caller creates offer
+              if (iAmTeacher || data.type === "hello") {
+                if (iAmTeacher) {
+                  const offer = await pc.createOffer();
+                  await pc.setLocalDescription(offer);
+                  ws.send(JSON.stringify({ type: "sdp-offer", sdp: offer }));
+                } else if (data.type === "peer-joined") {
+                  // Student announces presence back to joining teacher
+                  ws.send(JSON.stringify({ type: "hello", role: "student", userId: user?.id }));
+                }
               }
             } else if (data.type === "sdp-offer") {
               // Remote peer sent offer, set remote description and create answer
@@ -733,9 +766,17 @@ export default function ClassroomPage() {
             <div className="grid min-h-0 gap-3 sm:grid-cols-2 sm:gap-4">
               {/* Other participant */}
               <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-900 via-[#1B1440] to-[#0E0F13] ring-1 ring-white/10">
-                {remoteStream && peerConnected ? (
-                  <video ref={remoteVideoRef} autoPlay playsInline className="h-full w-full object-cover" />
-                ) : (
+                {/* Permanently mounted remote video element to prevent ontrack race conditions */}
+                <video
+                  ref={remoteVideoRef}
+                  autoPlay
+                  playsInline
+                  className={cn(
+                    "h-full w-full object-cover transition-opacity duration-300",
+                    remoteStream && peerConnected ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"
+                  )}
+                />
+                {(!remoteStream || !peerConnected) && (
                   <>
                     <div className="bg-grid-dark absolute inset-0 opacity-30" />
                     <div className="absolute inset-0 flex flex-col items-center justify-center">

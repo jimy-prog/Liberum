@@ -11,7 +11,8 @@ interface AppState {
   loginWithGoogle: (idToken: string, role?: Role) => Promise<User>;
   registerWithBackend: (name: string, email: string, password: string, role: Role) => Promise<User>;
   signOut: () => Promise<void>;
-  updateUser: (data: { name?: string; telegramUsername?: string }) => Promise<void>;
+  updateUser: (data: { name?: string; telegramUsername?: string; avatarUrl?: string }) => Promise<void>;
+  uploadUserAvatar: (file: File) => Promise<string>;
   lessons: Lesson[];
   bookLesson: (draft: BookingDraft) => Promise<Lesson>;
   completeLesson: (id: string) => Promise<void>;
@@ -142,7 +143,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("lm-user");
   };
 
-  const updateUser = async (data: { name?: string; telegramUsername?: string }) => {
+  const updateUser = async (data: { name?: string; telegramUsername?: string; avatarUrl?: string }) => {
     try {
       const res = await meetApi.updateAccount(data);
       if (res.user) {
@@ -154,12 +155,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const updated = {
           ...user,
           ...(data.name ? { name: data.name } : {}),
+          ...(data.avatarUrl !== undefined ? { avatarUrl: data.avatarUrl } : {}),
           ...(data.telegramUsername !== undefined ? { telegramUsername: data.telegramUsername } : {}),
         };
         setUser(updated);
         localStorage.setItem("lm-user", JSON.stringify(updated));
       }
     }
+  };
+
+  const uploadUserAvatar = async (file: File) => {
+    const res = await meetApi.uploadAvatar(file);
+    if (res.user) {
+      setUser(res.user);
+      localStorage.setItem("lm-user", JSON.stringify(res.user));
+    }
+    return res.avatarUrl;
   };
 
   const bookLesson = async (draft: BookingDraft) => {
@@ -220,6 +231,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     registerWithBackend,
     signOut,
     updateUser,
+    uploadUserAvatar,
     lessons,
     bookLesson,
     completeLesson,
