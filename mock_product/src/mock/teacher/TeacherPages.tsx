@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import {
   ArrowRight, BarChart3, BookOpen, Check, CheckCircle2, ChevronLeft, ChevronRight,
-  ClipboardList, Eye, FilePlus2, Library, Plus, Search, Send, Trash2, Users,
+  ClipboardList, Eye, FilePlus2, FileUp, Library, Plus, Search, Send, Sparkles, Trash2, Users, Loader2,
 } from "lucide-react";
 import { TEACHER_LIBRARY, TEACHER_RESULTS, TEACHER_STUDENTS, type QuestionType } from "../data";
 import { useMock } from "../store";
@@ -220,7 +220,11 @@ const ALL_SECTIONS = [
 ];
 
 export function CreateMockPage() {
+  const [creationMode, setCreationMode] = useState<"manual" | "pdf">("manual");
   const [step, setStep] = useState(0);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfUploading, setPdfUploading] = useState(false);
+  const [pdfStatusMsg, setPdfStatusMsg] = useState("");
   const [title, setTitle] = useState("");
   const [difficulty, setDifficulty] = useState("Intermediate");
   const [sections, setSections] = useState<string[]>(["reading"]);
@@ -279,6 +283,58 @@ export function CreateMockPage() {
         {/* STEP 0 — basic info */}
         {step === 0 && (
           <div className="space-y-5">
+            <div className="flex gap-2 p-1 bg-cloud rounded-xl border border-line">
+              <button
+                type="button"
+                onClick={() => setCreationMode("manual")}
+                className={cn("flex-1 py-2 rounded-lg text-[13px] font-semibold transition",
+                  creationMode === "manual" ? "bg-white text-ink shadow-xs" : "text-ink-500 hover:text-ink")}
+              >
+                Manual Step-by-Step Builder
+              </button>
+              <button
+                type="button"
+                onClick={() => setCreationMode("pdf")}
+                className={cn("flex-1 py-2 rounded-lg text-[13px] font-semibold transition flex items-center justify-center gap-1.5",
+                  creationMode === "pdf" ? "bg-white text-ink shadow-xs" : "text-ink-500 hover:text-ink")}
+              >
+                <Sparkles size={14} className="text-brand-600" /> AI PDF Ingestion (Cambridge)
+              </button>
+            </div>
+
+            {creationMode === "pdf" && (
+              <div className="rounded-2xl border-2 border-dashed border-brand-200 bg-brand-50/30 p-6 text-center">
+                <FileUp size={32} className="mx-auto text-brand-600" />
+                <h3 className="mt-3 font-display text-sm font-bold text-ink">Upload Official Cambridge or IELTS Exam PDF</h3>
+                <p className="mt-1 text-xs text-ink-500 max-w-sm mx-auto">
+                  Our pipeline automatically parses passages, question numbers, prompts, and answer keys.
+                </p>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setPdfFile(e.target.files[0]);
+                      if (!title) {
+                        setTitle(e.target.files[0].name.replace(/\.pdf$/i, "").replace(/[-_]/g, " "));
+                      }
+                    }
+                  }}
+                  className="mt-4 text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-brand-600 file:text-white hover:file:bg-brand-700 cursor-pointer"
+                />
+                {pdfFile && (
+                  <p className="mt-2 text-xs font-semibold text-[#157A3E]">
+                    ✓ Selected: {pdfFile.name} ({(pdfFile.size / (1024 * 1024)).toFixed(2)} MB)
+                  </p>
+                )}
+                {pdfUploading && (
+                  <div className="mt-4 flex items-center justify-center gap-2 text-xs font-medium text-brand-700">
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>{pdfStatusMsg || "AI is extracting sections, passages and questions..."}</span>
+                  </div>
+                )}
+              </div>
+            )}
             <Field label="Test title">
               <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. IELTS Academic Mock 03" />
             </Field>
@@ -467,28 +523,48 @@ export function CreateMockPage() {
           ) : (
             <Btn onClick={async () => {
               try {
-                await fetch("/api/mock/teacher/exams/create", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    title,
-                    difficulty,
-                    sections,
-                    time_limit_minutes: Number(timeLimit) || 60,
-                    questions: questions.map((q) => ({
-                      number: q.number,
-                      type: q.type,
-                      text: q.text,
-                      options: q.options,
-                      correct: q.correct,
-                      points: q.points,
-                    })),
-                  }),
-                });
+                if (creationMode === "pdf" && pdfFile) {
+                  setPdfUploading(true);
+                  setPdfStatusMsg("Uploading and processing exam PDF with AI pipeline...");
+                  const formData = new FormData();
+                  formData.append("title", title || pdfFile.name.replace(/\.pdf$/i, ""));
+                  formData.append("test_scope", "Reading Section");
+                  formData.append("pdf_file", pdfFile);
+                  
+                  const res = await fetch("/api/mock/teacher/exams/import-pdf", {
+                    method: "POST",
+                    body: formData,
+                  });
+                  if (res.ok) {
+                    setPublished(true);
+                  }
+                } else {
+                  await fetch("/api/mock/teacher/exams/create", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      title,
+                      difficulty,
+                      sections,
+                      time_limit_minutes: Number(timeLimit) || 60,
+                      questions: questions.map((q) => ({
+                        number: q.number,
+                        type: q.type,
+                        text: q.text,
+                        options: q.options,
+                        correct: q.correct,
+                        points: q.points,
+                      })),
+                    }),
+                  });
+                  setPublished(true);
+                }
               } catch (e) {
                 console.warn("Could not sync mock creation:", e);
+                setPublished(true);
+              } finally {
+                setPdfUploading(false);
               }
-              setPublished(true);
             }}><Check size={15} /> Publish mock</Btn>
           )}
         </div>

@@ -5,6 +5,7 @@ import io
 import json
 import re
 from services.ai_client import UniversalAIClient
+from config import GEMINI_API_KEY, OPENAI_API_KEY
 
 # Initialize AI Client with ChatGPT fallback support
 ai_client = UniversalAIClient(primary_provider="openai")

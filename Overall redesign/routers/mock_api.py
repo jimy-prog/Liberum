@@ -10,6 +10,9 @@ from fastapi import (
     HTTPException,
     Request,
     Response,
+    Form,
+    UploadFile,
+    File,
 )
 from pydantic import BaseModel
 from sqlalchemy.orm import joinedload
@@ -955,3 +958,92 @@ async def teacher_create_exam(
     db.commit()
     db.refresh(new_exam)
     return {"success": True, "exam_id": new_exam.id, "title": new_exam.title}
+
+
+from fastapi import UploadFile, File
+import shutil
+
+@router.post("/teacher/exams/import-pdf")
+async def teacher_import_pdf_exam(
+    request: Request,
+    title: str = Form("IELTS Mock Extracted Exam"),
+    test_scope: str = Form("Reading Section"),
+    pdf_file: UploadFile = File(...),
+    db: SessionMaster = Depends(get_mdb)
+):
+    """Direct PDF parsing and IELTS exam generation endpoint for teachers."""
+    user = get_mock_user(request)
+    if user.role not in ("teacher", "owner", "admin"):
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    from config import BASE_DIR
+    tmp_dir = BASE_DIR / "uploads" / "tmp"
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    temp_file = tmp_dir / pdf_file.filename
+    with open(temp_file, "wb") as buffer:
+        shutil.copyfileobj(pdf_file.file, buffer)
+    temp_path = str(temp_file)
+
+    from services.ai_extractor import extract_ielts_exam_from_pdf
+
+    exam = MockExam(
+        title=title,
+        exam_type="IELTS Academic",
+        test_scope=test_scope,
+        test_mode="Exam Mode",
+        is_published=True,
+        created_at=datetime.utcnow()
+    )
+    db.add(exam)
+    db.flush()
+
+    try:
+        data = extract_ielts_exam_from_pdf(temp_path, test_scope=test_scope)
+        for s_idx, s_data in enumerate(data.get("sections", [])):
+            section = ExamSection(
+                exam_id=exam.id,
+                section_type=s_data.get("section_type", "Reading Section"),
+                time_limit_minutes=20,
+                order=s_idx + 1
+            )
+            db.add(section)
+            db.flush()
+
+            for b_idx, b_data in enumerate(s_data.get("blocks", [])):
+                block = QuestionBlock(
+                    section_id=section.id,
+                    part_number=b_idx + 1,
+                    instructions=b_data.get("instructions", ""),
+                    passage_text=b_data.get("passage_text", ""),
+                    media_url=b_data.get("media_url", "")
+                )
+                db.add(block)
+                db.flush()
+
+                for q_data in b_data.get("questions", []):
+                    question = Question(
+                        block_id=block.id,
+                        q_type=q_data.get("q_type", "MCQ"),
+                        question_number=q_data.get("question_number", 1),
+                        prompt=q_data.get("prompt", ""),
+                        correct_answer_text=q_data.get("correct_answer_text", ""),
+                        points=1
+                    )
+                    db.add(question)
+                    db.flush()
+
+                    for o_idx, o_data in enumerate(q_data.get("options", [])):
+                        opt = AnswerOption(
+                            question_id=question.id,
+                            text=o_data.get("text", "") if isinstance(o_data, dict) else str(o_data),
+                            is_correct=o_data.get("is_correct", False) if isinstance(o_data, dict) else False,
+                            order=o_idx
+                        )
+                        db.add(opt)
+
+        db.commit()
+        db.refresh(exam)
+        return {"success": True, "exam_id": exam.id, "title": exam.title, "sections_count": len(exam.sections)}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"PDF extraction error: {str(e)}")
