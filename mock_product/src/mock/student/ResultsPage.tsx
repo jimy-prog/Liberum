@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import {
-  ArrowLeft, ArrowRight, CheckCircle2, ChevronDown, Loader2, Sparkles, XCircle,
+  ArrowLeft, ArrowRight, CheckCircle2, ChevronDown, Loader2, Printer, Sparkles, XCircle,
 } from "lucide-react";
 import { EXAM_SECTIONS, type Question } from "../data";
 import { useMock } from "../store";
@@ -194,7 +194,16 @@ export default function ResultsPage() {
             <div className="text-right">
               <p className="font-display text-lg font-semibold leading-snug">{attempt.testTitle}</p>
               <p className="mt-1 text-[13px] text-white/70">{attempt.date}</p>
-              <BtnLink to="/app/tests" variant="white" size="sm" className="mt-4">Take another test <ArrowRight size={13} /></BtnLink>
+              <div className="mt-4 flex items-center justify-end gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-white/20 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/30 backdrop-blur-xs"
+                  title="Print official diagnostic report or save as PDF"
+                >
+                  <Printer size={13} /> Print / Save PDF
+                </button>
+                <BtnLink to="/app/tests" variant="white" size="sm">Take another test <ArrowRight size={13} /></BtnLink>
+              </div>
             </div>
           </div>
         </div>
@@ -304,7 +313,13 @@ export default function ResultsPage() {
         </div>
       </Card>
 
-      <div className="mt-6 flex flex-wrap justify-center gap-3 pb-4">
+      <div className="mt-6 flex flex-wrap justify-center gap-3 pb-4 print:hidden">
+        <button
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-5 py-2.5 text-sm font-semibold text-ink shadow-xs transition hover:bg-cloud active:scale-95"
+        >
+          <Printer size={15} className="text-brand-600" /> Print Diagnostic Certificate (PDF)
+        </button>
         <BtnLink to="/app/tests" size="lg">Take another mock test <ArrowRight size={15} /></BtnLink>
         <BtnLink to="/app/analytics" variant="outline" size="lg">View Performance Analytics</BtnLink>
       </div>
