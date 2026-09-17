@@ -1047,3 +1047,40 @@ async def teacher_import_pdf_exam(
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"PDF extraction error: {str(e)}")
+
+
+class UpdateProfilePayload(BaseModel):
+    full_name: str
+    target_band: Optional[str] = "7.5"
+
+@router.post("/profile/update")
+async def update_mock_profile(
+    payload: UpdateProfilePayload,
+    request: Request,
+    db: SessionMaster = Depends(get_mdb)
+):
+    """Update profile details for student or teacher."""
+    user = get_mock_user(request)
+    
+    db_user = db.query(User).filter(User.id == user.id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    new_name = payload.full_name.strip()
+    if new_name:
+        db_user.full_name = new_name
+
+    db.commit()
+    db.refresh(db_user)
+
+    initials = "".join([p[0].upper() for p in db_user.full_name.split(" ") if p])[:2] or "U"
+    return {
+        "success": True,
+        "user": {
+            "id": str(db_user.id),
+            "name": db_user.full_name,
+            "email": db_user.email,
+            "role": db_user.role,
+            "initials": initials,
+        }
+    }

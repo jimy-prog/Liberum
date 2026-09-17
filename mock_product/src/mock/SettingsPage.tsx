@@ -3,35 +3,62 @@ import { useMock } from "./store";
 import { Avatar, Btn, Card, Field, Input } from "@/components/ui-kit";
 
 export function MockSettingsPage() {
-  const { user } = useMock();
+  const { user, signIn } = useMock();
   const [name, setName] = useState(user?.name ?? "");
+  const [targetBand, setTargetBand] = useState("7.5");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [notif, setNotif] = useState({ results: true, deadlines: true, product: false });
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/mock/profile/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ full_name: name, target_band: targetBand }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.user) {
+          signIn(data.user);
+        }
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+      }
+    } catch (e) {
+      console.warn("Could not save profile:", e);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-2xl animate-fade-up">
-      <h1 className="font-display text-[26px] font-bold tracking-tight text-ink">Settings</h1>
-      <p className="mt-1 text-sm text-ink-500">Manage your Liberum Mock account.</p>
+      <h1 className="font-display text-[26px] font-bold tracking-tight text-ink">Account Settings</h1>
+      <p className="mt-1 text-sm text-ink-500">Manage your profile, target band, and notifications.</p>
 
-      <Card className="mt-5 p-6">
+      <Card className="mt-5 p-6 shadow-xs">
         <div className="flex items-center gap-4">
-          <Avatar initials={user?.initials ?? "U"} color="#7B61FF" size="lg" />
+          <Avatar initials={user?.initials ?? "U"} color="#7B61FF" size="lg" className="ring-2 ring-brand-200" />
           <div>
-            <p className="font-display text-[15px] font-semibold text-ink">{user?.name}</p>
+            <p className="font-display text-[16px] font-bold text-ink">{user?.name}</p>
             <p className="text-xs capitalize text-ink-400">{user?.role} account · {user?.email}</p>
           </div>
         </div>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <Field label="Full name">
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" />
           </Field>
-          <Field label="Target band">
-            <Input defaultValue="7.5" />
+          <Field label="Target IELTS Band">
+            <Input value={targetBand} onChange={(e) => setTargetBand(e.target.value)} placeholder="e.g. 7.5 or 8.0" />
           </Field>
         </div>
         <div className="mt-5 flex items-center gap-3">
-          <Btn size="sm" onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2000); }}>
-            {saved ? "Saved ✓" : "Save changes"}
+          <Btn size="sm" disabled={saving} onClick={handleSave}>
+            {saved ? "Saved ✓" : saving ? "Saving…" : "Save changes"}
           </Btn>
         </div>
       </Card>

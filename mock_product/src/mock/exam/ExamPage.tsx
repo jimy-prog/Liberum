@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import {
   AlertTriangle, CheckCircle2, ChevronRight,
   Flag, Loader2, Mic, Pause, Play,
-  Save, Square, Volume2, VolumeX, Highlighter, StickyNote, X,
+  Save, Settings, Square, Type, Volume2, VolumeX, Highlighter, StickyNote, X,
 } from "lucide-react";
 import {
   EXAM_SECTIONS, MOCK_TESTS, SPEAKING_PARTS, WRITING_TASKS,
@@ -886,6 +886,9 @@ export default function ExamPage() {
   const [phase, setPhase] = useState<"exam" | "review" | "processing">("exam");
   const [savedAt, setSavedAt] = useState("—");
   const [exitWarn, setExitWarn] = useState(false);
+  const [contrast, setContrast] = useState<"standard" | "black-yellow" | "yellow-black">("standard");
+  const [fontSize, setFontSize] = useState<"normal" | "large" | "xl">("normal");
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Initialize backend attempt
   useEffect(() => {
@@ -1080,8 +1083,16 @@ export default function ExamPage() {
     return null;
   }
 
+  const contrastClass = contrast === "black-yellow" 
+    ? "bg-black text-yellow-300 [&_*]:!text-yellow-300 [&_*]:!bg-black [&_*]:!border-yellow-400"
+    : contrast === "yellow-black"
+      ? "bg-yellow-100 text-black [&_*]:!text-black [&_*]:!bg-yellow-100 [&_*]:!border-black"
+      : "bg-white text-ink";
+
+  const fontClass = fontSize === "large" ? "text-[17px]" : fontSize === "xl" ? "text-[19px]" : "text-[15px]";
+
   return (
-    <div className="flex h-screen flex-col bg-white">
+    <div className={cn("flex h-screen flex-col transition-colors duration-150", contrastClass, fontClass)}>
       {/* Exam Header: Distraction-free testing layout */}
       <header className="flex h-14 shrink-0 items-center gap-3 border-b border-line bg-white px-4">
         <span className="font-display text-[15px] font-bold text-ink">
@@ -1110,6 +1121,77 @@ export default function ExamPage() {
               <span className="text-[10px] font-normal uppercase tracking-wider text-ink-400">left</span>
             </div>
           )}
+
+          <div className="relative">
+            <button
+              onClick={() => setSettingsOpen(!settingsOpen)}
+              className="flex h-8 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs font-semibold text-ink hover:bg-mist transition"
+              title="Display Settings"
+            >
+              <Settings size={13} />
+              <span className="hidden sm:inline">Settings</span>
+            </button>
+
+            {settingsOpen && (
+              <div className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-line bg-white p-4 shadow-xl z-50 text-ink animate-fade-up">
+                <div className="flex items-center justify-between pb-2 border-b border-line">
+                  <span className="text-xs font-bold uppercase tracking-wider text-ink-500">Display Settings</span>
+                  <button onClick={() => setSettingsOpen(false)} className="text-ink-400 hover:text-ink">
+                    <X size={13} />
+                  </button>
+                </div>
+
+                {/* Contrast Modes */}
+                <div className="mt-3">
+                  <span className="text-[11px] font-semibold text-ink-500">Color Contrast</span>
+                  <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+                    {[
+                      { id: "standard", label: "Standard", bg: "bg-white text-black border-line" },
+                      { id: "black-yellow", label: "Yellow on Black", bg: "bg-black text-yellow-300 border-yellow-400" },
+                      { id: "yellow-black", label: "Black on Yellow", bg: "bg-yellow-200 text-black border-black" },
+                    ].map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => setContrast(c.id as any)}
+                        className={cn(
+                          "rounded-md border px-1.5 py-1 text-[10px] font-bold transition text-center",
+                          c.bg,
+                          contrast === c.id ? "ring-2 ring-brand-500 ring-offset-1" : "opacity-80 hover:opacity-100"
+                        )}
+                      >
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Font Scaling */}
+                <div className="mt-3 pt-3 border-t border-line">
+                  <span className="text-[11px] font-semibold text-ink-500 flex items-center gap-1">
+                    <Type size={12} /> Text Size
+                  </span>
+                  <div className="mt-1.5 flex gap-1.5">
+                    {[
+                      { id: "normal", label: "Standard" },
+                      { id: "large", label: "Large" },
+                      { id: "xl", label: "Extra Large" },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => setFontSize(f.id as any)}
+                        className={cn(
+                          "flex-1 rounded-md border px-2 py-1 text-[11px] font-semibold transition",
+                          fontSize === f.id ? "border-brand-500 bg-brand-50 text-brand-700" : "border-line bg-white text-ink-600 hover:border-ink-400"
+                        )}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           {phase === "exam" && (
             <button
